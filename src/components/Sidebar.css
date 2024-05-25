@@ -1,0 +1,14 @@
+.sidebar {
+  width: 18rem !important;
+}
+
+.list-group-item.active,
+.dropdown-item.active,
+.dropdown-item:active {
+  color: black !important;
+  background-color: #f4f4f5 !important;
+}
+
+.theme-dropdown {
+  inset: auto 0px 0px auto !important;
+}

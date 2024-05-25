@@ -1,23 +1,42 @@
-import logo from './logo.svg';
-import './App.css';
+import { Route, Routes } from "react-router-dom";
+import PageContent from "./components/PageContent";
+import Sidebar from "./components/Sidebar";
+import Home from "./pages/Home";
+import Products from "./pages/Products";
+import Customers from "./pages/Customers";
+import Vendors from "./pages/Vendors";
+import Transactions from "./pages/Transactions";
+import SoldPermission from "./pages/SoldPermission";
+import AdditionPermission from "./pages/AdditionPermission";
+import SoldInvoices from "./pages/SoldInvoices";
+import AdditionInvoices from "./pages/AdditionInvoices";
+import Navbar from "./components/Navbar";
+import "./App.css";
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <div className="bg-dark d-none opacity-50 vh-100 vw-100 position-fixed overlay"></div>
+      <Navbar />
+      <div className="d-flex">
+        <Sidebar forOffcanvas={false} />
+        <PageContent>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="products" element={<Products />} />
+            <Route path="customers" element={<Customers />} />
+            <Route path="vendors" element={<Vendors />} />
+            <Route path="transactions" element={<Transactions />} />
+            <Route path="sold-permission" element={<SoldPermission />} />
+            <Route
+              path="addition-permission"
+              element={<AdditionPermission />}
+            />
+            <Route path="sold-invoices" element={<SoldInvoices />} />
+            <Route path="addition-invoices" element={<AdditionInvoices />} />
+          </Routes>
+        </PageContent>
+      </div>
     </div>
   );
 }

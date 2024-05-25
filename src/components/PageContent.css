@@ -1,0 +1,73 @@
+.w-lg-100 {
+  width: 100% !important;
+}
+.content-w-lg-100 {
+  @media (min-width: 992px) {
+    & {
+      width: calc(100% - 18rem) !important;
+    }
+  }
+}
+.search-input {
+  background: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="grey" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search"%3E%3Ccircle cx="11" cy="11" r="8"%3E%3C/circle%3E%3Cpath d="m21 21-4.3-4.3"%3E%3C/path%3E%3C/svg%3E')
+    no-repeat;
+  background-size: 15px 15px;
+  background-position: right 10px center;
+  padding-right: 30px !important;
+
+  @media (min-width: 992px) {
+    & {
+      max-width: 24rem !important;
+    }
+  }
+}
+input:focus {
+  border-color: #dee2e6 !important;
+  outline: 2px solid black !important;
+  outline-offset: 1px !important;
+  box-shadow: none !important;
+}
+
+.search-input::placeholder {
+  color: #ccc;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 0.6rem !important;
+  height: 0.6rem !important;
+}
+.sm-scroll::-webkit-scrollbar {
+  width: 0.4rem !important;
+  height: 0.4rem !important;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #71717a;
+  border-radius: 10px;
+}
+
+table {
+  min-width: 50rem;
+}
+
+.modal-body {
+  max-height: 20rem !important;
+}
+
+.popup-btn {
+  @media (min-width: 576px) {
+    & {
+      max-width: 5rem !important;
+    }
+  }
+}
+.was-validated .form-control:valid {
+  border: var(--bs-border-width) solid var(--bs-border-color) !important;
+  padding: 0.375rem 0.75rem !important;
+  background: none !important;
+}
+
+.was-validated .form-control:not(:placeholder-shown):not(.is-invalid) {
+  border-color: var(--bs-form-invalid-border-color);
+}
