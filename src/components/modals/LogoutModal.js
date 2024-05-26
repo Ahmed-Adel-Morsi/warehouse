@@ -1,23 +1,19 @@
-import { useDispatch } from "react-redux";
 import { toastFire } from "../../elements/toastFire";
 
-function RemoveItemModal({ itemToDelete, deleteFunction ,title, children }) {
-  const dispatch = useDispatch();
-
+function LogoutModal() {
   const handleConfirmAction = () => {
-    dispatch(deleteFunction(itemToDelete.id));
-    toastFire("success", `تم حذف ${itemToDelete.name} بنجاح`);
+    toastFire("success", "تم تسجيل الخروج بنجاح");
   };
 
   return (
     <>
       <div
         className="modal fade"
-        id="removeItemModal"
+        id="logoutModal"
         tabIndex="-1"
         data-bs-backdrop="static"
         data-bs-keyboard="false"
-        aria-labelledby="removeItemModalLabel"
+        aria-labelledby="logoutModalLabel"
         aria-hidden="true"
       >
         <div className="modal-dialog modal-dialog-centered">
@@ -25,9 +21,9 @@ function RemoveItemModal({ itemToDelete, deleteFunction ,title, children }) {
             <div className="modal-header justify-content-between border-0 p-0">
               <h1
                 className="modal-title fs-medium fw-semibold"
-                id="removeItemModalLabel"
+                id="logoutModalLabel"
               >
-                {title}
+                تسجيل الخروج
               </h1>
               <button
                 type="button"
@@ -37,7 +33,7 @@ function RemoveItemModal({ itemToDelete, deleteFunction ,title, children }) {
               ></button>
             </div>
             <div className="modal-body text-body-secondary fs-small text-center text-sm-end my-3 p-0">
-              {children}
+              سيتم تسجيل خروجك من البرنامج.
             </div>
             <div className="modal-footer border-0 p-0">
               <button
@@ -53,7 +49,7 @@ function RemoveItemModal({ itemToDelete, deleteFunction ,title, children }) {
                 onClick={() => handleConfirmAction()}
                 data-bs-dismiss="modal"
               >
-                {title}
+                تسجيل الخروج
               </button>
             </div>
           </div>
@@ -63,4 +59,4 @@ function RemoveItemModal({ itemToDelete, deleteFunction ,title, children }) {
   );
 }
 
-export default RemoveItemModal;
+export default LogoutModal;

@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { Modal } from "react-bootstrap";
 
-import ProductsModalBody from "./ProductsModalBody";
-import { editSvg } from "../../svgs/actionsSVGs";
+import VendorsModalBody from "./VendorsModalBody";
+import { editSvg } from "../../../svgs/actionsSVGs";
 
-function EditProductModal({ productToEdit }) {
+function EditVendorModal({ vendorToEdit }) {
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
-  
+
   return (
     <>
       <button
@@ -27,14 +27,14 @@ function EditProductModal({ productToEdit }) {
         aria-labelledby="contained-modal-title-vcenter"
         centered
       >
-        <ProductsModalBody
+        <VendorsModalBody
           closeHandler={handleClose}
           forEdit={true}
-          initialFormData={{ ...productToEdit }}
+          initialFormData={{ ...vendorToEdit }}
         />
       </Modal>
     </>
   );
 }
 
-export default EditProductModal;
+export default EditVendorModal;

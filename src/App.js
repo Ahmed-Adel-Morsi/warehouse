@@ -12,10 +12,12 @@ import SoldInvoices from "./pages/SoldInvoices";
 import AdditionInvoices from "./pages/AdditionInvoices";
 import Navbar from "./components/Navbar";
 import "./App.css";
+import LogoutModal from "./components/modals/LogoutModal";
 
 function App() {
   return (
     <div className="App">
+      <LogoutModal />
       <div className="bg-dark d-none opacity-50 vh-100 vw-100 position-fixed overlay"></div>
       <Navbar />
       <div className="d-flex">

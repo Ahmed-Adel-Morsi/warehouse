@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchProducts } from "../rtk/slices/productsSlice";
+import { deleteProduct, fetchProducts } from "../features/productsSlice";
+import RemoveItemModal from "../components/modals/RemoveItemModal";
+import AddProductsModal from "../components/modals/products/AddProductModal";
+import EditProductModal from "../components/modals/products/EditProductModal";
 import {
   actionsSvg,
   productTransactionsSvg,
   removeSvg,
 } from "../svgs/actionsSVGs";
-import RemoveItemModal from "../components/modals/RemoveItemModal";
-import AddProductsModal from "../components/modals/AddProductModal";
-import EditProductModal from "../components/modals/EditProductModal";
 
 function Products() {
   const products = useSelector((state) => state.products);
@@ -41,8 +41,10 @@ function Products() {
 
   return (
     <>
-      <h1 className="fw-boldest text-center text-lg-end mb-4">ارصدة المخزن</h1>
-      <div className="py-3 d-flex flex-column flex-lg-row justify-content-between">
+      <h1 className="fw-boldest text-center text-lg-end mb-3 mb-md-5">
+        ارصدة المخزن
+      </h1>
+      <div className="mb-3 d-flex flex-column flex-lg-row justify-content-between">
         <input
           type="search"
           name="addProduct"
@@ -52,7 +54,7 @@ function Products() {
           }}
           placeholder="يمكنك البحث عن الصنف بالإسم والكود"
         />
-        <AddProductsModal />
+        <AddProductsModal title="إضافة صنف" />
       </div>
       <div className="border rounded mw-100 overflow-x-auto table-container">
         {loading ? (
@@ -174,7 +176,13 @@ function Products() {
           </div>
         )}
       </div>
-      <RemoveItemModal productToDelete={productToBeRemove} />
+      <RemoveItemModal
+        itemToDelete={productToBeRemove}
+        deleteFunction={deleteProduct}
+        title="حذف الصنف"
+      >
+        هل انت متاكد؟ سيتم حذف الصنف نهائياً
+      </RemoveItemModal>
     </>
   );
 }

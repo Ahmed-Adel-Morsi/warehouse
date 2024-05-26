@@ -2,25 +2,22 @@ import { useState } from "react";
 import { useSelector } from "react-redux";
 import { Modal } from "react-bootstrap";
 
-import { addProductSvg } from "../../svgs/pageContentSVGs";
-import ProductsModalBody from "./ProductsModalBody";
+import { addCustomerSvg } from "../../../svgs/pageContentSVGs";
+import CustomersModalBody from "./CustomersModalBody";
+import { getLastCustomer } from "../../../features/customersSlice";
 
-function AddProductModal() {
+function AddCustomerModal({ title }) {
   const theme = useSelector((state) => state.theme);
+  const lastCustomer = useSelector(getLastCustomer);
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
   const initialFormData = {
     name: "",
-    code: "",
-    brand: "",
-    size: "",
-    color: "",
-    location: "",
-    countryOfOrigin: "",
-    quantity: "",
-    price: "",
+    code: lastCustomer ? lastCustomer.code + 1 : 1,
+    phoneNumber: "",
+    address: "",
   };
 
   return (
@@ -29,11 +26,11 @@ function AddProductModal() {
         type="button"
         className={`btn ${
           theme === "dark" ? "btn-light" : "btn-dark"
-        } d-flex align-items-center justify-content-center fs-small gap-1`}
+        } d-flex align-items-center justify-content-center fs-small fw-medium py-2 px-3 gap-1`}
         onClick={handleShow}
       >
-        إضافة صنف
-        {addProductSvg}
+        {title}
+        {addCustomerSvg}
       </button>
       <Modal
         show={show}
@@ -43,7 +40,7 @@ function AddProductModal() {
         aria-labelledby="contained-modal-title-vcenter"
         centered
       >
-        <ProductsModalBody
+        <CustomersModalBody
           closeHandler={handleClose}
           forEdit={false}
           initialFormData={initialFormData}
@@ -53,4 +50,4 @@ function AddProductModal() {
   );
 }
 
-export default AddProductModal;
+export default AddCustomerModal;

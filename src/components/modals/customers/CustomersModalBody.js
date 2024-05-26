@@ -1,13 +1,15 @@
 import { useState } from "react";
-import ModalInput from "../ModalInput";
+import ModalInput from "../../ModalInput";
 import { useDispatch } from "react-redux";
-import { addProduct, editProduct } from "../../rtk/slices/productsSlice";
+import { addCustomer, editCustomer } from "../../../features/customersSlice";
 
-import { toastFire } from "../../elements/toastFire";
+import { toastFire } from "../../../elements/toastFire";
+import { Spinner } from "react-bootstrap";
 
-function ProductsModalBody({ forEdit, closeHandler, initialFormData }) {
+function CustomersModalBody({ forEdit, closeHandler, initialFormData }) {
   const [formData, setFormData] = useState(initialFormData);
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -31,11 +33,12 @@ function ProductsModalBody({ forEdit, closeHandler, initialFormData }) {
   };
 
   const handleSubmit = (e) => {
+    setLoading(true);
     e.preventDefault();
     setSubmitted(true);
     if (e.currentTarget.checkValidity()) {
       console.log(formData);
-      dispatch(forEdit ? editProduct(formData) : addProduct(formData));
+      dispatch(forEdit ? editCustomer(formData) : addCustomer(formData));
       toastFire(
         "success",
         `تم ${forEdit ? "تعديل" : "اضافة"} ${initialFormData.name} بنجاح`
@@ -44,22 +47,18 @@ function ProductsModalBody({ forEdit, closeHandler, initialFormData }) {
       setFormData(initialFormData);
       closeHandler();
     }
+    setLoading(false);
   };
 
   const isFieldValid = (e) => {
     let value = e.target.value;
 
     switch (e.target.name) {
-      case "code":
       case "name":
         return value !== "";
 
-      case "quantity":
-      case "size":
+      case "phoneNumber":
         return value !== "" ? !isNaN(parseInt(value)) : true;
-
-      case "price":
-        return value !== "" ? !isNaN(parseFloat(value)) : true;
 
       default:
         return true;
@@ -73,7 +72,9 @@ function ProductsModalBody({ forEdit, closeHandler, initialFormData }) {
           className="modal-title fs-medium fw-semibold flex-grow-1"
           id="exampleModalLabel"
         >
-          {forEdit ? `تعديل الصنف | ${initialFormData.name}` : "إضافة صنف"}
+          {forEdit
+            ? `تعديل بيانات العميل | ${initialFormData.name}`
+            : "إضافة عميل"}
         </h1>
         <button
           type="button"
@@ -85,7 +86,7 @@ function ProductsModalBody({ forEdit, closeHandler, initialFormData }) {
       <p className="text-body-secondary fs-small text-center text-sm-end m-0">
         {forEdit
           ? "يجب عليك ملء الخانات المراد تعديلها"
-          : "يجب عليك ملء اسم الصنف و الكود اولاً لأضافة صنف جديد"}
+          : "يجب عليك ملء اسم العميل اولاً لأضافة عميل جديد"}
       </p>
       <form
         className={`needs-validation ${submitted ? "was-validated" : ""}`}
@@ -93,83 +94,33 @@ function ProductsModalBody({ forEdit, closeHandler, initialFormData }) {
         noValidate
       >
         <div className="modal-body overflow-y-auto sm-scroll p-0 py-1 my-4">
-          <div className="d-flex flex-wrap gap-2">
+          <div className="d-flex flex-wrap gap-3">
             <ModalInput
               type="text"
               name="name"
-              label="اسم الصنف"
+              label="اسم العميل"
               value={formData.name}
               onChange={handleChange}
               onBlur={handleBlur}
-              invalidFeedback="يجب إدخال اسم الصنف"
-              required
-            />
-            <ModalInput
-              type="text"
-              name="code"
-              label="الكود"
-              value={formData.code}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              invalidFeedback="يجب إدخال الكود"
+              invalidFeedback="يجب إدخال اسم العميل"
               required
               disabled={forEdit}
             />
             <ModalInput
               type="text"
-              name="quantity"
-              label="العدد"
-              value={formData.quantity}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              invalidFeedback="يجب إدخال ارقام فقط"
-              disabled={forEdit}
-            />
-            <ModalInput
-              type="text"
-              name="price"
-              label="السعر"
-              value={formData.price}
+              name="phoneNumber"
+              label="رقم الهاتف"
+              value={formData.phoneNumber}
               onChange={handleChange}
               onBlur={handleBlur}
               invalidFeedback="يجب إدخال ارقام فقط"
             />
             <ModalInput
               type="text"
-              name="brand"
-              label="الماركة"
-              value={formData.brand}
+              name="address"
+              label="عنوان العميل"
+              value={formData.address}
               onChange={handleChange}
-            />
-            <ModalInput
-              type="text"
-              name="countryOfOrigin"
-              label="بلد المنشـأ"
-              value={formData.countryOfOrigin}
-              onChange={handleChange}
-            />
-            <ModalInput
-              type="text"
-              name="location"
-              label="المكان"
-              value={formData.location}
-              onChange={handleChange}
-            />
-            <ModalInput
-              type="text"
-              name="color"
-              label="اللون"
-              value={formData.color}
-              onChange={handleChange}
-            />
-            <ModalInput
-              type="text"
-              name="size"
-              label="الحجم"
-              value={formData.size}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              invalidFeedback="يجب إدخال ارقام فقط"
             />
           </div>
         </div>
@@ -181,8 +132,20 @@ function ProductsModalBody({ forEdit, closeHandler, initialFormData }) {
           >
             إلغاء
           </button>
-          <button type="submit" className="btn btn-dark popup-btn w-100">
+          <button
+            type="submit"
+            className="btn btn-dark popup-btn w-100 d-flex justify-content-center align-items-center gap-2"
+          >
             {forEdit ? "تعديل" : "إضافة"}
+            {loading && (
+              <Spinner
+                as="span"
+                animation="border"
+                size="sm"
+                role="status"
+                aria-hidden="true"
+              />
+            )}
           </button>
         </div>
       </form>
@@ -190,4 +153,4 @@ function ProductsModalBody({ forEdit, closeHandler, initialFormData }) {
   );
 }
 
-export default ProductsModalBody;
+export default CustomersModalBody;

@@ -24,6 +24,9 @@ td .dropdown-menu {
 .w-fit {
   width: fit-content !important;
 }
+.h-fit {
+  height: fit-content !important;
+}
 .btn-hov:hover {
   background-color: #f4f4f5 !important;
 }
@@ -71,4 +74,3 @@ td .dropdown-menu {
 .modal {
   padding-right: 0 !important;
 }
-

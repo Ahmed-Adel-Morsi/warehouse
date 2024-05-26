@@ -6,7 +6,7 @@ import {
   lightSvgSM,
 } from "../svgs/themeSVGs";
 import { useDispatch, useSelector } from "react-redux";
-import { setTheme } from "../rtk/slices/themeSlice";
+import { setTheme } from "../features/themeSlice";
 
 function ThemeDropdown(props) {
   const theme = useSelector((state) => state.theme);
