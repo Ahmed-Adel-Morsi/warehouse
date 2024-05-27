@@ -1,30 +1,38 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteProduct, fetchProducts } from "../features/productsSlice";
-import RemoveItemModal from "../components/modals/RemoveItemModal";
-import AddProductsModal from "../components/modals/products/AddProductModal";
-import EditProductModal from "../components/modals/products/EditProductModal";
 import {
   actionsSvg,
   productTransactionsSvg,
   removeSvg,
 } from "../svgs/actionsSVGs";
+import AddandEditProduct from "../components/modals/AddandEditProduct";
+import CustomModal from "../components/CustomModal";
 
 function Products() {
   const products = useSelector((state) => state.products);
   const dispatch = useDispatch();
   const [filteredProducts, setFilteredProducts] = useState([]);
-  const [productToBeRemove, setProductToBeRemove] = useState();
   const [loading, setLoading] = useState(true);
 
-  function filterItems(value) {
+  const filterItems = (value) => {
     setFilteredProducts(
       products.filter(function (product) {
         const codeAndName = `${product.name} ${product.code}`.toLowerCase();
         return codeAndName.includes(value.toString().toLowerCase());
       })
     );
-  }
+  };
+
+  const removeProductHandler = async (currentProduct) => {
+    try {
+      await dispatch(deleteProduct(currentProduct.id)).unwrap();
+      return true;
+    } catch (error) {
+      console.error("Failed to delete the Product:", error);
+      return false;
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -54,7 +62,7 @@ function Products() {
           }}
           placeholder="يمكنك البحث عن الصنف بالإسم والكود"
         />
-        <AddProductsModal title="إضافة صنف" />
+        <AddandEditProduct />
       </div>
       <div className="border rounded mw-100 overflow-x-auto table-container">
         {loading ? (
@@ -144,18 +152,28 @@ function Products() {
                         <li className="text-end p-2 fw-semibold">إجراءات</li>
                         <hr className="my-1" />
                         <li>
-                          <EditProductModal productToEdit={product} />
+                          <AddandEditProduct
+                            forEdit={true}
+                            initialFormData={product}
+                          />
                         </li>
                         <li>
-                          <button
-                            className="dropdown-item rounded d-flex align-items-center gap-1 px-2 fs-small fw-medium"
-                            data-bs-toggle="modal"
-                            data-bs-target="#removeItemModal"
-                            onClick={() => setProductToBeRemove(product)}
+                          <CustomModal
+                            modalFor="remove"
+                            btnIcon={removeSvg}
+                            btnTitle="حذف"
                           >
-                            {removeSvg}
-                            حذف
-                          </button>
+                            <CustomModal.Header title="حذف الصنف" />
+                            <CustomModal.Body
+                              btnTitle="حذف الصنف"
+                              successMessage={`تم حذف ${product.name} بنجاح`}
+                              submitHandler={async () =>
+                                await removeProductHandler(product)
+                              }
+                            >
+                              هل انت متاكد؟ سيتم حذف الصنف نهائياً
+                            </CustomModal.Body>
+                          </CustomModal>
                         </li>
                         <li>
                           <button className="dropdown-item rounded d-flex align-items-center gap-1 px-2 fs-small fw-medium">
@@ -176,13 +194,6 @@ function Products() {
           </div>
         )}
       </div>
-      <RemoveItemModal
-        itemToDelete={productToBeRemove}
-        deleteFunction={deleteProduct}
-        title="حذف الصنف"
-      >
-        هل انت متاكد؟ سيتم حذف الصنف نهائياً
-      </RemoveItemModal>
     </>
   );
 }

@@ -11,13 +11,19 @@ export const fetchVendors = createAsyncThunk(
 
 export const addVendor = createAsyncThunk(
   "vendorsSlice/addVendor",
-  async (vendor) => {
+  async (vendor, { getState }) => {
+    const vendors = getState().vendors;
+    const lastVendor = vendors[vendors.length - 1];
+    const lastCode = lastVendor ? lastVendor.code : 0;
+
+    const newVendor = { ...vendor, code: lastCode + 1 };
+
     let res = await fetch("http://localhost:9000/vendors", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(vendor),
+      body: JSON.stringify(newVendor),
     });
     let data = await res.json();
     return data;
@@ -60,27 +66,14 @@ const vendorsSlice = createSlice({
       return state.filter((vendor) => vendor.id !== action.payload);
     });
     builder.addCase(addVendor.fulfilled, (state, action) => {
-      state.push(action.payload);
+      return [...state, action.payload];
     });
     builder.addCase(editVendor.fulfilled, (state, action) => {
-      const index = state.findIndex(
-        (vendor) => vendor.id === action.payload.id
+      return state.map((vendor) =>
+        vendor.id === action.payload.id ? action.payload : vendor
       );
-      if (index !== -1) {
-        state[index] = action.payload;
-      }
     });
   },
 });
 
-export const getLastVendor = (state) => {
-  if (state.vendors.length === 0) return null;
-  const vendors = state.vendors || [];
-  if (vendors.length === 0) return null;
-  return vendors.reduce((prev, current) => {
-    return prev.code > current.code ? prev : current;
-  });
-};
-
-// export const {} = vendorsSlice.actions;
 export default vendorsSlice.reducer;

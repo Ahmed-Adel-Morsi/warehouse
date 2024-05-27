@@ -14,8 +14,11 @@ import {
   transactionsSvg,
   vendorsSvg,
 } from "../svgs/sidebarSVGs";
+import CustomModal from "./CustomModal";
 
 function Sidebar(props) {
+  const logoutHandler = () => true;
+
   return (
     <>
       <div
@@ -102,14 +105,21 @@ function Sidebar(props) {
           {!props.forOffcanvas && (
             <ThemeDropdown forNavbar={false}>تبديل الثيم</ThemeDropdown>
           )}
-          <button
-            className="list-group-item my-1 list-group-item-action d-flex align-items-center gap-2 p-2 fs-small rounded border-0"
-            data-bs-toggle="modal"
-            data-bs-target="#logoutModal"
+          <CustomModal
+            btnIcon={logoutSvg}
+            dangerVariant={true}
+            btnTitle="تسجيل الخروج"
+            btnStyle="list-group-item my-1 list-group-item-action d-flex align-items-center gap-2 p-2 fs-small rounded border-0"
           >
-            {logoutSvg}
-            تسجيل الخروج
-          </button>
+            <CustomModal.Header title="تسجيل الخروج" />
+            <CustomModal.Body
+              btnTitle="تسجيل الخروج"
+              successMessage="تم تسجيل الخروج بنجاح"
+              submitHandler={logoutHandler}
+            >
+              هل انت متاكد؟ سيتم تسجيل الخروج نهائياً
+            </CustomModal.Body>
+          </CustomModal>
         </div>
       </div>
     </>

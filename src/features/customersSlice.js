@@ -11,13 +11,19 @@ export const fetchCustomers = createAsyncThunk(
 
 export const addCustomer = createAsyncThunk(
   "customersSlice/addCustomer",
-  async (customer) => {
+  async (customer, { getState }) => {
+    const customers = getState().customers;
+    const lastCustomer = customers[customers.length - 1];
+    const lastCode = lastCustomer ? lastCustomer.code : 0;
+
+    const newCustomer = { ...customer, code: lastCode + 1 };
+
     let res = await fetch("http://localhost:9000/customers", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(customer),
+      body: JSON.stringify(newCustomer),
     });
     let data = await res.json();
     return data;
@@ -60,27 +66,14 @@ const customersSlice = createSlice({
       return state.filter((customer) => customer.id !== action.payload);
     });
     builder.addCase(addCustomer.fulfilled, (state, action) => {
-      state.push(action.payload);
+      return [...state, action.payload];
     });
     builder.addCase(editCustomer.fulfilled, (state, action) => {
-      const index = state.findIndex(
-        (customer) => customer.id === action.payload.id
+      return state.map((customer) =>
+        customer.id === action.payload.id ? action.payload : customer
       );
-      if (index !== -1) {
-        state[index] = action.payload;
-      }
     });
   },
 });
 
-export const getLastCustomer = (state) => {
-  if (state.customers.length === 0) return null;
-  const customers = state.customers || [];
-  if (customers.length === 0) return null;
-  return customers.reduce((prev, current) => {
-    return prev.code > current.code ? prev : current;
-  });
-};
-
-// export const {} = customersSlice.actions;
 export default customersSlice.reducer;

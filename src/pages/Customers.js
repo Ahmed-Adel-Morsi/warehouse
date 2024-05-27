@@ -1,26 +1,24 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCustomers } from "../features/customersSlice";
-import RemoveItemModal from "../components/modals/RemoveItemModal";
-import AddCustomerModal from "../components/modals/customers/AddCustomerModal";
-import EditCustomerModal from "../components/modals/customers/EditCustomerModal";
 import {
   actionsSvg,
   productTransactionsSvg,
   removeSvg,
 } from "../svgs/actionsSVGs";
 import { deleteCustomer } from "../features/customersSlice";
+import AddandEditCustomer from "../components/modals/AddandEditCustomer";
+import CustomModal from "../components/CustomModal";
 
 function Customers() {
   const customers = useSelector((state) => state.customers);
   const dispatch = useDispatch();
   const [filteredCustomers, setFilteredCustomers] = useState([]);
-  const [customerToBeRemove, setCustomerToBeRemove] = useState();
   const [loading, setLoading] = useState(true);
 
   function filterItems(value) {
     setFilteredCustomers(
-      customers.filter(function (customer) {
+      customers.filter((customer) => {
         const codeAndName = `${customer.name} ${customer.code}`.toLowerCase();
         return codeAndName.includes(value.toString().toLowerCase());
       })
@@ -40,6 +38,16 @@ function Customers() {
     setFilteredCustomers(customers);
   }, [customers]);
 
+  const removeCustomerHandler = async (currentCustomer) => {
+    try {
+      await dispatch(deleteCustomer(currentCustomer.id)).unwrap();
+      return true;
+    } catch (error) {
+      console.error("Failed to delete the customer:", error);
+      return false;
+    }
+  };
+
   return (
     <>
       <h1 className="fw-boldest text-center text-lg-end mb-3 mb-md-5">
@@ -55,7 +63,7 @@ function Customers() {
           }}
           placeholder="يمكنك البحث عن الصنف بالإسم والكود"
         />
-        <AddCustomerModal title="إضافة عميل" />
+        <AddandEditCustomer />
       </div>
       <div className="border rounded mw-100 overflow-x-auto table-container">
         {loading ? (
@@ -115,18 +123,28 @@ function Customers() {
                         <li className="text-end p-2 fw-semibold">إجراءات</li>
                         <hr className="my-1" />
                         <li>
-                          <EditCustomerModal customerToEdit={customer} />
+                          <AddandEditCustomer
+                            forEdit={true}
+                            initialFormData={customer}
+                          />
                         </li>
                         <li>
-                          <button
-                            className="dropdown-item rounded d-flex align-items-center gap-1 px-2 fs-small fw-medium"
-                            data-bs-toggle="modal"
-                            data-bs-target="#removeItemModal"
-                            onClick={() => setCustomerToBeRemove(customer)}
+                          <CustomModal
+                            modalFor="remove"
+                            btnIcon={removeSvg}
+                            btnTitle="حذف"
                           >
-                            {removeSvg}
-                            حذف
-                          </button>
+                            <CustomModal.Header title="حذف العميل" />
+                            <CustomModal.Body
+                              btnTitle="حذف العميل"
+                              successMessage={`تم حذف ${customer.name} بنجاح`}
+                              submitHandler={async () =>
+                                await removeCustomerHandler(customer)
+                              }
+                            >
+                              هل انت متاكد؟ سيتم حذف العميل نهائياً
+                            </CustomModal.Body>
+                          </CustomModal>
                         </li>
                         <li>
                           <button className="dropdown-item rounded d-flex align-items-center gap-1 px-2 fs-small fw-medium">
@@ -147,13 +165,6 @@ function Customers() {
           </div>
         )}
       </div>
-      <RemoveItemModal
-        itemToDelete={customerToBeRemove}
-        deleteFunction={deleteCustomer}
-        title="حذف العميل"
-      >
-        هل انت متاكد؟ سيتم حذف العميل نهائياً
-      </RemoveItemModal>
     </>
   );
 }

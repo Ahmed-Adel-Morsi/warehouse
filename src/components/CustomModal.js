@@ -5,24 +5,47 @@ import { toastFire } from "../elements/toastFire";
 
 const ModalContext = createContext();
 
-function CustomModal({ children, btnTitle, btnIcon }) {
+function CustomModal({
+  children,
+  btnTitle,
+  btnIcon,
+  modalFor,
+  btnStyle = false,
+  dangerVariant = false,
+}) {
   const theme = useSelector((state) => state.theme);
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
   return (
-    <ModalContext.Provider value={{ handleClose }}>
-      <button
-        type="button"
-        className={`btn ${
-          theme === "dark" ? "btn-light" : "btn-dark"
-        } d-flex align-items-center justify-content-center fs-small fw-medium py-2 px-3 gap-1`}
-        onClick={handleShow}
-      >
-        {btnTitle}
-        {btnIcon}
-      </button>
+    <ModalContext.Provider value={{ handleClose, dangerVariant }}>
+      {btnStyle ? (
+        <button type="button" className={btnStyle} onClick={handleShow}>
+          {btnIcon}
+          {btnTitle}
+        </button>
+      ) : ["edit", "remove"].includes(modalFor) ? (
+        <button
+          type="button"
+          className="dropdown-item rounded d-flex align-items-center gap-1 px-2 fs-small fw-medium"
+          onClick={handleShow}
+        >
+          {btnIcon}
+          {btnTitle}
+        </button>
+      ) : (
+        <button
+          type="button"
+          className={`btn ${
+            theme === "dark" ? "btn-light" : "btn-dark"
+          } d-flex align-items-center justify-content-center fs-small fw-medium py-2 px-3 gap-1`}
+          onClick={handleShow}
+        >
+          {btnTitle}
+          {btnIcon}
+        </button>
+      )}
       <Modal
         show={show}
         onHide={handleClose}
@@ -37,7 +60,6 @@ function CustomModal({ children, btnTitle, btnIcon }) {
   );
 }
 
-// Custom component for modal header
 function ModalHeader({ children, title }) {
   const { handleClose } = useContext(ModalContext);
   return (
@@ -63,20 +85,32 @@ function ModalHeader({ children, title }) {
   );
 }
 
-function ModalBody({ children, submitHandler, btnTitle }) {
-  const { handleClose } = useContext(ModalContext);
+function ModalBody({
+  children,
+  submitHandler,
+  btnTitle,
+  successMessage = false,
+  warningMessage = false,
+}) {
+  const { handleClose, dangerVariant } = useContext(ModalContext);
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = (e) => {
+    console.log(submitHandler);
     e.preventDefault();
     setLoading(true);
     setSubmitted(true);
-    if (submitHandler()) {
+    if (submitHandler(e)) {
       handleClose();
-      toastFire("success", `تم اختيار العميل بنجاح`);
+      if (successMessage) {
+        toastFire("success", successMessage);
+      }
+      setSubmitted(false);
     } else {
-      toastFire("warning", "يرجى اختيار العميل");
+      if (warningMessage) {
+        toastFire("warning", warningMessage);
+      }
     }
     setLoading(false);
   };
@@ -99,7 +133,9 @@ function ModalBody({ children, submitHandler, btnTitle }) {
         </button>
         <button
           type="submit"
-          className="btn btn-dark popup-btn w-100 d-flex justify-content-center align-items-center gap-2"
+          className={`btn ${
+            dangerVariant ? "btn-danger" : "btn-dark"
+          } popup-btn w-100 d-flex justify-content-center align-items-center gap-2`}
         >
           {btnTitle}
           {loading && (
@@ -117,7 +153,6 @@ function ModalBody({ children, submitHandler, btnTitle }) {
   );
 }
 
-// Export CustomModal and ModalHeader
 CustomModal.Header = ModalHeader;
 CustomModal.Body = ModalBody;
 export default CustomModal;

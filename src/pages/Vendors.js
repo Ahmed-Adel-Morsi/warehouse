@@ -1,21 +1,19 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchVendors } from "../features/vendorsSlice";
-import RemoveItemModal from "../components/modals/RemoveItemModal";
-import AddVendorModal from "../components/modals/vendors/AddVendorModal";
-import EditVendorModal from "../components/modals/vendors/EditVendorModal";
 import {
   actionsSvg,
   removeSvg,
   productTransactionsSvg,
 } from "../svgs/actionsSVGs";
 import { deleteVendor } from "../features/vendorsSlice";
+import AddandEditVendor from "../components/modals/AddandEditVendor";
+import CustomModal from "../components/CustomModal";
 
 function Vendors() {
   const vendors = useSelector((state) => state.vendors);
   const dispatch = useDispatch();
   const [filteredVendors, setFilteredVendors] = useState([]);
-  const [vendorToBeRemove, setVendorToBeRemove] = useState();
   const [loading, setLoading] = useState(true);
 
   function filterItems(value) {
@@ -40,6 +38,16 @@ function Vendors() {
     setFilteredVendors(vendors);
   }, [vendors]);
 
+  const removeVendorHandler = async (currentVendor) => {
+    try {
+      await dispatch(deleteVendor(currentVendor.id)).unwrap();
+      return true;
+    } catch (error) {
+      console.error("Failed to delete the vendor:", error);
+      return false;
+    }
+  };
+
   return (
     <>
       <h1 className="fw-boldest text-center text-lg-end mb-3 mb-md-5">
@@ -55,7 +63,7 @@ function Vendors() {
           }}
           placeholder="يمكنك البحث عن الصنف بالإسم والكود"
         />
-        <AddVendorModal />
+        <AddandEditVendor />
       </div>
       <div className="border rounded mw-100 overflow-x-auto table-container">
         {loading ? (
@@ -115,18 +123,28 @@ function Vendors() {
                         <li className="text-end p-2 fw-semibold">إجراءات</li>
                         <hr className="my-1" />
                         <li>
-                          <EditVendorModal vendorToEdit={vendor} />
+                          <AddandEditVendor
+                            forEdit={true}
+                            initialFormData={vendor}
+                          />
                         </li>
                         <li>
-                          <button
-                            className="dropdown-item rounded d-flex align-items-center gap-1 px-2 fs-small fw-medium"
-                            data-bs-toggle="modal"
-                            data-bs-target="#removeItemModal"
-                            onClick={() => setVendorToBeRemove(vendor)}
+                          <CustomModal
+                            modalFor="remove"
+                            btnIcon={removeSvg}
+                            btnTitle="حذف"
                           >
-                            {removeSvg}
-                            حذف
-                          </button>
+                            <CustomModal.Header title="حذف المورد" />
+                            <CustomModal.Body
+                              btnTitle="حذف المورد"
+                              successMessage={`تم حذف ${vendor.name} بنجاح`}
+                              submitHandler={async () =>
+                                await removeVendorHandler(vendor)
+                              }
+                            >
+                              هل انت متاكد؟ سيتم حذف المورد نهائياً
+                            </CustomModal.Body>
+                          </CustomModal>
                         </li>
                         <li>
                           <button className="dropdown-item rounded d-flex align-items-center gap-1 px-2 fs-small fw-medium">
@@ -147,13 +165,6 @@ function Vendors() {
           </div>
         )}
       </div>
-      <RemoveItemModal
-        itemToDelete={vendorToBeRemove}
-        deleteFunction={deleteVendor}
-        title="حذف المورد"
-      >
-        هل انت متاكد؟ سيتم حذف المورد نهائياً
-      </RemoveItemModal>
     </>
   );
 }

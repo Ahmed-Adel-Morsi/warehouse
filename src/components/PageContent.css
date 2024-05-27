@@ -67,7 +67,7 @@ table {
 .popup-btn {
   @media (min-width: 576px) {
     & {
-      max-width: 6rem !important;
+      max-width: 8rem !important;
     }
   }
 }
