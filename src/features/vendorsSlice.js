@@ -3,7 +3,9 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 export const fetchVendors = createAsyncThunk(
   "vendorsSlice/fetchVendors",
   async () => {
-    let res = await fetch(`https://mywarehouse-server.vercel.app/api/vendors`);
+    let res = await fetch(
+      `https://warehouse-api-ly5q.onrender.com/api/vendors`
+    );
     let data = await res.json();
     return data;
   }
@@ -18,13 +20,16 @@ export const addVendor = createAsyncThunk(
 
     const newVendor = { ...vendor, code: lastCode + 1 };
 
-    let res = await fetch(`https://mywarehouse-server.vercel.app/api/vendors`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(newVendor),
-    });
+    let res = await fetch(
+      `https://warehouse-api-ly5q.onrender.com/api/vendors`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newVendor),
+      }
+    );
     let data = await res.json();
     return data;
   }
@@ -34,7 +39,7 @@ export const deleteVendor = createAsyncThunk(
   "vendorsSlice/deleteVendor",
   async (vendorId) => {
     await fetch(
-      `https://mywarehouse-server.vercel.app/api/vendors/${vendorId}`,
+      `https://warehouse-api-ly5q.onrender.com/api/vendors/${vendorId}`,
       {
         method: "DELETE",
       }
@@ -47,7 +52,7 @@ export const editVendor = createAsyncThunk(
   "vendorsSlice/editVendor",
   async (vendor) => {
     await fetch(
-      `https://mywarehouse-server.vercel.app/api/vendors/${vendor.id}`,
+      `https://warehouse-api-ly5q.onrender.com/api/vendors/${vendor.id}`,
       {
         method: "PUT",
         headers: {

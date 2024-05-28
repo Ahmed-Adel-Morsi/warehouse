@@ -3,7 +3,9 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 export const fetchProducts = createAsyncThunk(
   "productsSlice/fetchProducts",
   async () => {
-    let res = await fetch(`https://mywarehouse-server.vercel.app/api/products`);
+    let res = await fetch(
+      `https://warehouse-api-ly5q.onrender.com/api/products`
+    );
     let data = await res.json();
     return data;
   }
@@ -13,7 +15,7 @@ export const addProduct = createAsyncThunk(
   "productsSlice/addProduct",
   async (product) => {
     let res = await fetch(
-      `https://mywarehouse-server.vercel.app/api/products`,
+      `https://warehouse-api-ly5q.onrender.com/api/products`,
       {
         method: "POST",
         headers: {
@@ -31,7 +33,7 @@ export const deleteProduct = createAsyncThunk(
   "productsSlice/deleteProduct",
   async (productId) => {
     await fetch(
-      `https://mywarehouse-server.vercel.app/api/products/${productId}`,
+      `https://warehouse-api-ly5q.onrender.com/api/products/${productId}`,
       {
         method: "DELETE",
       }
@@ -44,7 +46,7 @@ export const editProduct = createAsyncThunk(
   "productsSlice/editProduct",
   async (product) => {
     await fetch(
-      `https://mywarehouse-server.vercel.app/api/products/${product.id}`,
+      `https://warehouse-api-ly5q.onrender.com/api/products/${product.id}`,
       {
         method: "PUT",
         headers: {
