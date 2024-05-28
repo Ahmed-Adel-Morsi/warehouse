@@ -3,7 +3,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 export const fetchProducts = createAsyncThunk(
   "productsSlice/fetchProducts",
   async () => {
-    let res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/products`);
+    let res = await fetch(`https://mywarehouse-server.vercel.app/api/products`);
     let data = await res.json();
     return data;
   }
@@ -12,13 +12,16 @@ export const fetchProducts = createAsyncThunk(
 export const addProduct = createAsyncThunk(
   "productsSlice/addProduct",
   async (product) => {
-    let res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/products`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(product),
-    });
+    let res = await fetch(
+      `https://mywarehouse-server.vercel.app/api/products`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(product),
+      }
+    );
     let data = await res.json();
     return data;
   }
@@ -27,9 +30,12 @@ export const addProduct = createAsyncThunk(
 export const deleteProduct = createAsyncThunk(
   "productsSlice/deleteProduct",
   async (productId) => {
-    await fetch(`${process.env.REACT_APP_API_BASE_URL}/products/${productId}`, {
-      method: "DELETE",
-    });
+    await fetch(
+      `https://mywarehouse-server.vercel.app/api/products/${productId}`,
+      {
+        method: "DELETE",
+      }
+    );
     return productId;
   }
 );
@@ -38,7 +44,7 @@ export const editProduct = createAsyncThunk(
   "productsSlice/editProduct",
   async (product) => {
     await fetch(
-      `${process.env.REACT_APP_API_BASE_URL}/products/${product.id}`,
+      `https://mywarehouse-server.vercel.app/api/products/${product.id}`,
       {
         method: "PUT",
         headers: {
