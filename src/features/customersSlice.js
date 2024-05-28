@@ -4,7 +4,7 @@ export const fetchCustomers = createAsyncThunk(
   "customersSlice/fetchCustomers",
   async () => {
     let res = await fetch(
-      `https://api-fmnr0krwx-ahmed-adel-morsis-projects.vercel.app/api/customers`
+      `https://mywarehouse-server.vercel.app/api/customers`
     );
     let data = await res.json();
     return data;
@@ -21,7 +21,7 @@ export const addCustomer = createAsyncThunk(
     const newCustomer = { ...customer, code: lastCode + 1 };
 
     let res = await fetch(
-      `https://api-fmnr0krwx-ahmed-adel-morsis-projects.vercel.app/api/customers`,
+      `https://mywarehouse-server.vercel.app/api/customers`,
       {
         method: "POST",
         headers: {
@@ -39,7 +39,7 @@ export const deleteCustomer = createAsyncThunk(
   "customersSlice/deleteCustomer",
   async (customerId) => {
     await fetch(
-      `https://api-fmnr0krwx-ahmed-adel-morsis-projects.vercel.app/api/customers/${customerId}`,
+      `https://mywarehouse-server.vercel.app/api/customers/${customerId}`,
       {
         method: "DELETE",
       }
@@ -52,7 +52,7 @@ export const editCustomer = createAsyncThunk(
   "customersSlice/editCustomer",
   async (customer) => {
     await fetch(
-      `https://api-fmnr0krwx-ahmed-adel-morsis-projects.vercel.app/api/customers/${customer.id}`,
+      `https://mywarehouse-server.vercel.app/api/customers/${customer.id}`,
       {
         method: "PUT",
         headers: {
