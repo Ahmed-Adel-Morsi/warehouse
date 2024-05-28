@@ -3,7 +3,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 export const fetchCustomers = createAsyncThunk(
   "customersSlice/fetchCustomers",
   async () => {
-    let res = await fetch("http://localhost:9000/customers");
+    let res = await fetch(`${process.env.API_BASE_URL}/customers`);
     let data = await res.json();
     return data;
   }
@@ -18,7 +18,7 @@ export const addCustomer = createAsyncThunk(
 
     const newCustomer = { ...customer, code: lastCode + 1 };
 
-    let res = await fetch("http://localhost:9000/customers", {
+    let res = await fetch(`${process.env.API_BASE_URL}/customers`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -33,7 +33,7 @@ export const addCustomer = createAsyncThunk(
 export const deleteCustomer = createAsyncThunk(
   "customersSlice/deleteCustomer",
   async (customerId) => {
-    await fetch(`http://localhost:9000/customers/${customerId}`, {
+    await fetch(`${process.env.API_BASE_URL}/customers/${customerId}`, {
       method: "DELETE",
     });
     return customerId;
@@ -43,7 +43,7 @@ export const deleteCustomer = createAsyncThunk(
 export const editCustomer = createAsyncThunk(
   "customersSlice/editCustomer",
   async (customer) => {
-    await fetch(`http://localhost:9000/customers/${customer.id}`, {
+    await fetch(`${process.env.API_BASE_URL}/customers/${customer.id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
