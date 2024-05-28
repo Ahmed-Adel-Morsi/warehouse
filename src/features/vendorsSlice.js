@@ -3,7 +3,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 export const fetchVendors = createAsyncThunk(
   "vendorsSlice/fetchVendors",
   async () => {
-    let res = await fetch(`${process.env.API_BASE_URL}/vendors`);
+    let res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/vendors`);
     let data = await res.json();
     return data;
   }
@@ -18,7 +18,7 @@ export const addVendor = createAsyncThunk(
 
     const newVendor = { ...vendor, code: lastCode + 1 };
 
-    let res = await fetch(`${process.env.API_BASE_URL}/vendors`, {
+    let res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/vendors`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -33,7 +33,7 @@ export const addVendor = createAsyncThunk(
 export const deleteVendor = createAsyncThunk(
   "vendorsSlice/deleteVendor",
   async (vendorId) => {
-    await fetch(`${process.env.API_BASE_URL}/vendors/${vendorId}`, {
+    await fetch(`${process.env.REACT_APP_API_BASE_URL}/vendors/${vendorId}`, {
       method: "DELETE",
     });
     return vendorId;
@@ -43,7 +43,7 @@ export const deleteVendor = createAsyncThunk(
 export const editVendor = createAsyncThunk(
   "vendorsSlice/editVendor",
   async (vendor) => {
-    await fetch(`${process.env.API_BASE_URL}/vendors/${vendor.id}`, {
+    await fetch(`${process.env.REACT_APP_API_BASE_URL}/vendors/${vendor.id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
