@@ -12,6 +12,7 @@ import SoldInvoices from "./pages/SoldInvoices";
 import AdditionInvoices from "./pages/AdditionInvoices";
 import Navbar from "./components/Navbar";
 import "./App.css";
+import { ROUTES } from "./routes/routes";
 
 function App() {
   return (
@@ -22,18 +23,21 @@ function App() {
         <Sidebar forOffcanvas={false} />
         <PageContent>
           <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="products" element={<Products />} />
-            <Route path="customers" element={<Customers />} />
-            <Route path="vendors" element={<Vendors />} />
-            <Route path="transactions" element={<Transactions />} />
-            <Route path="sold-permission" element={<SoldPermission />} />
+            <Route path={ROUTES.HOME} element={<Home />} />
+            <Route path={ROUTES.PRODUCTS} element={<Products />} />
+            <Route path={ROUTES.CUSTOMERS} element={<Customers />} />
+            <Route path={ROUTES.VENDORS} element={<Vendors />} />
+            <Route path={ROUTES.TRANSACTIONS} element={<Transactions />} />
+            <Route path={ROUTES.SOLD_PERMISSION} element={<SoldPermission />} />
             <Route
-              path="addition-permission"
+              path={ROUTES.ADDITION_PERMISSION}
               element={<AdditionPermission />}
             />
-            <Route path="sold-invoices" element={<SoldInvoices />} />
-            <Route path="addition-invoices" element={<AdditionInvoices />} />
+            <Route path={ROUTES.SOLD_INVOICES} element={<SoldInvoices />} />
+            <Route
+              path={ROUTES.ADDITION_INVOICES}
+              element={<AdditionInvoices />}
+            />
           </Routes>
         </PageContent>
       </div>

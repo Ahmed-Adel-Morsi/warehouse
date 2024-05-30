@@ -41,9 +41,6 @@ function Customers() {
 
   return (
     <>
-      <h1 className="fw-boldest text-center text-lg-end mb-3 mb-md-5">
-        العملاء
-      </h1>
       <div className="mb-3 d-flex flex-column flex-lg-row justify-content-between">
         <input
           type="search"

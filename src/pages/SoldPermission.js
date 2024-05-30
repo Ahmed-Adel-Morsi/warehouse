@@ -76,9 +76,6 @@ function SoldPermission() {
 
   return (
     <>
-      <h1 className="fw-boldest text-center text-lg-end mb-3 mb-md-5">
-        إذن بيع
-      </h1>
       <div className="mb-3 d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 fw-semibold">
         <div className="text-center text-md-end">
           {chosenCustomer

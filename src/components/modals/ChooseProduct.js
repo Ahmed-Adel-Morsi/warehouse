@@ -11,7 +11,7 @@ function ChooseProduct({
   chosenProduct,
   setOrderedProducts,
 }) {
-  const { data: products, loading, error } = useSelector((state) => state.products);
+  const { data: products } = useSelector((state) => state.products);
   const [currentChoice, setCurrentChoice] = useState({});
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredProducts, setFilteredProducts] = useState([]);
@@ -24,6 +24,7 @@ function ChooseProduct({
   const handleProductChoice = () => {
     if (document.getElementById("hiddenInput").value) {
       setOrderedProducts((prevProducts) => [...prevProducts, chosenProduct]);
+      setChosenProduct(null);
       return true;
     }
     return false;
