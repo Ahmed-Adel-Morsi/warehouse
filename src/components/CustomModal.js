@@ -91,7 +91,7 @@ function ModalBody({
   btnTitle,
   successMessage = false,
   warningMessage = false,
-  loadingState, // Receive loading state as prop
+  loadingState,
 }) {
   const { handleClose, dangerVariant } = useContext(ModalContext);
   const [submitted, setSubmitted] = useState(false);
