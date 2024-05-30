@@ -6,7 +6,7 @@ import { fetchCustomers } from "../../features/customersSlice";
 import { customersSvg } from "../../svgs/sidebarSVGs";
 
 function ChooseCustomer({ setChosenCustomer }) {
-  const customers = useSelector((state) => state.customers);
+  const { data: customers, loading, error } = useSelector((state) => state.customers);
   const [currentChoice, setCurrentChoice] = useState({});
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredCustomers, setFilteredCustomers] = useState([]);

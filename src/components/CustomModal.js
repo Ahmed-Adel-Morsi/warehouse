@@ -13,7 +13,7 @@ function CustomModal({
   btnStyle = false,
   dangerVariant = false,
 }) {
-  const theme = useSelector((state) => state.theme);
+  const { theme } = useSelector((state) => state.theme);
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
@@ -91,28 +91,29 @@ function ModalBody({
   btnTitle,
   successMessage = false,
   warningMessage = false,
+  loadingState, // Receive loading state as prop
 }) {
   const { handleClose, dangerVariant } = useContext(ModalContext);
-  const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
-  const handleSubmit = (e) => {
-    console.log(submitHandler);
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setSubmitted(true);
-    if (submitHandler(e)) {
-      handleClose();
-      if (successMessage) {
-        toastFire("success", successMessage);
+    try {
+      if (await submitHandler(e)) {
+        handleClose();
+        if (successMessage) {
+          toastFire("success", successMessage);
+        }
+      } else {
+        if (warningMessage) {
+          toastFire("warning", warningMessage);
+        }
       }
-      setSubmitted(false);
-    } else {
-      if (warningMessage) {
-        toastFire("warning", warningMessage);
-      }
+    } catch (error) {
+      console.error("Error:", error);
+      toastFire("error", "Failed to submit the form.");
     }
-    setLoading(false);
   };
   return (
     <form
@@ -136,9 +137,10 @@ function ModalBody({
           className={`btn ${
             dangerVariant ? "btn-danger" : "btn-dark"
           } popup-btn w-100 d-flex justify-content-center align-items-center gap-2`}
+          disabled={loadingState}
         >
           {btnTitle}
-          {loading && (
+          {loadingState && (
             <Spinner
               as="span"
               animation="border"

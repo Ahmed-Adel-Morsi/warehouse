@@ -1,20 +1,19 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCustomers } from "../features/customersSlice";
-import {
-  actionsSvg,
-  productTransactionsSvg,
-  removeSvg,
-} from "../svgs/actionsSVGs";
+import { actionsSvg, productTransactionsSvg } from "../svgs/actionsSVGs";
 import { deleteCustomer } from "../features/customersSlice";
 import AddandEditCustomer from "../components/modals/AddandEditCustomer";
-import CustomModal from "../components/CustomModal";
+import DangerPopup from "../components/modals/DangerPopup";
 
 function Customers() {
-  const customers = useSelector((state) => state.customers);
+  const {
+    data: customers,
+    loading,
+    error,
+  } = useSelector((state) => state.customers);
   const dispatch = useDispatch();
   const [filteredCustomers, setFilteredCustomers] = useState([]);
-  const [loading, setLoading] = useState(true);
 
   function filterItems(value) {
     setFilteredCustomers(
@@ -27,9 +26,11 @@ function Customers() {
 
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true);
-      await dispatch(fetchCustomers()).unwrap();
-      setLoading(false);
+      try {
+        await dispatch(fetchCustomers()).unwrap();
+      } catch (err) {
+        console.error("Failed to fetch customers:", err);
+      }
     };
     fetchData();
   }, [dispatch]);
@@ -37,16 +38,6 @@ function Customers() {
   useEffect(() => {
     setFilteredCustomers(customers);
   }, [customers]);
-
-  const removeCustomerHandler = async (currentCustomer) => {
-    try {
-      await dispatch(deleteCustomer(currentCustomer.id)).unwrap();
-      return true;
-    } catch (error) {
-      console.error("Failed to delete the customer:", error);
-      return false;
-    }
-  };
 
   return (
     <>
@@ -69,6 +60,11 @@ function Customers() {
         {loading ? (
           <div className="p-4 text-center fs-small fw-medium">
             جارى التحميل...
+          </div>
+        ) : error ? (
+          <div className="p-4 text-center fs-small fw-medium">
+            حدث خطأ ما
+            <p>Error: {error}</p>
           </div>
         ) : filteredCustomers.length > 0 ? (
           <table className="table table-hover table-borderless m-0">
@@ -129,22 +125,14 @@ function Customers() {
                           />
                         </li>
                         <li>
-                          <CustomModal
-                            modalFor="remove"
-                            btnIcon={removeSvg}
-                            btnTitle="حذف"
-                          >
-                            <CustomModal.Header title="حذف العميل" />
-                            <CustomModal.Body
-                              btnTitle="حذف العميل"
-                              successMessage={`تم حذف ${customer.name} بنجاح`}
-                              submitHandler={async () =>
-                                await removeCustomerHandler(customer)
-                              }
-                            >
-                              هل انت متاكد؟ سيتم حذف العميل نهائياً
-                            </CustomModal.Body>
-                          </CustomModal>
+                          <DangerPopup
+                            buttonTitle="حذف"
+                            title="حذف العميل"
+                            itemToRemove={customer}
+                            handler={deleteCustomer}
+                            description="هل انت متاكد؟ سيتم حذف العميل نهائياً"
+                            submitBtnTitle="حذف العميل"
+                          />
                         </li>
                         <li>
                           <button className="dropdown-item rounded d-flex align-items-center gap-1 px-2 fs-small fw-medium">

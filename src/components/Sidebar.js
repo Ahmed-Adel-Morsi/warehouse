@@ -14,7 +14,7 @@ import {
   transactionsSvg,
   vendorsSvg,
 } from "../svgs/sidebarSVGs";
-import CustomModal from "./CustomModal";
+import DangerPopup from "./modals/DangerPopup";
 
 function Sidebar(props) {
   const logoutHandler = () => true;
@@ -105,21 +105,17 @@ function Sidebar(props) {
           {!props.forOffcanvas && (
             <ThemeDropdown forNavbar={false}>تبديل الثيم</ThemeDropdown>
           )}
-          <CustomModal
-            btnIcon={logoutSvg}
-            dangerVariant={true}
-            btnTitle="تسجيل الخروج"
+          <DangerPopup
+            notRemove={true}
             btnStyle="list-group-item my-1 list-group-item-action d-flex align-items-center gap-2 p-2 fs-small rounded border-0"
-          >
-            <CustomModal.Header title="تسجيل الخروج" />
-            <CustomModal.Body
-              btnTitle="تسجيل الخروج"
-              successMessage="تم تسجيل الخروج بنجاح"
-              submitHandler={logoutHandler}
-            >
-              هل انت متاكد؟ سيتم تسجيل الخروج نهائياً
-            </CustomModal.Body>
-          </CustomModal>
+            buttonTitle="تسجيل الخروج"
+            title="تسجيل الخروج"
+            icon={logoutSvg}
+            handler={logoutHandler}
+            description="هل انت متاكد؟ سيتم تسجيل الخروج نهائياً"
+            submitBtnTitle="تسجيل الخروج"
+            successMessage="تم تسجيل الخروج بنجاح"
+          />
         </div>
       </div>
     </>

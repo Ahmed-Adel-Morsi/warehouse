@@ -1,19 +1,18 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteProduct, fetchProducts } from "../features/productsSlice";
-import {
-  actionsSvg,
-  productTransactionsSvg,
-  removeSvg,
-} from "../svgs/actionsSVGs";
+import { actionsSvg, productTransactionsSvg } from "../svgs/actionsSVGs";
 import AddandEditProduct from "../components/modals/AddandEditProduct";
-import CustomModal from "../components/CustomModal";
+import DangerPopup from "../components/modals/DangerPopup";
 
 function Products() {
-  const products = useSelector((state) => state.products);
+  const {
+    data: products,
+    loading,
+    error,
+  } = useSelector((state) => state.products);
   const dispatch = useDispatch();
   const [filteredProducts, setFilteredProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
 
   const filterItems = (value) => {
     setFilteredProducts(
@@ -24,21 +23,13 @@ function Products() {
     );
   };
 
-  const removeProductHandler = async (currentProduct) => {
-    try {
-      await dispatch(deleteProduct(currentProduct.id)).unwrap();
-      return true;
-    } catch (error) {
-      console.error("Failed to delete the Product:", error);
-      return false;
-    }
-  };
-
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true);
-      await dispatch(fetchProducts()).unwrap();
-      setLoading(false);
+      try {
+        await dispatch(fetchProducts()).unwrap();
+      } catch (err) {
+        console.error("Failed to fetch products:", err);
+      }
     };
     fetchData();
   }, [dispatch]);
@@ -68,6 +59,11 @@ function Products() {
         {loading ? (
           <div className="p-4 text-center fs-small fw-medium">
             جارى التحميل...
+          </div>
+        ) : error ? (
+          <div className="p-4 text-center fs-small fw-medium">
+            حدث خطأ ما
+            <p>Error: {error}</p>
           </div>
         ) : filteredProducts.length > 0 ? (
           <table className="table table-hover table-borderless m-0">
@@ -158,22 +154,14 @@ function Products() {
                           />
                         </li>
                         <li>
-                          <CustomModal
-                            modalFor="remove"
-                            btnIcon={removeSvg}
-                            btnTitle="حذف"
-                          >
-                            <CustomModal.Header title="حذف الصنف" />
-                            <CustomModal.Body
-                              btnTitle="حذف الصنف"
-                              successMessage={`تم حذف ${product.name} بنجاح`}
-                              submitHandler={async () =>
-                                await removeProductHandler(product)
-                              }
-                            >
-                              هل انت متاكد؟ سيتم حذف الصنف نهائياً
-                            </CustomModal.Body>
-                          </CustomModal>
+                          <DangerPopup
+                            buttonTitle="حذف"
+                            title="حذف الصنف"
+                            itemToRemove={product}
+                            handler={deleteProduct}
+                            description="هل انت متاكد؟ سيتم حذف الصنف نهائياً"
+                            submitBtnTitle="حذف الصنف"
+                          />
                         </li>
                         <li>
                           <button className="dropdown-item rounded d-flex align-items-center gap-1 px-2 fs-small fw-medium">

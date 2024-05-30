@@ -21,6 +21,7 @@ function AddandEditProduct({
   },
 }) {
   const [formData, setFormData] = useState(initialFormData);
+  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
 
   const handleChange = (e) => {
@@ -42,11 +43,21 @@ function AddandEditProduct({
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     if (e.currentTarget.checkValidity()) {
-      dispatch(forEdit ? editProduct(formData) : addProduct(formData));
-      setFormData(initialFormData);
-      return true;
+      try {
+        setLoading(true);
+        await dispatch(
+          forEdit ? editProduct(formData) : addProduct(formData)
+        ).unwrap();
+        setFormData(initialFormData);
+        setLoading(false);
+        return true;
+      } catch (error) {
+        console.error("Error:", error);
+        setLoading(false);
+        return false;
+      }
     }
     return false;
   };
@@ -90,6 +101,7 @@ function AddandEditProduct({
         successMessage={`تم ${forEdit ? "تعديل" : "اضافة"} ${
           formData.name
         } بنجاح`}
+        loadingState={loading}
       >
         <ModalInput
           type="text"

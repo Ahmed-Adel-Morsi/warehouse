@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { removeSvg } from "../svgs/actionsSVGs";
 import AddandEditCustomer from "../components/modals/AddandEditCustomer";
 import ChooseCustomer from "../components/modals/ChooseCustomer";
 import CustomModal from "../components/CustomModal";
 import { resetSvg, saveSvg } from "../svgs/pageContentSVGs";
 import ChooseProduct from "../components/modals/ChooseProduct";
+import DangerPopup from "../components/modals/DangerPopup";
 
 function SoldPermission() {
   const [loading, setLoading] = useState(false);
@@ -20,6 +20,13 @@ function SoldPermission() {
       console.error("Failed to delete the Product:", error);
       return false;
     }
+  };
+
+  const resetHandler = () => {
+    setChosenCustomer(null);
+    setChosenProduct(null);
+    setOrderedProducts([]);
+    return true;
   };
 
   const [chosenCustomer, setChosenCustomer] = useState(() => {
@@ -92,26 +99,17 @@ function SoldPermission() {
                 setOrderedProducts={setOrderedProducts}
                 chosenProduct={chosenProduct}
               />
-              <CustomModal
-                btnIcon={resetSvg}
-                btnTitle="إعادة تهيئة"
-                dangerVariant={true}
-              >
-                <CustomModal.Header title="إعادة تهيئة البيانات" />
-                <CustomModal.Body
-                  btnTitle="إعادة تهيئة"
-                  successMessage="تمت إعادة تهيئة البيانات بنجاح"
-                  submitHandler={() => {
-                    setChosenCustomer(null);
-                    setChosenProduct(null);
-                    setOrderedProducts([]);
-                    return true;
-                  }}
-                >
-                  هل أنت متأكد؟ سيتم إعادة تهيئة البيانات، إذا كنت ترغب في
-                  الاحتفاظ بالبيانات، يُرجى الضغط على 'حفظ' قبل إعادة التهيئة.
-                </CustomModal.Body>
-              </CustomModal>
+              <DangerPopup
+                notRemove={true}
+                buttonTitle="إعادة تهيئة"
+                title="إعادة تهيئة البيانات"
+                icon={resetSvg}
+                handler={resetHandler}
+                description="هل أنت متأكد؟ سيتم إعادة تهيئة البيانات، إذا كنت ترغب في
+                الاحتفاظ بالبيانات، يُرجى الضغط على 'حفظ' قبل إعادة التهيئة."
+                submitBtnTitle="إعادة تهيئة"
+                successMessage="تمت إعادة تهيئة البيانات بنجاح"
+              />
               <CustomModal btnIcon={saveSvg} btnTitle="حفظ">
                 <CustomModal.Header title="حفظ البيانات" />
                 <CustomModal.Body
@@ -189,22 +187,17 @@ function SoldPermission() {
                     {product.price || "-"}
                   </td>
                   <td className="fs-small h-100 d-flex justify-content-center">
-                    <CustomModal
-                      btnIcon={removeSvg}
+                    <DangerPopup
+                      notRemove={true}
+                      title="حذف الصنف"
+                      handler={async () => {
+                        await removeProductHandler(product);
+                      }}
+                      description="هل انت متاكد؟ سيتم حذف الصنف"
+                      successMessage={`تم حذف ${product.name} بنجاح`}
+                      submitBtnTitle="حذف"
                       btnStyle="btn btn-hov"
-                      dangerVariant={true}
-                    >
-                      <CustomModal.Header title="حذف الصنف" />
-                      <CustomModal.Body
-                        btnTitle="حذف"
-                        successMessage={`تم حذف ${product.name} بنجاح`}
-                        submitHandler={async () => {
-                          await removeProductHandler(product);
-                        }}
-                      >
-                        هل انت متاكد؟ سيتم حذف الصنف
-                      </CustomModal.Body>
-                    </CustomModal>
+                    />
                   </td>
                 </tr>
               ))}

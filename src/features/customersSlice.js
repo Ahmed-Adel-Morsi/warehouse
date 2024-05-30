@@ -3,10 +3,11 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 export const fetchCustomers = createAsyncThunk(
   "customersSlice/fetchCustomers",
   async () => {
-    let res = await fetch(
-      `https://warehouse-api-ly5q.onrender.com/api/customers`
+    const response = await fetch(
+      `${process.env.REACT_APP_API_BASE_URL}/customers`
     );
-    let data = await res.json();
+    if (!response.ok) throw new Error("Network response was not ok");
+    const data = await response.json();
     return data;
   }
 );
@@ -14,14 +15,18 @@ export const fetchCustomers = createAsyncThunk(
 export const addCustomer = createAsyncThunk(
   "customersSlice/addCustomer",
   async (customer, { getState }) => {
-    const customers = getState().customers;
-    const lastCustomer = customers[customers.length - 1];
+    const { data: customers } = getState().customers;
+    const lastCustomer = customers.reduce(
+      (prev, curr) => {
+        return prev.code > curr.code ? prev : curr;
+      },
+      { code: 0 }
+    );
     const lastCode = lastCustomer ? lastCustomer.code : 0;
-
     const newCustomer = { ...customer, code: lastCode + 1 };
 
-    let res = await fetch(
-      `https://warehouse-api-ly5q.onrender.com/api/customers`,
+    const response = await fetch(
+      `${process.env.REACT_APP_API_BASE_URL}/customers`,
       {
         method: "POST",
         headers: {
@@ -30,7 +35,8 @@ export const addCustomer = createAsyncThunk(
         body: JSON.stringify(newCustomer),
       }
     );
-    let data = await res.json();
+    if (!response.ok) throw new Error("Network response was not ok");
+    const data = await response.json();
     return data;
   }
 );
@@ -38,12 +44,13 @@ export const addCustomer = createAsyncThunk(
 export const deleteCustomer = createAsyncThunk(
   "customersSlice/deleteCustomer",
   async (customerId) => {
-    await fetch(
-      `https://warehouse-api-ly5q.onrender.com/api/customers/${customerId}`,
+    const response = await fetch(
+      `${process.env.REACT_APP_API_BASE_URL}/customers/${customerId}`,
       {
         method: "DELETE",
       }
     );
+    if (!response.ok) throw new Error("Network response was not ok");
     return customerId;
   }
 );
@@ -51,8 +58,8 @@ export const deleteCustomer = createAsyncThunk(
 export const editCustomer = createAsyncThunk(
   "customersSlice/editCustomer",
   async (customer) => {
-    await fetch(
-      `https://warehouse-api-ly5q.onrender.com/api/customers/${customer.id}`,
+    const response = await fetch(
+      `${process.env.REACT_APP_API_BASE_URL}/customers/${customer.id}`,
       {
         method: "PUT",
         headers: {
@@ -61,29 +68,81 @@ export const editCustomer = createAsyncThunk(
         body: JSON.stringify(customer),
       }
     );
-    return customer;
+    if (!response.ok) throw new Error("Network response was not ok");
+    const data = await response.json();
+    return data;
   }
 );
 
 const customersSlice = createSlice({
-  initialState: [],
   name: "customersSlice",
+  initialState: {
+    data: [],
+    loading: false,
+    error: null,
+  },
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(fetchCustomers.fulfilled, (state, action) => {
-      return action.payload;
-    });
-    builder.addCase(deleteCustomer.fulfilled, (state, action) => {
-      return state.filter((customer) => customer.id !== action.payload);
-    });
-    builder.addCase(addCustomer.fulfilled, (state, action) => {
-      return [...state, action.payload];
-    });
-    builder.addCase(editCustomer.fulfilled, (state, action) => {
-      return state.map((customer) =>
-        customer.id === action.payload.id ? action.payload : customer
-      );
-    });
+    builder
+      // Fetch Customers
+      .addCase(fetchCustomers.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchCustomers.fulfilled, (state, action) => {
+        state.loading = false;
+        state.data = action.payload;
+      })
+      .addCase(fetchCustomers.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      })
+      // Add Customer
+      .addCase(addCustomer.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(addCustomer.fulfilled, (state, action) => {
+        state.loading = false;
+        state.data.push(action.payload);
+      })
+      .addCase(addCustomer.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      })
+      // Delete Customer
+      .addCase(deleteCustomer.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteCustomer.fulfilled, (state, action) => {
+        state.loading = false;
+        state.data = state.data.filter(
+          (customer) => customer.id !== action.payload
+        );
+      })
+      .addCase(deleteCustomer.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      })
+      // Edit Customer
+      .addCase(editCustomer.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(editCustomer.fulfilled, (state, action) => {
+        state.loading = false;
+        const index = state.data.findIndex(
+          (customer) => customer.id === action.payload.id
+        );
+        if (index !== -1) {
+          state.data[index] = action.payload;
+        }
+      })
+      .addCase(editCustomer.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      });
   },
 });
 

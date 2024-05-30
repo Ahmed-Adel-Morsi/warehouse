@@ -11,7 +11,7 @@ function ChooseProduct({
   chosenProduct,
   setOrderedProducts,
 }) {
-  const products = useSelector((state) => state.products);
+  const { data: products, loading, error } = useSelector((state) => state.products);
   const [currentChoice, setCurrentChoice] = useState({});
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredProducts, setFilteredProducts] = useState([]);

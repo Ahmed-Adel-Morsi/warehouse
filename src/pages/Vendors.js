@@ -1,20 +1,19 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchVendors } from "../features/vendorsSlice";
-import {
-  actionsSvg,
-  removeSvg,
-  productTransactionsSvg,
-} from "../svgs/actionsSVGs";
+import { actionsSvg, productTransactionsSvg } from "../svgs/actionsSVGs";
 import { deleteVendor } from "../features/vendorsSlice";
 import AddandEditVendor from "../components/modals/AddandEditVendor";
-import CustomModal from "../components/CustomModal";
+import DangerPopup from "../components/modals/DangerPopup";
 
 function Vendors() {
-  const vendors = useSelector((state) => state.vendors);
+  const {
+    data: vendors,
+    loading,
+    error,
+  } = useSelector((state) => state.vendors);
   const dispatch = useDispatch();
   const [filteredVendors, setFilteredVendors] = useState([]);
-  const [loading, setLoading] = useState(true);
 
   function filterItems(value) {
     setFilteredVendors(
@@ -27,9 +26,11 @@ function Vendors() {
 
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true);
-      await dispatch(fetchVendors()).unwrap();
-      setLoading(false);
+      try {
+        await dispatch(fetchVendors()).unwrap();
+      } catch (err) {
+        console.error("Failed to fetch vendors:", err);
+      }
     };
     fetchData();
   }, [dispatch]);
@@ -37,16 +38,6 @@ function Vendors() {
   useEffect(() => {
     setFilteredVendors(vendors);
   }, [vendors]);
-
-  const removeVendorHandler = async (currentVendor) => {
-    try {
-      await dispatch(deleteVendor(currentVendor.id)).unwrap();
-      return true;
-    } catch (error) {
-      console.error("Failed to delete the vendor:", error);
-      return false;
-    }
-  };
 
   return (
     <>
@@ -69,6 +60,11 @@ function Vendors() {
         {loading ? (
           <div className="p-4 text-center fs-small fw-medium">
             جارى التحميل...
+          </div>
+        ) : error ? (
+          <div className="p-4 text-center fs-small fw-medium">
+            حدث خطأ ما
+            <p>Error: {error}</p>
           </div>
         ) : filteredVendors.length > 0 ? (
           <table className="table table-hover table-borderless m-0">
@@ -129,22 +125,14 @@ function Vendors() {
                           />
                         </li>
                         <li>
-                          <CustomModal
-                            modalFor="remove"
-                            btnIcon={removeSvg}
-                            btnTitle="حذف"
-                          >
-                            <CustomModal.Header title="حذف المورد" />
-                            <CustomModal.Body
-                              btnTitle="حذف المورد"
-                              successMessage={`تم حذف ${vendor.name} بنجاح`}
-                              submitHandler={async () =>
-                                await removeVendorHandler(vendor)
-                              }
-                            >
-                              هل انت متاكد؟ سيتم حذف المورد نهائياً
-                            </CustomModal.Body>
-                          </CustomModal>
+                          <DangerPopup
+                            buttonTitle="حذف"
+                            title="حذف المورد"
+                            itemToRemove={vendor}
+                            handler={deleteVendor}
+                            description="هل انت متاكد؟ سيتم حذف المورد نهائياً"
+                            submitBtnTitle="حذف المورد"
+                          />
                         </li>
                         <li>
                           <button className="dropdown-item rounded d-flex align-items-center gap-1 px-2 fs-small fw-medium">

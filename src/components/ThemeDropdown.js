@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setTheme } from "../features/themeSlice";
 
 function ThemeDropdown(props) {
-  const theme = useSelector((state) => state.theme);
+  const { theme } = useSelector((state) => state.theme);
   const dispatch = useDispatch();
   const themeIcon = theme === "dark" ? darkSvgLg : lightSvgLg;
 

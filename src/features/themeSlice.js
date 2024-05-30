@@ -1,13 +1,19 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+const getInitialTheme = () => {
+  return localStorage.getItem("theme") || "light";
+};
+
 const themeSlice = createSlice({
-  initialState: localStorage.getItem("theme") || "light",
   name: "themeSlice",
+  initialState: {
+    theme: getInitialTheme(),
+  },
   reducers: {
     setTheme: (state, action) => {
       document.body.setAttribute("data-bs-theme", action.payload);
       localStorage.setItem("theme", action.payload);
-      return action.payload;
+      state.theme = action.payload;
     },
   },
 });

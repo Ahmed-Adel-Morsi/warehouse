@@ -3,10 +3,11 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 export const fetchVendors = createAsyncThunk(
   "vendorsSlice/fetchVendors",
   async () => {
-    let res = await fetch(
-      `https://warehouse-api-ly5q.onrender.com/api/vendors`
+    const response = await fetch(
+      `${process.env.REACT_APP_API_BASE_URL}/vendors`
     );
-    let data = await res.json();
+    if (!response.ok) throw new Error("Network response was not ok");
+    const data = await response.json();
     return data;
   }
 );
@@ -14,14 +15,18 @@ export const fetchVendors = createAsyncThunk(
 export const addVendor = createAsyncThunk(
   "vendorsSlice/addVendor",
   async (vendor, { getState }) => {
-    const vendors = getState().vendors;
-    const lastVendor = vendors[vendors.length - 1];
+    const { data: vendors } = getState().vendors;
+    const lastVendor = vendors.reduce(
+      (prev, curr) => {
+        return prev.code > curr.code ? prev : curr;
+      },
+      { code: 0 }
+    );
     const lastCode = lastVendor ? lastVendor.code : 0;
-
     const newVendor = { ...vendor, code: lastCode + 1 };
 
-    let res = await fetch(
-      `https://warehouse-api-ly5q.onrender.com/api/vendors`,
+    const response = await fetch(
+      `${process.env.REACT_APP_API_BASE_URL}/vendors`,
       {
         method: "POST",
         headers: {
@@ -30,7 +35,8 @@ export const addVendor = createAsyncThunk(
         body: JSON.stringify(newVendor),
       }
     );
-    let data = await res.json();
+    if (!response.ok) throw new Error("Network response was not ok");
+    const data = await response.json();
     return data;
   }
 );
@@ -38,12 +44,13 @@ export const addVendor = createAsyncThunk(
 export const deleteVendor = createAsyncThunk(
   "vendorsSlice/deleteVendor",
   async (vendorId) => {
-    await fetch(
-      `https://warehouse-api-ly5q.onrender.com/api/vendors/${vendorId}`,
+    const response = await fetch(
+      `${process.env.REACT_APP_API_BASE_URL}/vendors/${vendorId}`,
       {
         method: "DELETE",
       }
     );
+    if (!response.ok) throw new Error("Network response was not ok");
     return vendorId;
   }
 );
@@ -51,8 +58,8 @@ export const deleteVendor = createAsyncThunk(
 export const editVendor = createAsyncThunk(
   "vendorsSlice/editVendor",
   async (vendor) => {
-    await fetch(
-      `https://warehouse-api-ly5q.onrender.com/api/vendors/${vendor.id}`,
+    const response = await fetch(
+      `${process.env.REACT_APP_API_BASE_URL}/vendors/${vendor.id}`,
       {
         method: "PUT",
         headers: {
@@ -61,29 +68,81 @@ export const editVendor = createAsyncThunk(
         body: JSON.stringify(vendor),
       }
     );
-    return vendor;
+    if (!response.ok) throw new Error("Network response was not ok");
+    const data = await response.json();
+    return data;
   }
 );
 
 const vendorsSlice = createSlice({
-  initialState: [],
   name: "vendorsSlice",
+  initialState: {
+    data: [],
+    loading: false,
+    error: null,
+  },
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(fetchVendors.fulfilled, (state, action) => {
-      return action.payload;
-    });
-    builder.addCase(deleteVendor.fulfilled, (state, action) => {
-      return state.filter((vendor) => vendor.id !== action.payload);
-    });
-    builder.addCase(addVendor.fulfilled, (state, action) => {
-      return [...state, action.payload];
-    });
-    builder.addCase(editVendor.fulfilled, (state, action) => {
-      return state.map((vendor) =>
-        vendor.id === action.payload.id ? action.payload : vendor
-      );
-    });
+    builder
+      // Fetch Vendors
+      .addCase(fetchVendors.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchVendors.fulfilled, (state, action) => {
+        state.loading = false;
+        state.data = action.payload;
+      })
+      .addCase(fetchVendors.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      })
+      // Add Vendor
+      .addCase(addVendor.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(addVendor.fulfilled, (state, action) => {
+        state.loading = false;
+        state.data.push(action.payload);
+      })
+      .addCase(addVendor.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      })
+      // Delete Vendor
+      .addCase(deleteVendor.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteVendor.fulfilled, (state, action) => {
+        state.loading = false;
+        state.data = state.data.filter(
+          (vendor) => vendor.id !== action.payload
+        );
+      })
+      .addCase(deleteVendor.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      })
+      // Edit Vendor
+      .addCase(editVendor.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(editVendor.fulfilled, (state, action) => {
+        state.loading = false;
+        const index = state.data.findIndex(
+          (vendor) => vendor.id === action.payload.id
+        );
+        if (index !== -1) {
+          state.data[index] = action.payload;
+        }
+      })
+      .addCase(editVendor.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      });
   },
 });
 

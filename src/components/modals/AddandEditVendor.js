@@ -14,8 +14,9 @@ function AddandEditVendor({
     address: "",
   },
 }) {
-  const dispatch = useDispatch();
   const [formData, setFormData] = useState(initialFormData);
+  const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
 
   const handleChange = (e) => {
     setFormData({
@@ -36,11 +37,21 @@ function AddandEditVendor({
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     if (e.currentTarget.checkValidity()) {
-      dispatch(forEdit ? editVendor(formData) : addVendor(formData));
-      setFormData(initialFormData);
-      return true;
+      try {
+        setLoading(true);
+        await dispatch(
+          forEdit ? editVendor(formData) : addVendor(formData)
+        ).unwrap();
+        setFormData(initialFormData);
+        setLoading(false);
+        return true;
+      } catch (error) {
+        console.error("Error:", error);
+        setLoading(false);
+        return false;
+      }
     }
     return false;
   };
@@ -83,6 +94,7 @@ function AddandEditVendor({
         successMessage={`تم ${forEdit ? "تعديل" : "اضافة"} ${
           formData.name
         } بنجاح`}
+        loadingState={loading}
       >
         <ModalInput
           type="text"
