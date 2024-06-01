@@ -23,7 +23,7 @@ function Navbar() {
         <ThemeDropdown forNavbar={true} />
         <div
           className="offcanvas offcanvas-end overflow-y-auto w-fit border-start"
-          data-bs-backdrop="static"
+          // data-bs-backdrop="static"
           tabIndex="-1"
           id="staticBackdrop"
           aria-labelledby="staticBackdropLabel"
