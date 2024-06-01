@@ -12,12 +12,12 @@ function AddandEditProduct({
     name: "",
     code: "",
     brand: "",
-    size: "",
+    size: null,
     color: "",
     location: "",
     countryOfOrigin: "",
-    quantity: "",
-    price: "",
+    quantity: null,
+    price: null,
   },
 }) {
   const [formData, setFormData] = useState(initialFormData);
