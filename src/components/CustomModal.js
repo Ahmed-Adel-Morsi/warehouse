@@ -92,6 +92,7 @@ function ModalBody({
   successMessage = false,
   warningMessage = false,
   loadingState,
+  disableSubmit
 }) {
   const { handleClose, dangerVariant } = useContext(ModalContext);
   const [submitted, setSubmitted] = useState(false);
@@ -137,7 +138,7 @@ function ModalBody({
           className={`btn ${
             dangerVariant ? "btn-danger" : "btn-dark"
           } popup-btn w-100 d-flex justify-content-center align-items-center gap-2`}
-          disabled={loadingState}
+          disabled={loadingState || disableSubmit}
         >
           {btnTitle}
           {loadingState && (

@@ -6,28 +6,104 @@ import { fetchProducts } from "../../features/productsSlice";
 import { productsSvg } from "../../svgs/sidebarSVGs";
 import ModalInput from "../CustomInput";
 
-function ChooseProduct({
-  setChosenProduct,
-  chosenProduct,
-  setOrderedProducts,
-}) {
+function ChooseProduct({ setChosenProduct, chosenProduct, setOrders }) {
   const { data: products } = useSelector((state) => state.products);
   const [currentChoice, setCurrentChoice] = useState({});
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredProducts, setFilteredProducts] = useState([]);
+  let [invalidCountFeedbackMsg, setInvalidCountFeedbackMsg] = useState("");
+  let [invalidPriceFeedbackMsg, setInvalidPriceFeedbackMsg] = useState("");
   const dispatch = useDispatch();
+
+  const [formData, setFormData] = useState({});
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (e) => {
+    handleBlur(e);
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleBlur = (e) => {
+    if (isFieldValid(e)) {
+      e.target.removeAttribute("required");
+      e.target.classList.remove("is-invalid");
+      e.target.setCustomValidity("");
+    } else {
+      e.target.required = true;
+      e.target.classList.add("is-invalid");
+      e.target.setCustomValidity("Invalid field.");
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    if (e.currentTarget.checkValidity()) {
+      try {
+        setLoading(true);
+        await setOrders((prevProducts) => [
+          ...prevProducts,
+          {
+            ...formData,
+            totalPrice:
+              parseInt(formData.quantity) * parseFloat(formData.price),
+            productDetails: chosenProduct,
+          },
+        ]);
+        await setChosenProduct(null);
+        setLoading(false);
+        return true;
+      } catch (error) {
+        console.error("Error:", error);
+        setLoading(false);
+        return false;
+      }
+    }
+    return false;
+  };
+
+  const isFieldValid = (e) => {
+    let value = e.target.value;
+
+    switch (e.target.name) {
+      case "quantity":
+        if (value !== "") {
+          if (!isNaN(parseInt(value))) {
+            if (parseInt(value) <= chosenProduct.quantity) {
+              return true;
+            } else {
+              setInvalidCountFeedbackMsg(
+                `لا يمكن أن يكون العدد أكبر من ${chosenProduct.quantity}`
+              );
+            }
+          } else {
+            setInvalidCountFeedbackMsg("يجب إدخال ارقام فقط");
+          }
+        } else {
+          setInvalidCountFeedbackMsg("يجب إدخال العدد");
+        }
+        return false;
+
+      case "price":
+        if (value !== "") {
+          if (!isNaN(parseFloat(value))) {
+            return true;
+          } else {
+            setInvalidPriceFeedbackMsg("يجب إدخال ارقام فقط");
+          }
+        } else {
+          setInvalidPriceFeedbackMsg("يجب إدخال السعر");
+        }
+        return false;
+
+      default:
+        return true;
+    }
+  };
 
   const handleInput = (e) => {
     setSearchQuery(e.target.value);
-  };
-
-  const handleProductChoice = () => {
-    if (document.getElementById("hiddenInput").value) {
-      setOrderedProducts((prevProducts) => [...prevProducts, chosenProduct]);
-      setChosenProduct(null);
-      return true;
-    }
-    return false;
   };
 
   useEffect(() => {
@@ -51,9 +127,10 @@ function ChooseProduct({
       </CustomModal.Header>
       <CustomModal.Body
         btnTitle="اضافة"
-        submitHandler={() => handleProductChoice()}
+        submitHandler={handleSubmit}
         successMessage={`تم اختيار الصنف ${currentChoice.name} بنجاح`}
-        warningMessage="يرجى اختيار الصنف"
+        disableSubmit={chosenProduct ? false : true}
+        loadingState={loading}
       >
         <div className="dropdown dropdown-center w-100">
           <button
@@ -63,33 +140,33 @@ function ChooseProduct({
             data-bs-toggle="dropdown"
             aria-expanded="false"
           >
-            اختر الصنف
+            {chosenProduct ? chosenProduct.name : "اختر الصنف"}
             {selectTogglerSvg}
           </button>
           <ul
-            className="dropdown-menu pt-0 position-fixed"
+            className="dropdown-menu pt-0 position-fixed overflow-hidden"
             aria-labelledby="dropdownMenuButton1"
           >
             <input
               type="text"
-              className="form-control border-0 border-bottom shadow-none mb-2 no-outline search-input"
+              className="form-control border-0 border-bottom rounded-0 shadow-none mb-2 no-outline search-input"
               placeholder="ابحث عن الصنف بالإسم"
               onInput={handleInput}
             />
             <input type="hidden" id="hiddenInput" required />
             <div className="overflow-y-auto mh-6rem sm-scroll">
               {filteredProducts.map((product) => (
-                <li key={product.id}>
+                <li className="px-1 text-end" key={product.id}>
                   <a
-                    className="dropdown-item"
+                    className="dropdown-item rounded py-1 pe-4"
                     href="/"
                     onClick={(e) => {
                       e.preventDefault();
                       document.getElementById(
                         "dropdownMenuButton1"
-                      ).textContent = product.name;
-                      document.getElementById("hiddenInput").value =
-                        product.name;
+                      ).firstChild.textContent = product.name;
+                      // document.getElementById("hiddenInput").value =
+                      //   product.name;
                       setCurrentChoice(product);
                       setChosenProduct(product);
                     }}
@@ -104,23 +181,38 @@ function ChooseProduct({
         {chosenProduct && (
           <>
             <div className="d-flex gap-3 text-muted">
-              <p>العدد بالمخزن : {chosenProduct.quantity}</p>
-              <p>السعر بالمخزن : {chosenProduct.price}</p>
+              <p className="mb-0">
+                العدد بالمخزن : {chosenProduct.quantity || 0}
+              </p>
+              <p className="mb-0">السعر بالمخزن : {chosenProduct.price || 0}</p>
             </div>
-            <ModalInput
-              type="text"
-              name="quantity"
-              label="العدد"
-              invalidFeedback="يجب إدخال العدد (ارقام فقط)"
-              required
-            />
-            <ModalInput
-              type="text"
-              name="price"
-              label="سعر الوحدة"
-              invalidFeedback="يجب إدخال السعر (ارقام فقط)"
-              required
-            />
+            {chosenProduct.quantity ? (
+              <>
+                <ModalInput
+                  type="text"
+                  name="quantity"
+                  label="العدد"
+                  invalidFeedback={invalidCountFeedbackMsg}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  required
+                />
+                <ModalInput
+                  type="text"
+                  name="price"
+                  label="سعر الوحدة"
+                  invalidFeedback={invalidPriceFeedbackMsg}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  required
+                />
+              </>
+            ) : (
+              <p className="text-danger m-0 fs-small">
+                الصنف '{chosenProduct.name}' لا يوجد منه فى المخزن لذلك لا يمكنك
+                بيعه
+              </p>
+            )}
           </>
         )}
       </CustomModal.Body>

@@ -6,7 +6,7 @@ import { fetchCustomers } from "../../features/customersSlice";
 import { customersSvg } from "../../svgs/sidebarSVGs";
 
 function ChooseCustomer({ setChosenCustomer }) {
-  const { data: customers, loading, error } = useSelector((state) => state.customers);
+  const { data: customers, loading } = useSelector((state) => state.customers);
   const [currentChoice, setCurrentChoice] = useState({});
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredCustomers, setFilteredCustomers] = useState([]);
@@ -17,7 +17,7 @@ function ChooseCustomer({ setChosenCustomer }) {
   };
 
   const handleCustomerChoice = () => {
-    if (document.getElementById("hiddenInput").value) {
+    if (Object.keys(currentChoice).length !== 0) {
       setChosenCustomer(currentChoice);
       return true;
     }
@@ -45,7 +45,8 @@ function ChooseCustomer({ setChosenCustomer }) {
       </CustomModal.Header>
       <CustomModal.Body
         btnTitle="اضافة"
-        submitHandler={() => handleCustomerChoice()}
+        submitHandler={handleCustomerChoice}
+        loadingState={loading}
         successMessage={`تم اختيار العميل ${currentChoice.name} بنجاح`}
         warningMessage="يرجى اختيار العميل"
       >
@@ -61,29 +62,26 @@ function ChooseCustomer({ setChosenCustomer }) {
             {selectTogglerSvg}
           </button>
           <ul
-            className="dropdown-menu pt-0 position-fixed"
+            className="dropdown-menu pt-0 position-fixed overflow-hidden"
             aria-labelledby="dropdownMenuButton1"
           >
             <input
               type="text"
-              className="form-control border-0 border-bottom shadow-none mb-2 no-outline search-input"
+              className="form-control border-0 border-bottom rounded-0 shadow-none mb-2 no-outline search-input"
               placeholder="ابحث عن العميل بالإسم"
               onInput={handleInput}
             />
-            <input type="hidden" id="hiddenInput" required />
             <div className="overflow-y-auto mh-6rem sm-scroll">
               {filteredCustomers.map((customer) => (
-                <li key={customer.id}>
+                <li className="px-1 text-end" key={customer.id}>
                   <a
-                    className="dropdown-item"
+                    className="dropdown-item rounded py-1 pe-4"
                     href="/"
                     onClick={(e) => {
                       e.preventDefault();
                       document.getElementById(
                         "dropdownMenuButton1"
-                      ).textContent = customer.name;
-                      document.getElementById("hiddenInput").value =
-                        customer.name;
+                      ).firstChild.textContent = customer.name;
                       setCurrentChoice(customer);
                     }}
                   >

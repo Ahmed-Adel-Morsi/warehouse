@@ -5,14 +5,18 @@ import CustomModal from "../components/CustomModal";
 import { resetSvg, saveSvg } from "../svgs/pageContentSVGs";
 import ChooseProduct from "../components/modals/ChooseProduct";
 import DangerPopup from "../components/modals/DangerPopup";
+import { useDispatch } from "react-redux";
+import { addTransaction } from "../features/transactionsSlice";
+import { editProduct } from "../features/productsSlice";
 
 function SoldPermission() {
   const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
 
   const removeProductHandler = async (currentProduct) => {
     try {
-      const savedProducts = JSON.parse(localStorage.getItem("orderedProducts"));
-      setOrderedProducts(
+      const savedProducts = JSON.parse(localStorage.getItem("orders"));
+      setOrders(
         savedProducts.filter((product) => product.id !== currentProduct.id)
       );
       return true;
@@ -25,8 +29,36 @@ function SoldPermission() {
   const resetHandler = () => {
     setChosenCustomer(null);
     setChosenProduct(null);
-    setOrderedProducts([]);
+    setOrders([]);
     return true;
+  };
+
+  const submitHandler = async () => {
+    setLoading(true);
+    try {
+      for (const order of orders) {
+        await dispatch(
+          addTransaction({
+            transactionType: "sell",
+            ...order,
+            customerDetails: chosenCustomer,
+          })
+        );
+        await dispatch(
+          editProduct({
+            ...order.productDetails,
+            quantity: order.productDetails.quantity - order.quantity,
+          })
+        );
+      }
+      resetHandler();
+      setLoading(false);
+      return true;
+    } catch (error) {
+      console.error("Error:", error);
+      setLoading(false);
+      return false;
+    }
   };
 
   const [chosenCustomer, setChosenCustomer] = useState(() => {
@@ -39,8 +71,8 @@ function SoldPermission() {
     return savedProduct ? JSON.parse(savedProduct) : null;
   });
 
-  const [orderedProducts, setOrderedProducts] = useState(() => {
-    const savedProducts = localStorage.getItem("orderedProducts");
+  const [orders, setOrders] = useState(() => {
+    const savedProducts = localStorage.getItem("orders");
     return savedProducts ? JSON.parse(savedProducts) : [];
   });
 
@@ -66,13 +98,13 @@ function SoldPermission() {
 
   useEffect(() => {
     setLoading(true);
-    if (orderedProducts.length > 0) {
-      localStorage.setItem("orderedProducts", JSON.stringify(orderedProducts));
+    if (orders.length > 0) {
+      localStorage.setItem("orders", JSON.stringify(orders));
     } else {
-      localStorage.removeItem("orderedProducts");
+      localStorage.removeItem("orders");
     }
     setLoading(false);
-  }, [orderedProducts]);
+  }, [orders]);
 
   return (
     <>
@@ -85,7 +117,10 @@ function SoldPermission() {
         <div className="d-flex gap-2 w-sm-100 flex-column flex-sm-row flex-grow-1 justify-content-end">
           {!chosenCustomer && (
             <>
-              <ChooseCustomer setChosenCustomer={setChosenCustomer} />
+              <ChooseCustomer
+                setChosenCustomer={setChosenCustomer}
+                chosenCustomer={chosenCustomer}
+              />
               <AddandEditCustomer newCustomer={true} />
             </>
           )}
@@ -93,7 +128,7 @@ function SoldPermission() {
             <>
               <ChooseProduct
                 setChosenProduct={setChosenProduct}
-                setOrderedProducts={setOrderedProducts}
+                setOrders={setOrders}
                 chosenProduct={chosenProduct}
               />
               <DangerPopup
@@ -112,9 +147,8 @@ function SoldPermission() {
                 <CustomModal.Body
                   btnTitle="حفظ"
                   successMessage="تم حفظ البيانات بنجاح"
-                  submitHandler={() => {
-                    return true;
-                  }}
+                  loadingState={loading}
+                  submitHandler={submitHandler}
                 >
                   يرجي تأكيد حفظ البيانات
                 </CustomModal.Body>
@@ -128,7 +162,7 @@ function SoldPermission() {
           <div className="p-4 text-center fs-small fw-medium">
             جارى التحميل...
           </div>
-        ) : orderedProducts.length > 0 ? (
+        ) : orders.length > 0 ? (
           <table className="table table-hover table-borderless m-0">
             <thead>
               <tr className="table-light border-bottom">
@@ -153,45 +187,51 @@ function SoldPermission() {
                 <td className="border-start fs-small fw-medium text-center p-3">
                   السعر
                 </td>
+                <td className="border-start fs-small fw-medium text-center p-3">
+                  الاجمالى
+                </td>
                 <td className="fs-small fw-medium text-center p-3">إجراءات</td>
               </tr>
             </thead>
             <tbody>
-              {orderedProducts.map((product, index, arr) => (
+              {orders.map((order, index, arr) => (
                 <tr
-                  key={product.id}
+                  key={order.productDetails.id}
                   className={index !== arr.length - 1 ? "border-bottom" : ""}
                 >
                   <td className="border-start fs-small fw-medium text-center p-3">
-                    {product.name || "-"}
+                    {order.productDetails.name || "-"}
                   </td>
                   <td className="border-start fs-small fw-medium text-center p-3">
-                    {product.code || "-"}
+                    {order.productDetails.code || "-"}
                   </td>
                   <td className="border-start fs-small fw-medium text-center p-3">
-                    {product.brand || "-"}
+                    {order.productDetails.brand || "-"}
                   </td>
                   <td className="border-start fs-small fw-medium text-center p-3">
-                    {product.size || "-"}
+                    {order.productDetails.size || "-"}
                   </td>
                   <td className="border-start fs-small fw-medium text-center p-3">
-                    {product.color || "-"}
+                    {order.productDetails.color || "-"}
                   </td>
                   <td className="border-start fs-small fw-medium text-center p-3">
-                    {product.quantity || "-"}
+                    {order.quantity || "-"}
                   </td>
                   <td className="border-start fs-small fw-medium text-center p-3">
-                    {product.price || "-"}
+                    {order.price || "-"}
+                  </td>
+                  <td className="border-start fs-small fw-medium text-center p-3">
+                    {order.totalPrice || "-"}
                   </td>
                   <td className="fs-small h-100 d-flex justify-content-center">
                     <DangerPopup
                       notRemove={true}
                       title="حذف الصنف"
                       handler={async () => {
-                        await removeProductHandler(product);
+                        await removeProductHandler(order.productDetails);
                       }}
                       description="هل انت متاكد؟ سيتم حذف الصنف"
-                      successMessage={`تم حذف ${product.name} بنجاح`}
+                      successMessage={`تم حذف ${order.productDetails.name} بنجاح`}
                       submitBtnTitle="حذف"
                       btnStyle="btn btn-hov"
                     />

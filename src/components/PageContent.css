@@ -34,6 +34,9 @@ input:focus:not(.no-outline) {
   outline-offset: 1px !important;
   box-shadow: none !important;
 }
+input.is-invalid:focus:not(.no-outline) {
+  outline: 2px solid var(--bs-danger) !important;
+}
 
 .search-input::placeholder {
   color: #ccc;
