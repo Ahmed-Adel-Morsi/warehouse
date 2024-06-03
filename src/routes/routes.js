@@ -8,6 +8,7 @@ export const ROUTES = {
   ADDITION_PERMISSION: "/addition-permission",
   SOLD_INVOICES: "/sold-invoices",
   ADDITION_INVOICES: "/addition-invoices",
+  PRODUCT_INVOICES: ":productId",
 };
 
 export const PATH_TO_HEADING = {
@@ -20,4 +21,5 @@ export const PATH_TO_HEADING = {
   [ROUTES.ADDITION_PERMISSION]: "إذن اضافة",
   [ROUTES.SOLD_INVOICES]: "فواتير البيع",
   [ROUTES.ADDITION_INVOICES]: "فواتير الإضافة",
+  [ROUTES.PRODUCT_INVOICES]: "حركة الصنف",
 };

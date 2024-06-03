@@ -45,7 +45,7 @@ function Vendors() {
         <input
           type="search"
           name="addVendor"
-          className="form-control w-100 mb-3 mb-lg-0 search-input"
+          className="form-control w-100 mb-3 mb-lg-0 search-input pe-30px"
           onChange={(e) => {
             filterItems(e.target.value);
           }}

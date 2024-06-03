@@ -13,6 +13,7 @@ function AddandEditVendor({
     phoneNumber: "",
     address: "",
   },
+  btnTitle = "إضافة مورد",
 }) {
   const [formData, setFormData] = useState(initialFormData);
   const [loading, setLoading] = useState(false);
@@ -73,7 +74,7 @@ function AddandEditVendor({
 
   return (
     <CustomModal
-      btnTitle={forEdit ? "تعديل" : "إضافة مورد"}
+      btnTitle={forEdit ? "تعديل" : btnTitle}
       btnIcon={forEdit ? editSvg : addCustomerSvg}
       modalFor={forEdit ? "edit" : false}
     >

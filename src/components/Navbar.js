@@ -5,7 +5,7 @@ import { hamburgerSvg } from "../svgs/navbarSVGs";
 
 function Navbar() {
   return (
-    <nav className="d-block d-lg-none navbar navbar-expand-lg bg-body-white py-2 px-3 border-bottom">
+    <nav className="d-block d-lg-none navbar navbar-expand-lg bg-body-white py-2 px-3 border-bottom d-print-none">
       <div className="container-fluid p-0">
         <button
           className="navbar-toggler border-0 p-2 btn-hov"

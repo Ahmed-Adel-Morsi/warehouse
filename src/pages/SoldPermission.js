@@ -3,7 +3,7 @@ import AddandEditCustomer from "../components/modals/AddandEditCustomer";
 import ChooseCustomer from "../components/modals/ChooseCustomer";
 import CustomModal from "../components/CustomModal";
 import { resetSvg, saveSvg } from "../svgs/pageContentSVGs";
-import ChooseProduct from "../components/modals/ChooseProduct";
+import ChooseProductToSell from "../components/modals/ChooseProductToSell";
 import DangerPopup from "../components/modals/DangerPopup";
 import { useDispatch } from "react-redux";
 import { addTransaction } from "../features/transactionsSlice";
@@ -11,13 +11,18 @@ import { editProduct } from "../features/productsSlice";
 
 function SoldPermission() {
   const [loading, setLoading] = useState(false);
+  const [chosenProductToSell, setChosenProductToSell] = useState(null);
   const dispatch = useDispatch();
 
   const removeProductHandler = async (currentProduct) => {
     try {
-      const savedProducts = JSON.parse(localStorage.getItem("orders"));
-      setOrders(
-        savedProducts.filter((product) => product.id !== currentProduct.id)
+      const savedProducts = JSON.parse(
+        localStorage.getItem("soldPermissionOrders")
+      );
+      setSoldPermissionOrders(
+        savedProducts.filter(
+          (product) => product.productDetails.id !== currentProduct.id
+        )
       );
       return true;
     } catch (error) {
@@ -28,15 +33,15 @@ function SoldPermission() {
 
   const resetHandler = () => {
     setChosenCustomer(null);
-    setChosenProduct(null);
-    setOrders([]);
+    setChosenProductToSell(null);
+    setSoldPermissionOrders([]);
     return true;
   };
 
   const submitHandler = async () => {
     setLoading(true);
     try {
-      for (const order of orders) {
+      for (const order of soldPermissionOrders) {
         await dispatch(
           addTransaction({
             transactionType: "sell",
@@ -66,16 +71,6 @@ function SoldPermission() {
     return savedCustomer ? JSON.parse(savedCustomer) : null;
   });
 
-  const [chosenProduct, setChosenProduct] = useState(() => {
-    const savedProduct = localStorage.getItem("chosenProduct");
-    return savedProduct ? JSON.parse(savedProduct) : null;
-  });
-
-  const [orders, setOrders] = useState(() => {
-    const savedProducts = localStorage.getItem("orders");
-    return savedProducts ? JSON.parse(savedProducts) : [];
-  });
-
   useEffect(() => {
     setLoading(true);
     if (chosenCustomer !== null) {
@@ -86,25 +81,23 @@ function SoldPermission() {
     setLoading(false);
   }, [chosenCustomer]);
 
-  useEffect(() => {
-    setLoading(true);
-    if (chosenProduct !== null) {
-      localStorage.setItem("chosenProduct", JSON.stringify(chosenProduct));
-    } else {
-      localStorage.removeItem("chosenProduct");
-    }
-    setLoading(false);
-  }, [chosenProduct]);
+  const [soldPermissionOrders, setSoldPermissionOrders] = useState(() => {
+    const savedProducts = localStorage.getItem("soldPermissionOrders");
+    return savedProducts ? JSON.parse(savedProducts) : [];
+  });
 
   useEffect(() => {
     setLoading(true);
-    if (orders.length > 0) {
-      localStorage.setItem("orders", JSON.stringify(orders));
+    if (soldPermissionOrders.length > 0) {
+      localStorage.setItem(
+        "soldPermissionOrders",
+        JSON.stringify(soldPermissionOrders)
+      );
     } else {
-      localStorage.removeItem("orders");
+      localStorage.removeItem("soldPermissionOrders");
     }
     setLoading(false);
-  }, [orders]);
+  }, [soldPermissionOrders]);
 
   return (
     <>
@@ -121,15 +114,15 @@ function SoldPermission() {
                 setChosenCustomer={setChosenCustomer}
                 chosenCustomer={chosenCustomer}
               />
-              <AddandEditCustomer newCustomer={true} />
+              <AddandEditCustomer btnTitle = "إضافة عميل جديد" />
             </>
           )}
           {chosenCustomer && (
             <>
-              <ChooseProduct
-                setChosenProduct={setChosenProduct}
-                setOrders={setOrders}
-                chosenProduct={chosenProduct}
+              <ChooseProductToSell
+                setChosenProductToSell={setChosenProductToSell}
+                setSoldPermissionOrders={setSoldPermissionOrders}
+                chosenProductToSell={chosenProductToSell}
               />
               <DangerPopup
                 notRemove={true}
@@ -142,17 +135,19 @@ function SoldPermission() {
                 submitBtnTitle="إعادة تهيئة"
                 successMessage="تمت إعادة تهيئة البيانات بنجاح"
               />
-              <CustomModal btnIcon={saveSvg} btnTitle="حفظ">
-                <CustomModal.Header title="حفظ البيانات" />
-                <CustomModal.Body
-                  btnTitle="حفظ"
-                  successMessage="تم حفظ البيانات بنجاح"
-                  loadingState={loading}
-                  submitHandler={submitHandler}
-                >
-                  يرجي تأكيد حفظ البيانات
-                </CustomModal.Body>
-              </CustomModal>
+              {soldPermissionOrders.length > 0 && (
+                <CustomModal btnIcon={saveSvg} btnTitle="حفظ">
+                  <CustomModal.Header title="حفظ البيانات" />
+                  <CustomModal.Body
+                    btnTitle="حفظ"
+                    successMessage="تم حفظ البيانات بنجاح"
+                    loadingState={loading}
+                    submitHandler={submitHandler}
+                  >
+                    يرجي تأكيد حفظ البيانات
+                  </CustomModal.Body>
+                </CustomModal>
+              )}
             </>
           )}
         </div>
@@ -162,7 +157,7 @@ function SoldPermission() {
           <div className="p-4 text-center fs-small fw-medium">
             جارى التحميل...
           </div>
-        ) : orders.length > 0 ? (
+        ) : soldPermissionOrders.length > 0 ? (
           <table className="table table-hover table-borderless m-0">
             <thead>
               <tr className="table-light border-bottom">
@@ -194,7 +189,7 @@ function SoldPermission() {
               </tr>
             </thead>
             <tbody>
-              {orders.map((order, index, arr) => (
+              {soldPermissionOrders.map((order, index, arr) => (
                 <tr
                   key={order.productDetails.id}
                   className={index !== arr.length - 1 ? "border-bottom" : ""}

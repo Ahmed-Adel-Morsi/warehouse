@@ -13,7 +13,7 @@ function AddandEditCustomer({
     phoneNumber: "",
     address: "",
   },
-  newCustomer = false,
+  btnTitle = "إضافة عميل",
 }) {
   const dispatch = useDispatch();
   const [formData, setFormData] = useState(initialFormData);
@@ -74,7 +74,7 @@ function AddandEditCustomer({
 
   return (
     <CustomModal
-      btnTitle={forEdit ? "تعديل" : `إضافة عميل ${newCustomer ? "جديد" : ""}`}
+      btnTitle={forEdit ? "تعديل" : btnTitle}
       btnIcon={forEdit ? editSvg : addCustomerSvg}
       modalFor={forEdit ? "edit" : false}
     >

@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Outlet, Route, Routes } from "react-router-dom";
 import PageContent from "./components/PageContent";
 import Sidebar from "./components/Sidebar";
 import Home from "./pages/Home";
@@ -13,6 +13,7 @@ import AdditionInvoices from "./pages/AdditionInvoices";
 import Navbar from "./components/Navbar";
 import "./App.css";
 import { ROUTES } from "./routes/routes";
+import ItemDetails from "./pages/ItemDetails";
 
 function App() {
   return (
@@ -24,7 +25,10 @@ function App() {
         <PageContent>
           <Routes>
             <Route path={ROUTES.HOME} element={<Home />} />
-            <Route path={ROUTES.PRODUCTS} element={<Products />} />
+            <Route path={ROUTES.PRODUCTS} element={<Outlet />}>
+              <Route path="" element={<Products />} />
+              <Route path={ROUTES.PRODUCT_INVOICES} element={<ItemDetails />} />
+            </Route>
             <Route path={ROUTES.CUSTOMERS} element={<Customers />} />
             <Route path={ROUTES.VENDORS} element={<Vendors />} />
             <Route path={ROUTES.TRANSACTIONS} element={<Transactions />} />

@@ -52,7 +52,7 @@ function Transactions() {
         <input
           type="search"
           name="addTransactions"
-          className="form-control w-100 mb-3 mb-lg-0 search-input"
+          className="form-control w-100 mb-3 mb-lg-0 search-input pe-30px"
           onChange={(e) => {
             filterItems(e.target.value);
           }}
@@ -110,7 +110,7 @@ function Transactions() {
                   </td>
                   <td className="border-start fs-small fw-medium text-center align-middle p-3">
                     <span
-                      class={`badge px-2 py-1 text-bg-${
+                      className={`badge px-2 py-1 text-bg-${
                         transaction.transactionType === "sell"
                           ? "light"
                           : "dark"

@@ -6,7 +6,11 @@ import { fetchProducts } from "../../features/productsSlice";
 import { productsSvg } from "../../svgs/sidebarSVGs";
 import ModalInput from "../CustomInput";
 
-function ChooseProduct({ setChosenProduct, chosenProduct, setOrders }) {
+function ChooseProductToSell({
+  setChosenProductToSell,
+  chosenProductToSell,
+  setSoldPermissionOrders,
+}) {
   const { data: products } = useSelector((state) => state.products);
   const [currentChoice, setCurrentChoice] = useState({});
   const [searchQuery, setSearchQuery] = useState("");
@@ -17,6 +21,18 @@ function ChooseProduct({ setChosenProduct, chosenProduct, setOrders }) {
 
   const [formData, setFormData] = useState({});
   const [loading, setLoading] = useState(false);
+
+  const handleDropdownChoice = (e, product) => {
+    e.preventDefault();
+    document.querySelectorAll(".dropdown .dropdown-item").forEach((e) => {
+      e.classList.remove("selected-item");
+    });
+    e.target.classList.add("selected-item");
+    document.getElementById("dropdownMenuButton1").firstChild.textContent =
+      product.name;
+    setCurrentChoice(product);
+    setChosenProductToSell(product);
+  };
 
   const handleChange = (e) => {
     handleBlur(e);
@@ -42,16 +58,16 @@ function ChooseProduct({ setChosenProduct, chosenProduct, setOrders }) {
     if (e.currentTarget.checkValidity()) {
       try {
         setLoading(true);
-        await setOrders((prevProducts) => [
+        await setSoldPermissionOrders((prevProducts) => [
           ...prevProducts,
           {
             ...formData,
             totalPrice:
               parseInt(formData.quantity) * parseFloat(formData.price),
-            productDetails: chosenProduct,
+            productDetails: chosenProductToSell,
           },
         ]);
-        await setChosenProduct(null);
+        await setChosenProductToSell(null);
         setLoading(false);
         return true;
       } catch (error) {
@@ -70,11 +86,11 @@ function ChooseProduct({ setChosenProduct, chosenProduct, setOrders }) {
       case "quantity":
         if (value !== "") {
           if (!isNaN(parseInt(value))) {
-            if (parseInt(value) <= chosenProduct.quantity) {
+            if (parseInt(value) <= chosenProductToSell.quantity) {
               return true;
             } else {
               setInvalidCountFeedbackMsg(
-                `لا يمكن أن يكون العدد أكبر من ${chosenProduct.quantity}`
+                `لا يمكن أن يكون العدد أكبر من ${chosenProductToSell.quantity}`
               );
             }
           } else {
@@ -129,7 +145,7 @@ function ChooseProduct({ setChosenProduct, chosenProduct, setOrders }) {
         btnTitle="اضافة"
         submitHandler={handleSubmit}
         successMessage={`تم اختيار الصنف ${currentChoice.name} بنجاح`}
-        disableSubmit={chosenProduct ? false : true}
+        disableSubmit={chosenProductToSell ? false : true}
         loadingState={loading}
       >
         <div className="dropdown dropdown-center w-100">
@@ -140,7 +156,7 @@ function ChooseProduct({ setChosenProduct, chosenProduct, setOrders }) {
             data-bs-toggle="dropdown"
             aria-expanded="false"
           >
-            {chosenProduct ? chosenProduct.name : "اختر الصنف"}
+            {chosenProductToSell ? chosenProductToSell.name : "اختر الصنف"}
             {selectTogglerSvg}
           </button>
           <ul
@@ -149,27 +165,22 @@ function ChooseProduct({ setChosenProduct, chosenProduct, setOrders }) {
           >
             <input
               type="text"
-              className="form-control border-0 border-bottom rounded-0 shadow-none mb-2 no-outline search-input"
+              className="form-control border-0 border-bottom rounded-0 shadow-none mb-2 no-outline search-input pe-30px"
               placeholder="ابحث عن الصنف بالإسم"
               onInput={handleInput}
             />
             <input type="hidden" id="hiddenInput" required />
             <div className="overflow-y-auto mh-6rem sm-scroll">
               {filteredProducts.map((product) => (
-                <li className="px-1 text-end" key={product.id}>
+                <li className="text-end" key={product.id}>
                   <a
-                    className="dropdown-item rounded py-1 pe-4"
+                    className={`dropdown-item rounded py-1 pe-30px ${
+                      chosenProductToSell &&
+                      chosenProductToSell.name === product.name &&
+                      "selected-item"
+                    }`}
                     href="/"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      document.getElementById(
-                        "dropdownMenuButton1"
-                      ).firstChild.textContent = product.name;
-                      // document.getElementById("hiddenInput").value =
-                      //   product.name;
-                      setCurrentChoice(product);
-                      setChosenProduct(product);
-                    }}
+                    onClick={(e) => handleDropdownChoice(e, product)}
                   >
                     {product.name}
                   </a>
@@ -178,15 +189,17 @@ function ChooseProduct({ setChosenProduct, chosenProduct, setOrders }) {
             </div>
           </ul>
         </div>
-        {chosenProduct && (
+        {chosenProductToSell && (
           <>
             <div className="d-flex gap-3 text-muted">
               <p className="mb-0">
-                العدد بالمخزن : {chosenProduct.quantity || 0}
+                العدد بالمخزن : {chosenProductToSell.quantity || 0}
               </p>
-              <p className="mb-0">السعر بالمخزن : {chosenProduct.price || 0}</p>
+              <p className="mb-0">
+                السعر بالمخزن : {chosenProductToSell.price || 0}
+              </p>
             </div>
-            {chosenProduct.quantity ? (
+            {chosenProductToSell.quantity ? (
               <>
                 <ModalInput
                   type="text"
@@ -209,8 +222,8 @@ function ChooseProduct({ setChosenProduct, chosenProduct, setOrders }) {
               </>
             ) : (
               <p className="text-danger m-0 fs-small">
-                الصنف '{chosenProduct.name}' لا يوجد منه فى المخزن لذلك لا يمكنك
-                بيعه
+                الصنف '{chosenProductToSell.name}' لا يوجد منه فى المخزن لذلك لا
+                يمكنك بيعه
               </p>
             )}
           </>
@@ -220,4 +233,4 @@ function ChooseProduct({ setChosenProduct, chosenProduct, setOrders }) {
   );
 }
 
-export default ChooseProduct;
+export default ChooseProductToSell;

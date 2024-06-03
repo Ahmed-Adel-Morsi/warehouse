@@ -4,6 +4,7 @@ import { deleteProduct, fetchProducts } from "../features/productsSlice";
 import { actionsSvg, productTransactionsSvg } from "../svgs/actionsSVGs";
 import AddandEditProduct from "../components/modals/AddandEditProduct";
 import DangerPopup from "../components/modals/DangerPopup";
+import { Link } from "react-router-dom";
 
 function Products() {
   const {
@@ -44,7 +45,7 @@ function Products() {
         <input
           type="search"
           name="addProduct"
-          className="form-control w-100 mb-3 mb-lg-0 search-input"
+          className="form-control w-100 mb-3 mb-lg-0 search-input pe-30px"
           onChange={(e) => {
             filterItems(e.target.value);
           }}
@@ -161,10 +162,13 @@ function Products() {
                           />
                         </li>
                         <li>
-                          <button className="dropdown-item rounded d-flex align-items-center gap-1 px-2 fs-small fw-medium">
+                          <Link
+                            to={`${product.id}`}
+                            className="dropdown-item rounded d-flex align-items-center gap-1 px-2 fs-small fw-medium"
+                          >
                             {productTransactionsSvg}
                             حركة الصنف
-                          </button>
+                          </Link>
                         </li>
                       </ul>
                     </div>

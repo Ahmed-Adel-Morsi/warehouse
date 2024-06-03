@@ -12,13 +12,14 @@ function AddandEditProduct({
     name: "",
     code: "",
     brand: "",
-    size: null,
+    size: "",
     color: "",
     location: "",
     countryOfOrigin: "",
-    quantity: null,
-    price: null,
+    quantity: "",
+    price: "",
   },
+  btnTitle = "إضافة صنف",
 }) {
   const [formData, setFormData] = useState(initialFormData);
   const [loading, setLoading] = useState(false);
@@ -84,7 +85,7 @@ function AddandEditProduct({
 
   return (
     <CustomModal
-      btnTitle={forEdit ? "تعديل" : "إضافة صنف"}
+      btnTitle={forEdit ? "تعديل" : btnTitle}
       btnIcon={forEdit ? editSvg : addProductSvg}
       modalFor={forEdit ? "edit" : false}
     >
