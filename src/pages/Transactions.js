@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchTransactions } from "../features/transactionsSlice";
+import convertDateFormat from "../elements/convertDateFormat";
 
 function Transactions() {
   const {
@@ -20,16 +21,6 @@ function Transactions() {
       })
     );
   };
-  function convertDateFormat(dateStr) {
-    const dateObj = new Date(dateStr);
-    const firstOfMonth = new Date(dateObj.getFullYear(), dateObj.getMonth(), 1);
-
-    const day = ("0" + firstOfMonth.getDate()).slice(-2);
-    const month = ("0" + (firstOfMonth.getMonth() + 1)).slice(-2);
-    const year = firstOfMonth.getFullYear();
-
-    return `${day}/${month}/${year}`;
-  }
 
   useEffect(() => {
     const fetchData = async () => {

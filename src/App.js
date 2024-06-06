@@ -14,6 +14,7 @@ import Navbar from "./components/Navbar";
 import "./App.css";
 import { ROUTES } from "./routes/routes";
 import ItemDetails from "./pages/ItemDetails";
+import InvoiceDetails from "./pages/InvoiceDetails";
 
 function App() {
   return (
@@ -37,11 +38,14 @@ function App() {
               path={ROUTES.ADDITION_PERMISSION}
               element={<AdditionPermission />}
             />
-            <Route path={ROUTES.SOLD_INVOICES} element={<SoldInvoices />} />
-            <Route
-              path={ROUTES.ADDITION_INVOICES}
-              element={<AdditionInvoices />}
-            />
+            <Route path={ROUTES.SOLD_INVOICES} element={<Outlet />}>
+              <Route path="" element={<SoldInvoices />} />
+              <Route path={ROUTES.INVOICE_DETAILS} element={<InvoiceDetails type="sell" />} />
+            </Route>
+            <Route path={ROUTES.ADDITION_INVOICES} element={<Outlet />}>
+              <Route path="" element={<AdditionInvoices />} />
+              <Route path={ROUTES.INVOICE_DETAILS} element={<InvoiceDetails type="buy" />} />
+            </Route>
           </Routes>
         </PageContent>
       </div>

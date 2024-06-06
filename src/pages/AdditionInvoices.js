@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchTransactions } from "../features/transactionsSlice";
+import { getTransactionsOfType } from "../features/transactionsSlice";
 import { showInvoicesSvg } from "../svgs/actionsSVGs";
+import { Link } from "react-router-dom";
+import convertDateFormat from "../elements/convertDateFormat";
 
 function AdditionInvoices() {
   const {
-    data: transactions,
+    filteredData: transactions,
     loading,
     error,
   } = useSelector((state) => state.transactions);
@@ -21,21 +23,11 @@ function AdditionInvoices() {
       })
     );
   };
-  function convertDateFormat(dateStr) {
-    const dateObj = new Date(dateStr);
-    const firstOfMonth = new Date(dateObj.getFullYear(), dateObj.getMonth(), 1);
-
-    const day = ("0" + firstOfMonth.getDate()).slice(-2);
-    const month = ("0" + (firstOfMonth.getMonth() + 1)).slice(-2);
-    const year = firstOfMonth.getFullYear();
-
-    return `${day}/${month}/${year}`;
-  }
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        await dispatch(fetchTransactions()).unwrap();
+        await dispatch(getTransactionsOfType("buy")).unwrap();
       } catch (err) {
         console.error("Failed to fetch transactions:", err);
       }
@@ -89,38 +81,31 @@ function AdditionInvoices() {
               </tr>
             </thead>
             <tbody>
-              {filteredTransactions.map(
-                (transaction, index, arr) =>
-                  transaction.transactionType === "buy" && (
-                    <tr
-                      key={transaction.id}
-                      className={
-                        index !== arr.length - 1 ? "border-bottom" : ""
-                      }
+              {filteredTransactions.map((transaction, index, arr) => (
+                <tr
+                  key={transaction.id}
+                  className={index !== arr.length - 1 ? "border-bottom" : ""}
+                >
+                  <td className="border-start fs-small fw-medium text-center align-middle p-3">
+                    {transaction.customerDetails.name || "-"}
+                  </td>
+                  <td className="border-start fs-small fw-medium text-center align-middle p-3">
+                    {convertDateFormat(transaction.createdAt) || "-"}
+                  </td>
+                  <td className="border-start fs-small fw-medium text-center align-middle p-3">
+                    {transaction.invoiceNumber}
+                  </td>
+                  <td className="border-start fs-small fw-medium text-center align-middle p-3 d-flex justify-content-center">
+                    <Link
+                      to={`${transaction.invoiceNumber}`}
+                      title="عرض الفاتورة"
+                      className="list-group-item list-group-item-action gap-2 fs-small w-2rem h-2rem rounded btn-hov"
                     >
-                      <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                        {transaction.customerDetails.name || "-"}
-                      </td>
-                      <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                        {convertDateFormat(transaction.createdAt) || "-"}
-                      </td>
-                      <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                        -
-                      </td>
-                      <td className="border-start fs-small fw-medium text-center align-middle p-3 d-flex justify-content-center">
-                        <button
-                          type="button"
-                          title="عرض الفاتورة"
-                          className="list-group-item list-group-item-action gap-2 fs-small w-2rem h-2rem rounded btn-hov"
-                          data-bs-toggle="dropdown"
-                          aria-expanded="false"
-                        >
-                          {showInvoicesSvg}
-                        </button>
-                      </td>
-                    </tr>
-                  )
-              )}
+                      {showInvoicesSvg}
+                    </Link>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         ) : (

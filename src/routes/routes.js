@@ -8,6 +8,7 @@ export const ROUTES = {
   ADDITION_PERMISSION: "/addition-permission",
   SOLD_INVOICES: "/sold-invoices",
   ADDITION_INVOICES: "/addition-invoices",
+  INVOICE_DETAILS: ":invoiceNumber",
   PRODUCT_INVOICES: ":productId",
 };
 
