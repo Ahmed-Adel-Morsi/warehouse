@@ -4,6 +4,10 @@ import { getTransactionsOfType } from "../features/transactionsSlice";
 import { showInvoicesSvg } from "../svgs/actionsSVGs";
 import { Link } from "react-router-dom";
 import convertDateFormat from "../elements/convertDateFormat";
+import CustomTable from "../components/CustomTable";
+import TableContainer from "../components/TableContainer";
+import SearchInput from "../components/SearchInput";
+import PageHeader from "../components/PageHeader";
 
 function SoldInvoices() {
   const {
@@ -14,10 +18,11 @@ function SoldInvoices() {
   const dispatch = useDispatch();
   const [filteredTransactions, setFilteredTransactions] = useState([]);
 
-  const filterItems = (value) => {
+  const filterItems = (e) => {
+    const value = e.target.value;
     setFilteredTransactions(
       transactions.filter(function (transaction) {
-        return transaction.customerDetails.name
+        return `${transaction.customerDetails.name} ${transaction.invoiceNumber}`
           .toLowerCase()
           .includes(value.toString().toLowerCase());
       })
@@ -41,18 +46,13 @@ function SoldInvoices() {
 
   return (
     <>
-      <div className="mb-3 d-flex flex-column flex-lg-row justify-content-between">
-        <input
-          type="search"
-          name="addTransactions"
-          className="form-control w-100 mb-3 mb-lg-0 search-input pe-30px"
-          onChange={(e) => {
-            filterItems(e.target.value);
-          }}
-          placeholder="يمكنك البحث عن العميل بالإسم"
-        />
-      </div>
-      <div className="border rounded mw-100 overflow-x-auto table-container">
+      <PageHeader>فواتير البيع</PageHeader>
+      <SearchInput
+        name="soldInvoicesFilter"
+        placeholder="يمكنك البحث عن العميل بالإسم ورقم الفاتوره"
+        onChange={filterItems}
+      />
+      <TableContainer>
         {loading ? (
           <div className="p-4 text-center fs-small fw-medium">
             جارى التحميل...
@@ -63,57 +63,48 @@ function SoldInvoices() {
             <p>Error: {error}</p>
           </div>
         ) : filteredTransactions.length > 0 ? (
-          <table className="table table-hover table-borderless m-0">
+          <CustomTable>
             <thead>
-              <tr className="table-light border-bottom">
-                <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                  اسم العميل
-                </td>
-                <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                  التاريخ
-                </td>
-                <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                  رقم الفاتورة
-                </td>
-                <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                  إجراءات
-                </td>
-              </tr>
+              <CustomTable.Row header={true}>
+                <CustomTable.Data body="اسم العميل" />
+                <CustomTable.Data body="التاريخ" />
+                <CustomTable.Data body="رقم الفاتورة" />
+                <CustomTable.Data body="إجراءات" last={true} />
+              </CustomTable.Row>
             </thead>
             <tbody>
               {filteredTransactions.map((transaction, index, arr) => (
-                <tr
+                <CustomTable.Row
                   key={transaction.id}
-                  className={index !== arr.length - 1 ? "border-bottom" : ""}
+                  last={index === arr.length - 1}
                 >
-                  <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                    {transaction.customerDetails.name || "-"}
-                  </td>
-                  <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                    {convertDateFormat(transaction.createdAt) || "-"}
-                  </td>
-                  <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                    {transaction.invoiceNumber}
-                  </td>
-                  <td className="border-start fs-small fw-medium text-center align-middle p-3 d-flex justify-content-center align-items-center">
-                    <Link
-                      to={`${transaction.invoiceNumber}`}
-                      title="عرض الفاتورة"
-                      className="list-group-item list-group-item-action gap-2 fs-small w-2rem h-2rem rounded btn-hov"
-                    >
-                      {showInvoicesSvg}
-                    </Link>
-                  </td>
-                </tr>
+                  <CustomTable.Data body={transaction.customerDetails.name} />
+                  <CustomTable.Data
+                    body={convertDateFormat(transaction.createdAt)}
+                  />
+                  <CustomTable.Data body={transaction.invoiceNumber} />
+                  <CustomTable.Data
+                    body={
+                      <Link
+                        to={`${transaction.invoiceNumber}`}
+                        title="عرض الفاتورة"
+                        className="btn btn-hov"
+                      >
+                        {showInvoicesSvg}
+                      </Link>
+                    }
+                    last={true}
+                  />
+                </CustomTable.Row>
               ))}
             </tbody>
-          </table>
+          </CustomTable>
         ) : (
           <div className="p-4 text-center fs-small fw-medium">
             لا يوجد بيانات
           </div>
         )}
-      </div>
+      </TableContainer>
     </>
   );
 }

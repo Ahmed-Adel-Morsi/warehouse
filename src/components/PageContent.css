@@ -9,14 +9,14 @@
   }
 }
 .w-sm-100 {
-  @media (max-width: 576px) {
+  @media (max-width: 575px) {
     & {
       width: 100% !important;
     }
   }
 }
 .search-input {
-  background: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="grey" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search"%3E%3Ccircle cx="11" cy="11" r="8"%3E%3C/circle%3E%3Cpath d="m21 21-4.3-4.3"%3E%3C/path%3E%3C/svg%3E')
+  background: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="grey" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class=""%3E%3Ccircle cx="11" cy="11" r="8"%3E%3C/circle%3E%3Cpath d="m21 21-4.3-4.3"%3E%3C/path%3E%3C/svg%3E')
     no-repeat;
   background-size: 15px 15px;
   background-position: right 10px center;
@@ -28,7 +28,7 @@
   }
 }
 .selected-item {
-  background: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20class%3D%22lucide%20lucide-check%20ml-2%20h-4%20w-4%20opacity-100%22%3E%3Cpath%20d%3D%22M20%206%209%2017l-5-5%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E")
+  background: url('data:image/svg+xml,%3Csvg xmlns="http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class=""%3E%3Cpath d="M20 6 9 17l-5-5"%3E%3C%2Fpath%3E%3C%2Fsvg%3E')
     no-repeat;
   background-size: 15px 15px;
   background-position: right 10px center;
@@ -45,7 +45,6 @@ input:focus:not(.no-outline) {
 input.is-invalid:focus:not(.no-outline) {
   outline: 2px solid var(--bs-danger) !important;
 }
-
 .search-input::placeholder {
   color: #ccc;
 }
@@ -59,16 +58,13 @@ input.is-invalid:focus:not(.no-outline) {
   width: 0.4rem !important;
   height: 0.4rem !important;
 }
-
 ::-webkit-scrollbar-thumb {
   background-color: #71717a;
   border-radius: 10px;
 }
-
 table {
   min-width: 50rem;
 }
-
 .modal-body {
   max-height: 20rem !important;
 }
@@ -76,10 +72,8 @@ table {
   max-height: 6rem !important;
 }
 .popup-btn {
-  @media (min-width: 576px) {
-    & {
-      max-width: 8rem !important;
-    }
+  @media (max-width: 575px) {
+    width: 100% !important;
   }
 }
 .was-validated .form-control:valid {
@@ -87,7 +81,6 @@ table {
   padding: 0.375rem 0.75rem !important;
   background: none !important;
 }
-
 .was-validated .form-control:not(:placeholder-shown):not(.is-invalid) {
   border-color: var(--bs-form-invalid-border-color);
 }

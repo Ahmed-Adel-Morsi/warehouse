@@ -52,7 +52,7 @@ function ChooseCustomer({ setChosenCustomer }) {
       >
         <div className="dropdown dropdown-center w-100">
           <button
-            className="btn border w-100 d-flex justify-content-between align-items-center"
+            className="btn border w-100 d-flex justify-content-between align-items-center btn-hov"
             type="button"
             id="dropdownMenuButton1"
             data-bs-toggle="dropdown"
@@ -75,7 +75,7 @@ function ChooseCustomer({ setChosenCustomer }) {
               {filteredCustomers.map((customer) => (
                 <li className="px-1 text-end" key={customer.id}>
                   <a
-                    className="dropdown-item rounded py-1 pe-4"
+                    className="dropdown-item rounded py-1 pe-4 btn-hov"
                     href="/"
                     onClick={(e) => {
                       e.preventDefault();

@@ -5,11 +5,11 @@ export const actionsSvg = (
     height="24"
     viewBox="0 0 24 24"
     fill="none"
-    stroke="currentColor"
+    stroke="black"
     strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
-    className="lucide lucide-ellipsis small-svg"
+    className="small-svg svg-fill"
   >
     <circle cx="12" cy="12" r="1"></circle>
     <circle cx="19" cy="12" r="1"></circle>
@@ -24,11 +24,11 @@ export const editSvg = (
     height="24"
     viewBox="0 0 24 24"
     fill="none"
-    stroke="currentColor"
+    stroke="black"
     strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
-    className="lucide lucide-square-pen small-svg"
+    className="small-svg svg-fill"
   >
     <path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
     <path d="M18.375 2.625a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4Z"></path>
@@ -42,11 +42,11 @@ export const removeSvg = (
     height="24"
     viewBox="0 0 24 24"
     fill="none"
-    stroke="currentColor"
+    stroke="black"
     strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
-    className="lucide lucide-trash2 small-svg"
+    className="small-svg svg-fill"
   >
     <path d="M3 6h18"></path>
     <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
@@ -63,11 +63,11 @@ export const productTransactionsSvg = (
     height="24"
     viewBox="0 0 24 24"
     fill="none"
-    stroke="currentColor"
+    stroke="black"
     strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
-    className="lucide lucide-square-arrow-out-up-right small-svg"
+    className="small-svg svg-fill"
   >
     <path d="M21 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6"></path>
     <path d="m21 3-9 9"></path>
@@ -82,11 +82,11 @@ export const showInvoicesSvg = (
     height="24"
     viewBox="0 0 24 24"
     fill="none"
-    stroke="currentColor"
+    stroke="black"
     strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
-    className="lucide lucide-file-text small-svg"
+    className="small-svg svg-fill"
   >
     <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path>
     <path d="M14 2v4a2 2 0 0 0 2 2h4"></path>

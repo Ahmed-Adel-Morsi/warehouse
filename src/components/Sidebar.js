@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, NavLink } from "react-router-dom";
+import { Link } from "react-router-dom";
 import "./Sidebar.css";
 import ThemeDropdown from "./ThemeDropdown";
 import {
@@ -15,99 +15,75 @@ import {
   vendorsSvg,
 } from "../svgs/sidebarSVGs";
 import DangerPopup from "./modals/DangerPopup";
+import SidebarButton from "./SidebarButton";
 
-function Sidebar(props) {
+function Sidebar({ forOffcanvas }) {
   const logoutHandler = () => true;
 
   return (
     <>
       <div
         className={`p-3 overflow-y-auto flex-shrink-0 sidebar ${
-          props.forOffcanvas
-            ? "d-flex h-100"
-            : "d-none d-lg-flex vh-100 border-start"
+          forOffcanvas ? "d-flex h-100" : "d-none d-lg-flex vh-100 border-start"
         } flex-column`}
       >
-        {!props.forOffcanvas && (
+        {!forOffcanvas && (
           <>
-            <Link to="/" className="navbar-brand text-center fs-4 fw-boldest">
+            <Link
+              to="/"
+              className="navbar-brand text-center fs-4 fw-boldest text-theme-color"
+            >
               Warehouse
             </Link>
             <hr className="m-3" />
           </>
         )}
         <div className="list-group flex-grow-1">
-          <NavLink
-            to="/"
-            className="list-group-item mb-1 list-group-item-action d-flex align-items-center gap-2 fw-semibold p-2 rounded border-0"
-          >
-            {homeSvg}
-            الصفحة الرئيسية
-          </NavLink>
-          <NavLink
-            to="/products"
-            className="list-group-item mb-1 list-group-item-action d-flex align-items-center gap-2 fw-semibold p-2 rounded border-0"
-          >
-            {productsSvg}
-            ارصدة المخزن
-          </NavLink>
-          <NavLink
-            to="/customers"
-            className="list-group-item mb-1 list-group-item-action d-flex align-items-center gap-2 fw-semibold p-2 rounded border-0"
-          >
-            {customersSvg}
-            العملاء
-          </NavLink>
-          <NavLink
-            to="/vendors"
-            className="list-group-item mb-1 list-group-item-action d-flex align-items-center gap-2 fw-semibold p-2 rounded border-0"
-          >
-            {vendorsSvg}
-            الموردين
-          </NavLink>
-          <NavLink
-            to="/transactions"
-            className="list-group-item mb-1 list-group-item-action d-flex align-items-center gap-2 fw-semibold p-2 rounded border-0"
-          >
-            {transactionsSvg}
-            حركة الاصناف
-          </NavLink>
-          <NavLink
-            to="/sold-permission"
-            className="list-group-item mb-1 list-group-item-action d-flex align-items-center gap-2 fw-semibold p-2 rounded border-0"
-          >
-            {soldPerSvg}
-            إذن بيع
-          </NavLink>
-          <NavLink
-            to="/addition-permission"
-            className="list-group-item mb-1 list-group-item-action d-flex align-items-center gap-2 fw-semibold p-2 rounded border-0"
-          >
-            {addPerSvg}
-            إذن اضافة
-          </NavLink>
-          <NavLink
-            to="/sold-invoices"
-            className="list-group-item mb-1 list-group-item-action d-flex align-items-center gap-2 fw-semibold p-2 rounded border-0"
-          >
-            {soldInvSvg}
-            فواتير البيع
-          </NavLink>
-          <NavLink
-            to="/addition-invoices"
-            className="list-group-item mb-3 list-group-item-action d-flex align-items-center gap-2 fw-semibold p-2 rounded border-0"
-          >
-            {addInvSvg}
-            فواتير الإضافة
-          </NavLink>
+          <SidebarButton NavTo="/" title="الصفحة الرئيسية" icon={homeSvg} />
+          <SidebarButton
+            NavTo="/products"
+            title="ارصدة المخزن"
+            icon={productsSvg}
+          />
+          <SidebarButton
+            NavTo="/customers"
+            title="العملاء"
+            icon={customersSvg}
+          />
+          <SidebarButton NavTo="/vendors" title="الموردين" icon={vendorsSvg} />
+          <SidebarButton
+            NavTo="/transactions"
+            title="حركة الاصناف"
+            icon={transactionsSvg}
+          />
+          <SidebarButton
+            NavTo="/sold-permission"
+            title="إذن بيع"
+            icon={soldPerSvg}
+          />
+          <SidebarButton
+            NavTo="/addition-permission"
+            title="إذن اضافة"
+            icon={addPerSvg}
+          />
+          <SidebarButton
+            NavTo="/sold-invoices"
+            title="فواتير البيع"
+            icon={soldInvSvg}
+          />
+          <SidebarButton
+            NavTo="/addition-invoices"
+            title="فواتير الإضافة"
+            icon={addInvSvg}
+          />
         </div>
         <div className="list-group">
-          {!props.forOffcanvas && (
+          {!forOffcanvas && (
             <ThemeDropdown forNavbar={false}>تبديل الثيم</ThemeDropdown>
           )}
           <DangerPopup
             notRemove={true}
-            btnStyle="list-group-item my-1 list-group-item-action d-flex align-items-center gap-2 p-2 fs-small rounded border-0"
+            btnStyle="list-group-item my-1 list-group-item-action d-flex align-items-center gap-2 p-2 fs-small fw-medium rounded border-0 btn-hov text-theme-color"
             buttonTitle="تسجيل الخروج"
             title="تسجيل الخروج"
             icon={logoutSvg}

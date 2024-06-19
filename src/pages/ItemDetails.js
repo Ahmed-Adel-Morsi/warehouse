@@ -6,6 +6,9 @@ import { printerSvg } from "../svgs/pageContentSVGs";
 import convertDateFormat from "../elements/convertDateFormat";
 import PageHeader from "../components/PageHeader";
 import { Spinner } from "react-bootstrap";
+import MainButton from "../components/MainButton";
+import CustomTable from "../components/CustomTable";
+import TableContainer from "../components/TableContainer";
 
 function ItemDetails() {
   const { productId } = useParams();
@@ -15,7 +18,6 @@ function ItemDetails() {
     loading,
   } = useSelector((state) => state.transactions);
   const dispatch = useDispatch();
-  const { theme } = useSelector((state) => state.theme);
 
   const handlePrint = () => {
     window.print();
@@ -44,98 +46,74 @@ function ItemDetails() {
         </div>
       ) : transactions.length > 0 ? (
         <>
-          <div className="mb-3 d-flex flex-column flex-lg-row justify-content-end d-print-none">
-            <button
-              type="button"
-              className={`btn ${
-                theme === "dark" ? "btn-light" : "btn-dark"
-              } d-flex align-items-center justify-content-center fs-small fw-medium py-2 px-3 gap-1`}
-              onClick={handlePrint}
-            >
-              طباعة
-              {printerSvg}
-            </button>
+          <div className="d-flex flex-column flex-lg-row justify-content-end d-print-none">
+            <MainButton
+              btnIcon={printerSvg}
+              clickHandler={handlePrint}
+              btnTitle="طباعة"
+            />
           </div>
-          <div className="border rounded mw-100 overflow-x-auto table-container">
-            <table className="table table-hover table-borderless m-0">
+          <TableContainer>
+            <CustomTable>
               <thead>
-                <tr className="table-light border-bottom">
-                  <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                    اسم الصنف
-                  </td>
-                  <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                    حركة الصنف
-                  </td>
-                  <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                    الكود
-                  </td>
-                  <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                    الماركة
-                  </td>
-                  <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                    العدد
-                  </td>
-                  <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                    السعر
-                  </td>
-                  <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                    العميل
-                  </td>
-                  <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                    التاريخ
-                  </td>
-                </tr>
+                <CustomTable.Row header={true}>
+                  <CustomTable.Data body="اسم الصنف" />
+                  <CustomTable.Data body="حركة الصنف" />
+                  <CustomTable.Data body="الكود" />
+                  <CustomTable.Data body="الماركة" />
+                  <CustomTable.Data body="العدد" />
+                  <CustomTable.Data body="السعر" />
+                  <CustomTable.Data body="العميل" />
+                  <CustomTable.Data body="التاريخ" last={true} />
+                </CustomTable.Row>
               </thead>
               <tbody>
                 {transactions.map(
                   (transaction, index, arr) =>
                     transaction.productDetails.id === productId && (
-                      <tr
+                      <CustomTable.Row
                         key={transaction.id}
-                        className={
-                          index !== arr.length - 1 ? "border-bottom" : ""
-                        }
+                        last={index === arr.length - 1}
                       >
-                        <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                          {transaction.productDetails.name || "-"}
-                        </td>
-                        <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                          <span
-                            className={`badge px-2 py-1 text-bg-${
-                              transaction.transactionType === "sell"
-                                ? "light"
-                                : "dark"
-                            }`}
-                          >
-                            {transaction.transactionType === "sell"
-                              ? "بيع"
-                              : "اضافة"}
-                          </span>
-                        </td>
-                        <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                          {transaction.productDetails.code || "-"}
-                        </td>
-                        <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                          {transaction.productDetails.brand || "-"}
-                        </td>
-                        <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                          {transaction.quantity || "-"}
-                        </td>
-                        <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                          {transaction.price || "-"}
-                        </td>
-                        <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                          {transaction.customerDetails.name || "-"}
-                        </td>
-                        <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                          {convertDateFormat(transaction.createdAt) || "-"}
-                        </td>
-                      </tr>
+                        <CustomTable.Data
+                          body={transaction.productDetails.name}
+                        />
+                        <CustomTable.Data
+                          body={
+                            <span
+                              className={`badge px-2 py-1 text-bg-${
+                                transaction.transactionType === "sell"
+                                  ? "light"
+                                  : "dark"
+                              }`}
+                            >
+                              {transaction.transactionType === "sell"
+                                ? "بيع"
+                                : "اضافة"}
+                            </span>
+                          }
+                        />
+                        <CustomTable.Data
+                          body={transaction.productDetails.code}
+                        />
+                        <CustomTable.Data
+                          body={transaction.productDetails.brand}
+                        />
+                        <CustomTable.Data body={transaction.quantity} />
+                        <CustomTable.Data body={transaction.price} />
+                        <CustomTable.Data
+                          body={transaction.customerDetails.name}
+                        />
+                        <CustomTable.Data
+                          body={convertDateFormat(transaction.createdAt)}
+                          last={true}
+                        />
+                      </CustomTable.Row>
                     )
                 )}
               </tbody>
-            </table>
-          </div>
+            </CustomTable>
+          </TableContainer>
         </>
       ) : (
         <div className="p-4 text-center fs-small fw-medium">لا يوجد بيانات</div>

@@ -17,7 +17,7 @@ function Navbar() {
           {hamburgerSvg}
         </button>
 
-        <Link to="/" className="navbar-brand fs-4 fw-boldest">
+        <Link to="/" className="navbar-brand fs-4 fw-boldest m-0">
           Warehouse
         </Link>
         <ThemeDropdown forNavbar={true} />

@@ -6,6 +6,9 @@ import { printerSvg } from "../svgs/pageContentSVGs";
 import convertDateFormat from "../elements/convertDateFormat";
 import PageHeader from "../components/PageHeader";
 import { Spinner } from "react-bootstrap";
+import MainButton from "../components/MainButton";
+import CustomTable from "../components/CustomTable";
+import TableContainer from "../components/TableContainer";
 
 function InvoiceDetails({ type }) {
   const { invoiceNumber } = useParams();
@@ -15,7 +18,6 @@ function InvoiceDetails({ type }) {
     loading,
   } = useSelector((state) => state.transactions);
   const dispatch = useDispatch();
-  const { theme } = useSelector((state) => state.theme);
 
   const handlePrint = () => {
     window.print();
@@ -44,98 +46,59 @@ function InvoiceDetails({ type }) {
         </div>
       ) : transaction ? (
         <>
-          <div className="mb-3 d-flex flex-column flex-lg-row justify-content-between gap-2">
-            <p className="fw-semibold m-0 align-self-center">
-              اسم {type === "sell" ? "العميل" : "المورد"} :{" "}
-              {transaction.customerDetails.name}
-            </p>
-            <p className="fw-semibold m-0 align-self-center">
-              تحريرا في : {convertDateFormat(transaction.createdAt)}
-            </p>
-            <p className="fw-semibold m-0 align-self-center">
-              رقم الفاتورة : {transaction.invoiceNumber}
-            </p>
-            <button
-              type="button"
-              className={`btn ${
-                theme === "dark" ? "btn-light" : "btn-dark"
-              } d-flex align-items-center justify-content-center fs-small fw-medium py-2 px-3 gap-1 d-print-none`}
-              onClick={handlePrint}
-            >
-              طباعة
-              {printerSvg}
-            </button>
+          <div className="d-flex flex-column flex-lg-row justify-content-between gap-3">
+            <div className="d-flex flex-column flex-lg-row justify-content-between gap-2">
+              <p className="fw-semibold mb-0 align-self-center">
+                اسم {type === "sell" ? "العميل" : "المورد"} :{" "}
+                {transaction.customerDetails.name}
+              </p>
+              <p className="fw-semibold mb-0 align-self-center">
+                تحريرا في : {convertDateFormat(transaction.createdAt)}
+              </p>
+              <p className="fw-semibold mb-0 align-self-center">
+                رقم الفاتورة : {transaction.invoiceNumber}
+              </p>
+            </div>
+            <MainButton
+              btnIcon={printerSvg}
+              clickHandler={handlePrint}
+              btnTitle="طباعة"
+            />
           </div>
-          <div className="border rounded mw-100 overflow-x-auto table-container">
-            <table className="table table-hover table-borderless m-0">
+          <TableContainer>
+            <CustomTable>
               <thead>
-                <tr className="table-light border-bottom">
-                  <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                    اسم الصنف
-                  </td>
-                  <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                    الكود
-                  </td>
-                  <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                    الماركة
-                  </td>
-                  <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                    الحجم
-                  </td>
-                  <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                    اللون
-                  </td>
-                  {type === "buy" && (
-                    <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                      المكان
-                    </td>
-                  )}
-                  <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                    العدد
-                  </td>
-                  <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                    السعر
-                  </td>
-                  <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                    الاجمالي
-                  </td>
-                </tr>
+                <CustomTable.Row header={true}>
+                  <CustomTable.Data body="اسم الصنف" />
+                  <CustomTable.Data body="الكود" />
+                  <CustomTable.Data body="الماركة" />
+                  <CustomTable.Data body="الحجم" />
+                  <CustomTable.Data body="اللون" />
+                  {type === "buy" && <CustomTable.Data body="المكان" />}
+                  <CustomTable.Data body="العدد" />
+                  <CustomTable.Data body="السعر" />
+                  <CustomTable.Data body="الاجمالي" last={true} />
+                </CustomTable.Row>
               </thead>
               <tbody>
-                <tr>
-                  <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                    {transaction.productDetails.name || "-"}
-                  </td>
-                  <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                    {transaction.productDetails.code || "-"}
-                  </td>
-                  <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                    {transaction.productDetails.brand || "-"}
-                  </td>
-                  <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                    {transaction.productDetails.size || "-"}
-                  </td>
-                  <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                    {transaction.productDetails.color || "-"}
-                  </td>
+                <CustomTable.Row last={true}>
+                  <CustomTable.Data body={transaction.productDetails.name} />
+                  <CustomTable.Data body={transaction.productDetails.code} />
+                  <CustomTable.Data body={transaction.productDetails.brand} />
+                  <CustomTable.Data body={transaction.productDetails.size} />
+                  <CustomTable.Data body={transaction.productDetails.color} />
                   {type === "buy" && (
-                    <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                      {transaction.productDetails.location || "-"}
-                    </td>
+                    <CustomTable.Data
+                      body={transaction.productDetails.location}
+                    />
                   )}
-                  <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                    {transaction.quantity || "-"}
-                  </td>
-                  <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                    {transaction.price || "-"}
-                  </td>
-                  <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                    {transaction.totalPrice || "-"}
-                  </td>
-                </tr>
+                  <CustomTable.Data body={transaction.quantity} />
+                  <CustomTable.Data body={transaction.price} />
+                  <CustomTable.Data body={transaction.totalPrice} last={true} />
+                </CustomTable.Row>
               </tbody>
-            </table>
-          </div>
+            </CustomTable>
+          </TableContainer>
           <p className="mt-5 d-none d-print-block fw-bold fs-6">التوقيع:</p>
         </>
       ) : (

@@ -9,6 +9,9 @@ import { addTransaction } from "../features/transactionsSlice";
 import { editProduct } from "../features/productsSlice";
 import ChooseProductToBuy from "../components/modals/ChooseProductToBuy";
 import AddandEditProduct from "../components/modals/AddandEditProduct";
+import CustomTable from "../components/CustomTable";
+import TableContainer from "../components/TableContainer";
+import PageHeader from "../components/PageHeader";
 
 function AdditionPermission() {
   const [loading, setLoading] = useState(false);
@@ -25,6 +28,7 @@ function AdditionPermission() {
           (product) => product.productDetails.id !== currentProduct.id
         )
       );
+      setOrdersIds(ordersIds.filter((id) => id !== currentProduct.id));
       return true;
     } catch (error) {
       console.error("Failed to delete the Product:", error);
@@ -36,6 +40,7 @@ function AdditionPermission() {
     setChosenVendor(null);
     setChosenProductToBuy(null);
     setAdditionPermissionOrders([]);
+    setOrdersIds([]);
     return true;
   };
 
@@ -105,15 +110,24 @@ function AdditionPermission() {
     setLoading(false);
   }, [additionPermissionOrders]);
 
+  const [ordersIds, setOrdersIds] = useState([]);
+
+  useEffect(() => {
+    additionPermissionOrders.forEach((e) => {
+      setOrdersIds((prev) => [...prev, e.productDetails.id]);
+    });
+  }, [additionPermissionOrders]);
+
   return (
     <>
+      <PageHeader>إذن اضافة</PageHeader>
       <div className="mb-3 d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 fw-semibold">
         <div className="text-center text-md-end">
           {chosenVendor
             ? `اسم المورد : ${chosenVendor.name}`
             : "الرجاء اختيار المورد"}
         </div>
-        <div className="d-flex gap-2 w-sm-100 flex-column flex-sm-row flex-grow-1 justify-content-end">
+        <div className="d-flex gap-3 w-sm-100 flex-column flex-sm-row flex-grow-1 justify-content-end">
           {!chosenVendor && (
             <>
               <ChooseVendor
@@ -129,6 +143,7 @@ function AdditionPermission() {
                 setChosenProductToBuy={setChosenProductToBuy}
                 setAdditionPermissionOrders={setAdditionPermissionOrders}
                 chosenProductToBuy={chosenProductToBuy}
+                ordersIds={ordersIds}
               />
               <AddandEditProduct btnTitle="إضافة صنف جديد" />
               <DangerPopup
@@ -159,95 +174,66 @@ function AdditionPermission() {
           )}
         </div>
       </div>
-      <div className="border rounded mw-100 overflow-x-auto table-container">
+      <TableContainer>
         {loading ? (
           <div className="p-4 text-center fs-small fw-medium">
             جارى التحميل...
           </div>
         ) : additionPermissionOrders.length > 0 ? (
-          <table className="table table-hover table-borderless m-0">
+          <CustomTable>
             <thead>
-              <tr className="table-light border-bottom">
-                <td className="border-start fs-small fw-medium text-center p-3">
-                  اسم الصنف
-                </td>
-                <td className="border-start fs-small fw-medium text-center p-3">
-                  الكود
-                </td>
-                <td className="border-start fs-small fw-medium text-center p-3">
-                  الماركة
-                </td>
-                <td className="border-start fs-small fw-medium text-center p-3">
-                  الحجم
-                </td>
-                <td className="border-start fs-small fw-medium text-center p-3">
-                  اللون
-                </td>
-                <td className="border-start fs-small fw-medium text-center p-3">
-                  العدد
-                </td>
-                <td className="border-start fs-small fw-medium text-center p-3">
-                  السعر
-                </td>
-                <td className="border-start fs-small fw-medium text-center p-3">
-                  الاجمالى
-                </td>
-                <td className="fs-small fw-medium text-center p-3">إجراءات</td>
-              </tr>
+              <CustomTable.Row header={true}>
+                <CustomTable.Data body="اسم الصنف" />
+                <CustomTable.Data body="الكود" />
+                <CustomTable.Data body="الماركة" />
+                <CustomTable.Data body="الحجم" />
+                <CustomTable.Data body="اللون" />
+                <CustomTable.Data body="العدد" />
+                <CustomTable.Data body="السعر" />
+                <CustomTable.Data body="الاجمالى" />
+                <CustomTable.Data body="إجراءات" last={true} />
+              </CustomTable.Row>
             </thead>
             <tbody>
               {additionPermissionOrders.map((order, index, arr) => (
-                <tr
+                <CustomTable.Row
                   key={order.productDetails.id}
-                  className={index !== arr.length - 1 ? "border-bottom" : ""}
+                  last={index === arr.length - 1}
                 >
-                  <td className="border-start fs-small fw-medium text-center p-3">
-                    {order.productDetails.name || "-"}
-                  </td>
-                  <td className="border-start fs-small fw-medium text-center p-3">
-                    {order.productDetails.code || "-"}
-                  </td>
-                  <td className="border-start fs-small fw-medium text-center p-3">
-                    {order.productDetails.brand || "-"}
-                  </td>
-                  <td className="border-start fs-small fw-medium text-center p-3">
-                    {order.productDetails.size || "-"}
-                  </td>
-                  <td className="border-start fs-small fw-medium text-center p-3">
-                    {order.productDetails.color || "-"}
-                  </td>
-                  <td className="border-start fs-small fw-medium text-center p-3">
-                    {order.quantity || "-"}
-                  </td>
-                  <td className="border-start fs-small fw-medium text-center p-3">
-                    {order.price || "-"}
-                  </td>
-                  <td className="border-start fs-small fw-medium text-center p-3">
-                    {order.totalPrice || "-"}
-                  </td>
-                  <td className="fs-small h-100 d-flex justify-content-center">
-                    <DangerPopup
-                      notRemove={true}
-                      title="حذف الصنف"
-                      handler={async () => {
-                        await removeProductHandler(order.productDetails);
-                      }}
-                      description="هل انت متاكد؟ سيتم حذف الصنف"
-                      successMessage={`تم حذف ${order.productDetails.name} بنجاح`}
-                      submitBtnTitle="حذف"
-                      btnStyle="btn btn-hov"
-                    />
-                  </td>
-                </tr>
+                  <CustomTable.Data body={order.productDetails.name} />
+                  <CustomTable.Data body={order.productDetails.code} />
+                  <CustomTable.Data body={order.productDetails.brand} />
+                  <CustomTable.Data body={order.productDetails.size} />
+                  <CustomTable.Data body={order.productDetails.color} />
+                  <CustomTable.Data body={order.quantity} />
+                  <CustomTable.Data body={order.price} />
+                  <CustomTable.Data body={order.totalPrice} />
+                  <CustomTable.Data
+                    body={
+                      <DangerPopup
+                        notRemove={true}
+                        title="حذف الصنف"
+                        handler={async () => {
+                          await removeProductHandler(order.productDetails);
+                        }}
+                        description="هل انت متاكد؟ سيتم حذف الصنف"
+                        successMessage={`تم حذف ${order.productDetails.name} بنجاح`}
+                        submitBtnTitle="حذف"
+                        btnStyle="btn btn-hov"
+                      />
+                    }
+                    last={true}
+                  />
+                </CustomTable.Row>
               ))}
             </tbody>
-          </table>
+          </CustomTable>
         ) : (
           <div className="p-4 text-center fs-small fw-medium">
             لا يوجد بيانات
           </div>
         )}
-      </div>
+      </TableContainer>
     </>
   );
 }

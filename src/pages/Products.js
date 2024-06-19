@@ -5,6 +5,10 @@ import { actionsSvg, productTransactionsSvg } from "../svgs/actionsSVGs";
 import AddandEditProduct from "../components/modals/AddandEditProduct";
 import DangerPopup from "../components/modals/DangerPopup";
 import { Link } from "react-router-dom";
+import CustomTable from "../components/CustomTable";
+import TableContainer from "../components/TableContainer";
+import SearchInput from "../components/SearchInput";
+import PageHeader from "../components/PageHeader";
 
 function Products() {
   const {
@@ -15,7 +19,8 @@ function Products() {
   const dispatch = useDispatch();
   const [filteredProducts, setFilteredProducts] = useState([]);
 
-  const filterItems = (value) => {
+  const filterItems = (e) => {
+    const value = e.target.value;
     setFilteredProducts(
       products.filter(function (product) {
         const codeAndName = `${product.name} ${product.code}`.toLowerCase();
@@ -41,19 +46,16 @@ function Products() {
 
   return (
     <>
-      <div className="mb-3 d-flex flex-column flex-lg-row justify-content-between">
-        <input
-          type="search"
-          name="addProduct"
-          className="form-control w-100 mb-3 mb-lg-0 search-input pe-30px"
-          onChange={(e) => {
-            filterItems(e.target.value);
-          }}
+      <PageHeader>ارصدة المخزن</PageHeader>
+      <div className="d-flex flex-column flex-lg-row justify-content-between gap-3">
+        <SearchInput
+          name="productsFilter"
           placeholder="يمكنك البحث عن الصنف بالإسم والكود"
+          onChange={filterItems}
         />
         <AddandEditProduct />
       </div>
-      <div className="border rounded mw-100 overflow-x-auto table-container">
+      <TableContainer>
         {loading ? (
           <div className="p-4 text-center fs-small fw-medium">
             جارى التحميل...
@@ -64,125 +66,90 @@ function Products() {
             <p>Error: {error}</p>
           </div>
         ) : filteredProducts.length > 0 ? (
-          <table className="table table-hover table-borderless m-0">
+          <CustomTable>
             <thead>
-              <tr className="table-light border-bottom">
-                <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                  اسم الصنف
-                </td>
-                <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                  الكود
-                </td>
-                <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                  الماركة
-                </td>
-                <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                  الحجم
-                </td>
-                <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                  اللون
-                </td>
-                <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                  المكان
-                </td>
-                <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                  بلد المنشـأ
-                </td>
-                <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                  العدد
-                </td>
-                <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                  السعر
-                </td>
-                <td className="fs-small fw-medium text-center align-middle p-3">
-                  إجراءات
-                </td>
-              </tr>
+              <CustomTable.Row header={true}>
+                <CustomTable.Data body="اسم الصنف" />
+                <CustomTable.Data body="الكود" />
+                <CustomTable.Data body="الماركة" />
+                <CustomTable.Data body="الحجم" />
+                <CustomTable.Data body="اللون" />
+                <CustomTable.Data body="المكان" />
+                <CustomTable.Data body="بلد المنشـأ" />
+                <CustomTable.Data body="العدد" />
+                <CustomTable.Data body="السعر" />
+                <CustomTable.Data body="إجراءات" last={true} />
+              </CustomTable.Row>
             </thead>
             <tbody>
               {filteredProducts.map((product, index, arr) => (
-                <tr
+                <CustomTable.Row
                   key={product.id}
-                  className={index !== arr.length - 1 ? "border-bottom" : ""}
+                  last={index === arr.length - 1}
                 >
-                  <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                    {product.name || "-"}
-                  </td>
-                  <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                    {product.code || "-"}
-                  </td>
-                  <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                    {product.brand || "-"}
-                  </td>
-                  <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                    {product.size || "-"}
-                  </td>
-                  <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                    {product.color || "-"}
-                  </td>
-                  <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                    {product.location || "-"}
-                  </td>
-                  <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                    {product.countryOfOrigin || "-"}
-                  </td>
-                  <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                    {product.quantity || "-"}
-                  </td>
-                  <td className="border-start fs-small fw-medium text-center align-middle p-3">
-                    {product.price || "-"}
-                  </td>
-                  <td className="fs-small text-center align-middle p-1">
-                    <div className="dropdown-center position-static d-flex justify-content-center">
-                      <button
-                        type="button"
-                        className="list-group-item list-group-item-action gap-2 fs-small w-2rem h-2rem rounded btn-hov"
-                        data-bs-toggle="dropdown"
-                        aria-expanded="false"
-                      >
-                        {actionsSvg}
-                      </button>
-                      <ul className="dropdown-menu position-absolute p-1">
-                        <li className="text-end p-2 fw-semibold">إجراءات</li>
-                        <hr className="my-1" />
-                        <li>
-                          <AddandEditProduct
-                            forEdit={true}
-                            initialFormData={product}
-                          />
-                        </li>
-                        <li>
-                          <DangerPopup
-                            buttonTitle="حذف"
-                            title="حذف الصنف"
-                            itemToRemove={product}
-                            handler={deleteProduct}
-                            description="هل انت متاكد؟ سيتم حذف الصنف نهائياً"
-                            submitBtnTitle="حذف الصنف"
-                          />
-                        </li>
-                        <li>
-                          <Link
-                            to={`${product.id}`}
-                            className="dropdown-item rounded d-flex align-items-center gap-1 px-2 fs-small fw-medium"
-                          >
-                            {productTransactionsSvg}
-                            حركة الصنف
-                          </Link>
-                        </li>
-                      </ul>
-                    </div>
-                  </td>
-                </tr>
+                  <CustomTable.Data body={product.name} />
+                  <CustomTable.Data body={product.code} />
+                  <CustomTable.Data body={product.brand} />
+                  <CustomTable.Data body={product.size} />
+                  <CustomTable.Data body={product.color} />
+                  <CustomTable.Data body={product.location} />
+                  <CustomTable.Data body={product.countryOfOrigin} />
+                  <CustomTable.Data body={product.quantity} />
+                  <CustomTable.Data body={product.price} />
+                  <CustomTable.Data
+                    body={
+                      <div className="dropdown-center position-static d-flex justify-content-center">
+                        <button
+                          type="button"
+                          className="list-group-item list-group-item-action gap-2 fs-small w-2rem h-2rem rounded btn-hov"
+                          data-bs-toggle="dropdown"
+                          aria-expanded="false"
+                        >
+                          {actionsSvg}
+                        </button>
+                        <ul className="dropdown-menu position-absolute p-1">
+                          <li className="text-end p-2 fw-semibold">إجراءات</li>
+                          <hr className="my-1" />
+                          <li>
+                            <AddandEditProduct
+                              forEdit={true}
+                              initialFormData={product}
+                            />
+                          </li>
+                          <li>
+                            <DangerPopup
+                              buttonTitle="حذف"
+                              title="حذف الصنف"
+                              itemToRemove={product}
+                              handler={deleteProduct}
+                              description="هل انت متاكد؟ سيتم حذف الصنف نهائياً"
+                              submitBtnTitle="حذف الصنف"
+                            />
+                          </li>
+                          <li>
+                            <Link
+                              to={`${product.id}`}
+                              className="dropdown-item rounded d-flex align-items-center gap-1 px-2 fs-small fw-medium"
+                            >
+                              {productTransactionsSvg}
+                              حركة الصنف
+                            </Link>
+                          </li>
+                        </ul>
+                      </div>
+                    }
+                    last={true}
+                  />
+                </CustomTable.Row>
               ))}
             </tbody>
-          </table>
+          </CustomTable>
         ) : (
           <div className="p-4 text-center fs-small fw-medium">
             لا يوجد بيانات
           </div>
         )}
-      </div>
+      </TableContainer>
     </>
   );
 }

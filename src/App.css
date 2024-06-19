@@ -1,3 +1,8 @@
+:root {
+  --main-hov-color: #f4f4f5;
+  --main-text-color: black;
+}
+
 .dropdown-menu {
   --bs-dropdown-min-width: 7rem !important;
 }
@@ -27,8 +32,29 @@ td .dropdown-menu {
 .h-fit {
   height: fit-content !important;
 }
-.btn-hov:hover {
-  background-color: #f4f4f5 !important;
+.p-badge {
+  padding: 0.125rem 0.625rem !important;
+}
+
+.text-theme-color {
+  color: var(--main-text-color) !important;
+}
+
+.table-head td,
+.bg-hov-color,
+.btn-hov:hover,
+.btn-hov:active,
+.btn-hov.active {
+  background-color: var(--main-hov-color) !important;
+  color: var(--main-text-color) !important;
+}
+
+.close-btn {
+  background-color: transparent !important;
+}
+
+.close-btn:hover {
+  background-color: rgb(0 0 0 / 10%) !important;
 }
 
 .fs-smallest {
@@ -52,19 +78,28 @@ td .dropdown-menu {
 }
 
 [data-bs-theme="dark"] {
+  --main-hov-color: #27272a;
+  --main-text-color: white;
   --bs-body-bg: #09090b !important;
+  --bs-border-color: var(--main-hov-color) !important;
 
-  .table-light {
-    --bs-table-bg: #141415 !important;
-    --bs-table-color: white !important;
+  .svg-fill {
+    stroke: white !important;
   }
-  .list-group {
-    --bs-list-group-action-hover-color: var(--bs-light);
-    --bs-list-group-action-hover-bg: #27272a;
+
+  .table-head td {
+    background-color: #141415 !important;
   }
-  .list-group-item.active {
-    color: var(--bs-light) !important;
-    background-color: #27272a !important;
+
+  .close-btn:hover {
+    background-color: rgb(255 255 255 / 10%) !important;
+  }
+
+  .btn-danger {
+    --bs-btn-bg: #7f1d1d !important;
+    --bs-btn-hover-bg: #7f1d1de6 !important;
+    --bs-btn-active-bg: #7f1d1de6 !important;
+    --bs-btn-disabled-bg: #7f1d1d !important;
   }
 }
 :focus {
@@ -73,4 +108,14 @@ td .dropdown-menu {
 .modal-open,
 .modal {
   padding-right: 0 !important;
+}
+
+.btn:disabled {
+  background-color: #9c9c9c !important;
+}
+
+@media print {
+  @page {
+    margin: 0;
+  }
 }

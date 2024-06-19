@@ -8,30 +8,26 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { setTheme } from "../features/themeSlice";
 
-function ThemeDropdown(props) {
+function ThemeDropdown({ children, forNavbar }) {
   const { theme } = useSelector((state) => state.theme);
   const dispatch = useDispatch();
   const themeIcon = theme === "dark" ? darkSvgLg : lightSvgLg;
 
   return (
-    <div className={`${props.forNavbar ? "dropdown" : "dropup"}`}>
+    <div className={`${forNavbar ? "dropdown" : "dropup"}`}>
       <button
         type="button"
-        className={`list-group-item list-group-item-action d-flex align-items-center p-2 gap-2 fs-small fw-medium rounded border-0 ${
-          props.forNavbar && "btn-hov"
-        }`}
+        className={`list-group-item list-group-item-action d-flex align-items-center p-2 gap-2 fs-small fw-medium btn-hov text-theme-color rounded border-0`}
         data-bs-toggle="dropdown"
         aria-expanded="false"
       >
         {themeIcon}
-        {props.children}
+        {children}
       </button>
-      <ul
-        className={`dropdown-menu p-1 ${!props.forNavbar && "theme-dropdown"}`}
-      >
+      <ul className={`dropdown-menu p-1 ${!forNavbar ? "theme-dropdown" : ""}`}>
         <li>
           <button
-            className="dropdown-item rounded d-flex align-items-center gap-1 fs-small fw-medium mb-1 px-2"
+            className="dropdown-item rounded d-flex align-items-center gap-1 fs-small fw-medium mb-1 px-2 btn-hov"
             onClick={() => {
               dispatch(setTheme("light"));
             }}
@@ -42,7 +38,7 @@ function ThemeDropdown(props) {
         </li>
         <li>
           <button
-            className="dropdown-item rounded d-flex align-items-center gap-1 fs-small fw-medium mb-1 px-2"
+            className="dropdown-item rounded d-flex align-items-center gap-1 fs-small fw-medium mb-1 px-2 btn-hov"
             onClick={() => {
               dispatch(setTheme("dark"));
             }}
@@ -53,7 +49,7 @@ function ThemeDropdown(props) {
         </li>
         <li>
           <button
-            className="dropdown-item rounded d-flex align-items-center gap-1 fs-small fw-medium px-2"
+            className="dropdown-item rounded d-flex align-items-center gap-1 fs-small fw-medium px-2 btn-hov"
             onClick={() => {
               if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
                 dispatch(setTheme("dark"));

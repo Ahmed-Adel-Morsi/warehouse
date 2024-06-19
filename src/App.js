@@ -40,11 +40,17 @@ function App() {
             />
             <Route path={ROUTES.SOLD_INVOICES} element={<Outlet />}>
               <Route path="" element={<SoldInvoices />} />
-              <Route path={ROUTES.INVOICE_DETAILS} element={<InvoiceDetails type="sell" />} />
+              <Route
+                path={ROUTES.INVOICE_DETAILS}
+                element={<InvoiceDetails type="sell" />}
+              />
             </Route>
             <Route path={ROUTES.ADDITION_INVOICES} element={<Outlet />}>
               <Route path="" element={<AdditionInvoices />} />
-              <Route path={ROUTES.INVOICE_DETAILS} element={<InvoiceDetails type="buy" />} />
+              <Route
+                path={ROUTES.INVOICE_DETAILS}
+                element={<InvoiceDetails type="buy" />}
+              />
             </Route>
           </Routes>
         </PageContent>

@@ -46,15 +46,13 @@ function DangerPopup({
       dangerVariant={true}
       btnStyle={btnStyle}
     >
-      <CustomModal.Header title={title} />
+      <CustomModal.Header title={title}>{description}</CustomModal.Header>
       <CustomModal.Body
         btnTitle={submitBtnTitle}
         successMessage={successMessage || `تم حذف ${itemToRemove.name} بنجاح`}
         submitHandler={handleSubmit}
         loadingState={loading}
-      >
-        {description}
-      </CustomModal.Body>
+      />
     </CustomModal>
   );
 }

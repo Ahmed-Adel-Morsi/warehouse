@@ -10,6 +10,7 @@ function ChooseProductToBuy({
   setChosenProductToBuy,
   chosenProductToBuy,
   setAdditionPermissionOrders,
+  ordersIds,
 }) {
   const { data: products } = useSelector((state) => state.products);
   const [currentChoice, setCurrentChoice] = useState({});
@@ -144,7 +145,7 @@ function ChooseProductToBuy({
       >
         <div className="dropdown dropdown-center w-100">
           <button
-            className="btn border w-100 d-flex justify-content-between align-items-center"
+            className="btn border w-100 d-flex justify-content-between align-items-center btn-hov"
             type="button"
             id="dropdownMenuButton1"
             data-bs-toggle="dropdown"
@@ -163,23 +164,26 @@ function ChooseProductToBuy({
               placeholder="ابحث عن الصنف بالإسم"
               onInput={handleInput}
             />
-            <input type="hidden" id="hiddenInput" required />
             <div className="overflow-y-auto mh-6rem sm-scroll">
-              {filteredProducts.map((product) => (
-                <li className="text-end" key={product.id}>
-                  <a
-                    className={`dropdown-item rounded py-1 pe-30px ${
-                      chosenProductToBuy &&
-                      chosenProductToBuy.name === product.name &&
-                      "selected-item"
-                    }`}
-                    href="/"
-                    onClick={(e) => handleDropdownChoice(e, product)}
-                  >
-                    {product.name}
-                  </a>
-                </li>
-              ))}
+              {filteredProducts.map(
+                (product) =>
+                  !ordersIds.includes(product.id) && (
+                    <li className="text-end" key={product.id}>
+                      <a
+                        className={`dropdown-item rounded py-1 pe-30px btn-hov ${
+                          chosenProductToBuy &&
+                          chosenProductToBuy.name === product.name
+                            ? "selected-item"
+                            : ""
+                        }`}
+                        href="/"
+                        onClick={(e) => handleDropdownChoice(e, product)}
+                      >
+                        {product.name}
+                      </a>
+                    </li>
+                  )
+              )}
             </div>
           </ul>
         </div>

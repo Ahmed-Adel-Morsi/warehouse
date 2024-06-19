@@ -1,7 +1,8 @@
 import { useState, createContext, useContext } from "react";
-import { useSelector } from "react-redux";
 import { Modal, Spinner } from "react-bootstrap";
 import { toastFire } from "../elements/toastFire";
+import MainButton from "./MainButton";
+import { useSelector } from "react-redux";
 
 const ModalContext = createContext();
 
@@ -13,7 +14,6 @@ function CustomModal({
   btnStyle = false,
   dangerVariant = false,
 }) {
-  const { theme } = useSelector((state) => state.theme);
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
@@ -35,16 +35,11 @@ function CustomModal({
           {btnTitle}
         </button>
       ) : (
-        <button
-          type="button"
-          className={`btn ${
-            theme === "dark" ? "btn-light" : "btn-dark"
-          } d-flex align-items-center justify-content-center fs-small fw-medium py-2 px-3 gap-1`}
-          onClick={handleShow}
-        >
-          {btnTitle}
-          {btnIcon}
-        </button>
+        <MainButton
+          btnIcon={btnIcon}
+          clickHandler={handleShow}
+          btnTitle={btnTitle}
+        />
       )}
       <Modal
         show={show}
@@ -66,7 +61,7 @@ function ModalHeader({ children, title }) {
     <>
       <div className="modal-header border-bottom-0 p-0 mb-2 text-center text-sm-end">
         <h1
-          className="modal-title fs-medium fw-semibold flex-grow-1"
+          className="modal-title fs-medium fw-semibold flex-grow-1 text-theme-color"
           id="exampleModalLabel"
         >
           {title}
@@ -92,10 +87,11 @@ function ModalBody({
   successMessage = false,
   warningMessage = false,
   loadingState,
-  disableSubmit
+  disableSubmit,
 }) {
   const { handleClose, dangerVariant } = useContext(ModalContext);
   const [submitted, setSubmitted] = useState(false);
+  const { theme } = useSelector((state) => state.theme);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -122,22 +118,21 @@ function ModalBody({
       onSubmit={handleSubmit}
       noValidate
     >
-      <div className="modal-body overflow-y-auto sm-scroll p-0 py-1 my-3">
-        <div className="d-flex flex-wrap gap-3">{children}</div>
-      </div>
-      <div className="modal-footer border-top-0 p-0 d-flex flex-column flex-sm-row">
-        <button
-          type="button"
-          className="btn btn-light popup-btn w-100"
-          onClick={handleClose}
-        >
-          إلغاء
-        </button>
+      {children && (
+        <div className="modal-body overflow-y-auto sm-scroll p-0 py-1 my-3">
+          <div className="d-flex flex-wrap gap-3">{children}</div>
+        </div>
+      )}
+      <div className="modal-footer border-top-0 p-0 d-flex flex-column flex-sm-row mt-3">
         <button
           type="submit"
           className={`btn ${
-            dangerVariant ? "btn-danger" : "btn-dark"
-          } popup-btn w-100 d-flex justify-content-center align-items-center gap-2`}
+            dangerVariant
+              ? "btn-danger"
+              : theme === "dark"
+              ? "btn-light"
+              : "btn-dark"
+          } popup-btn d-flex justify-content-center align-items-center gap-2 fw-medium fs-small border-0 px-3 py-2 order-sm-2`}
           disabled={loadingState || disableSubmit}
         >
           {btnTitle}
@@ -150,6 +145,13 @@ function ModalBody({
               aria-hidden="true"
             />
           )}
+        </button>
+        <button
+          type="button"
+          className="btn popup-btn close-btn border fw-medium fs-small px-3 py-2"
+          onClick={handleClose}
+        >
+          إلغاء
         </button>
       </div>
     </form>

@@ -11,16 +11,3 @@ export const ROUTES = {
   INVOICE_DETAILS: ":invoiceNumber",
   PRODUCT_INVOICES: ":productId",
 };
-
-export const PATH_TO_HEADING = {
-  [ROUTES.HOME]: "الصفحة الرئيسية",
-  [ROUTES.PRODUCTS]: "ارصدة المخزن",
-  [ROUTES.CUSTOMERS]: "العملاء",
-  [ROUTES.VENDORS]: "الموردين",
-  [ROUTES.TRANSACTIONS]: "حركة الاصناف",
-  [ROUTES.SOLD_PERMISSION]: "إذن بيع",
-  [ROUTES.ADDITION_PERMISSION]: "إذن اضافة",
-  [ROUTES.SOLD_INVOICES]: "فواتير البيع",
-  [ROUTES.ADDITION_INVOICES]: "فواتير الإضافة",
-  [ROUTES.PRODUCT_INVOICES]: "حركة الصنف",
-};

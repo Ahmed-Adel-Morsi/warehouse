@@ -9,7 +9,7 @@ export const addProductSvg = (
     strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
-    className="lucide lucide-package-plus small-svg"
+    className="small-svg"
   >
     <path d="M16 16h6"></path>
     <path d="M19 13v6"></path>
@@ -31,7 +31,7 @@ export const addCustomerSvg = (
     strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
-    className="lucide lucide-user-plus small-svg"
+    className="small-svg"
   >
     <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
     <circle cx="9" cy="7" r="4"></circle>
@@ -51,7 +51,7 @@ export const selectTogglerSvg = (
     strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
-    className="lucide lucide-chevrons-up-down small-svg"
+    className="small-svg"
   >
     <path d="m7 15 5 5 5-5"></path>
     <path d="m7 9 5-5 5 5"></path>
@@ -69,7 +69,7 @@ export const resetSvg = (
     strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
-    className="lucide lucide-file-symlink small-svg"
+    className="small-svg"
   >
     <path d="m10 18 3-3-3-3"></path>
     <path d="M14 2v4a2 2 0 0 0 2 2h4"></path>
@@ -88,7 +88,7 @@ export const saveSvg = (
     strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
-    className="lucide lucide-save small-svg"
+    className="small-svg"
   >
     <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
     <polyline points="17 21 17 13 7 13 7 21"></polyline>
@@ -107,7 +107,7 @@ export const printerSvg = (
     strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
-    className="lucide lucide-printer small-svg"
+    className="small-svg"
   >
     <polyline points="6 9 6 2 18 2 18 9"></polyline>
     <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
