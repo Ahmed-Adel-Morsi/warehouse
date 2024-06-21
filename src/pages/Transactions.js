@@ -86,7 +86,7 @@ function Transactions() {
                       <span
                         className={`badge p-badge fw-semibold fs-075rem ${
                           transaction.transactionType === "sell"
-                            ? "text-bg-light"
+                            ? "text-bg-dark"
                             : "bg-hov-color"
                         }`}
                       >

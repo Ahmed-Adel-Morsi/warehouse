@@ -46,8 +46,8 @@ function InvoiceDetails({ type }) {
         </div>
       ) : transaction ? (
         <>
-          <div className="d-flex flex-column flex-lg-row justify-content-between gap-3">
-            <div className="d-flex flex-column flex-lg-row justify-content-between gap-2">
+          <div className="d-flex flex-column flex-lg-row justify-content-between align-items-center gap-3">
+            <div className="d-flex flex-column flex-lg-row justify-content-between gap-2 w-75 invoice-details">
               <p className="fw-semibold mb-0 align-self-center">
                 اسم {type === "sell" ? "العميل" : "المورد"} :{" "}
                 {transaction.customerDetails.name}
@@ -59,11 +59,13 @@ function InvoiceDetails({ type }) {
                 رقم الفاتورة : {transaction.invoiceNumber}
               </p>
             </div>
-            <MainButton
-              btnIcon={printerSvg}
-              clickHandler={handlePrint}
-              btnTitle="طباعة"
-            />
+            <div className="d-block d-print-none">
+              <MainButton
+                btnIcon={printerSvg}
+                clickHandler={handlePrint}
+                btnTitle="طباعة"
+              />
+            </div>
           </div>
           <TableContainer>
             <CustomTable>
@@ -99,7 +101,7 @@ function InvoiceDetails({ type }) {
               </tbody>
             </CustomTable>
           </TableContainer>
-          <p className="mt-5 d-none d-print-block fw-bold fs-6">التوقيع:</p>
+          <p className="mt-4 d-none d-print-block fw-bold fs-6">التوقيع:</p>
         </>
       ) : (
         <div className="p-4 text-center fs-small fw-medium">لا يوجد بيانات</div>

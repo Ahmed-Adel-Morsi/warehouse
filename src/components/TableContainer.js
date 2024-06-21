@@ -1,6 +1,8 @@
 function TableContainer({ children }) {
   return (
-    <div className="border rounded mw-100 overflow-x-auto mt-3">{children}</div>
+    <div className="border rounded overflow-x-auto mt-3 table-container">
+      {children}
+    </div>
   );
 }
 

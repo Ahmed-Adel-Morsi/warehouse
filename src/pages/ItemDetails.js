@@ -81,10 +81,10 @@ function ItemDetails() {
                         <CustomTable.Data
                           body={
                             <span
-                              className={`badge px-2 py-1 text-bg-${
+                              className={`badge p-badge fw-semibold fs-075rem ${
                                 transaction.transactionType === "sell"
-                                  ? "light"
-                                  : "dark"
+                                  ? "bg-hov-color"
+                                  : "text-bg-dark"
                               }`}
                             >
                               {transaction.transactionType === "sell"
