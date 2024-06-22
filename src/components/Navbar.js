@@ -2,17 +2,21 @@ import { Link } from "react-router-dom";
 import ThemeDropdown from "./ThemeDropdown";
 import Sidebar from "./Sidebar";
 import { hamburgerSvg } from "../svgs/navbarSVGs";
+import { useState } from "react";
+import { Offcanvas } from "react-bootstrap";
 
 function Navbar() {
+  const [show, setShow] = useState(false);
+
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
   return (
     <nav className="d-block d-lg-none navbar navbar-expand-lg bg-body-white py-2 px-3 border-bottom d-print-none">
       <div className="container-fluid p-0">
         <button
           className="navbar-toggler border-0 p-2 btn-hov"
           type="button"
-          data-bs-toggle="offcanvas"
-          data-bs-target="#staticBackdrop"
-          aria-controls="staticBackdrop"
+          onClick={handleShow}
         >
           {hamburgerSvg}
         </button>
@@ -21,31 +25,26 @@ function Navbar() {
           Warehouse
         </Link>
         <ThemeDropdown forNavbar={true} />
-        <div
-          className="offcanvas offcanvas-end overflow-y-auto w-fit border-start"
-          // data-bs-backdrop="static"
-          tabIndex="-1"
-          id="staticBackdrop"
-          aria-labelledby="staticBackdropLabel"
+        <Offcanvas
+          show={show}
+          onHide={handleClose}
+          placement="end"
+          className="overflow-y-auto w-fit border-start"
         >
-          <div className="offcanvas-header justify-content-between">
-            <h5
-              className="offcanvas-title fw-medium fs-6"
-              id="staticBackdropLabel"
-            >
+          <Offcanvas.Header className="justify-content-between">
+            <Offcanvas.Title className="fw-medium fs-6">
               إدارة المخزن
-            </h5>
+            </Offcanvas.Title>
             <button
               type="button"
               className="btn-close fs-smallest rounded border m-0"
-              data-bs-dismiss="offcanvas"
-              aria-label="Close"
+              onClick={handleClose}
             ></button>
-          </div>
-          <div className="offcanvas-body p-0">
-            <Sidebar forOffcanvas={true} />
-          </div>
-        </div>
+          </Offcanvas.Header>
+          <Offcanvas.Body className="p-0">
+            <Sidebar forOffcanvas={true} closeHandler={handleClose} />
+          </Offcanvas.Body>
+        </Offcanvas>
       </div>
     </nav>
   );
