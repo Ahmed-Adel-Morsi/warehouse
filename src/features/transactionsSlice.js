@@ -1,19 +1,13 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-
-const apiCall = async (url, options) => {
-  const response = await fetch(url, options);
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || "Network response was not ok");
-  }
-  return response.json();
-};
+import apiCall from "../elements/apiCall";
 
 export const fetchTransactions = createAsyncThunk(
   "transactionsSlice/fetchTransactions",
-  async () => {
+  async (_, { rejectWithValue }) => {
     const data = await apiCall(
-      `${process.env.REACT_APP_API_BASE_URL}/transactions`
+      `${process.env.REACT_APP_API_BASE_URL}/transactions`,
+      undefined,
+      rejectWithValue
     );
     return data;
   }
@@ -21,56 +15,52 @@ export const fetchTransactions = createAsyncThunk(
 
 export const getTransactionsOfType = createAsyncThunk(
   "transactionsSlice/getTransactionsOfType",
-  async (type) => {
+  async (type, { rejectWithValue }) => {
     const data = await apiCall(
-      `${process.env.REACT_APP_API_BASE_URL}/transactions`
+      `${process.env.REACT_APP_API_BASE_URL}/transactions?type=${type}`,
+      undefined,
+      rejectWithValue
     );
-    return data.filter((transaction) => transaction.transactionType === type);
+    return data;
   }
 );
 
 export const getTransactionsByProductId = createAsyncThunk(
-  "transactionsSlice/getTransactionById",
-  async (productId) => {
+  "transactionsSlice/getTransactionsByProductId",
+  async (productId, { rejectWithValue }) => {
     const data = await apiCall(
-      `${process.env.REACT_APP_API_BASE_URL}/transactions`
+      `${process.env.REACT_APP_API_BASE_URL}/transactions?productId=${productId}`,
+      undefined,
+      rejectWithValue
     );
-    return data.filter(
-      (transaction) => transaction.productDetails.id === productId
-    );
+    return data;
   }
 );
 
 export const getTransactionByInvoiceNumber = createAsyncThunk(
   "transactionsSlice/getTransactionByInvoiceNumber",
-  async ({ type, invoiceNumber }) => {
+  async ({ type, invoiceNumber }, { rejectWithValue }) => {
     const data = await apiCall(
-      `${process.env.REACT_APP_API_BASE_URL}/transactions`
+      `${process.env.REACT_APP_API_BASE_URL}/transactions?type=${type}&invoiceNumber=${invoiceNumber}`,
+      undefined,
+      rejectWithValue
     );
-    return data.find(
-      (transaction) =>
-        transaction.transactionType === type &&
-        transaction.invoiceNumber === invoiceNumber
-    );
+    return data[0]; // Assuming only one transaction matches
   }
 );
 
 export const addTransaction = createAsyncThunk(
   "transactionsSlice/addTransaction",
-  async (transaction, { getState }) => {
+  async (transaction, { getState, rejectWithValue }) => {
     const { data: transactions } = getState().transactions;
 
-    const lastTransaction = transactions
-      .filter((curr) => curr.transactionType === transaction.transactionType)
-      .reduce(
-        (prev, curr) => (prev.invoiceNumber > curr.invoiceNumber ? prev : curr),
-        { invoiceNumber: 0 }
-      );
-
-    const lastInvoiceNumber = lastTransaction.invoiceNumber || 0;
+    const lastTransaction = transactions.reduce(
+      (prev, curr) => (prev.invoiceNumber > curr.invoiceNumber ? prev : curr),
+      { invoiceNumber: 0 }
+    );
 
     const newTransaction = {
-      invoiceNumber: lastInvoiceNumber + 1,
+      invoiceNumber: lastTransaction.invoiceNumber + 1,
       ...transaction,
     };
 
@@ -82,7 +72,8 @@ export const addTransaction = createAsyncThunk(
           "Content-Type": "application/json",
         },
         body: JSON.stringify(newTransaction),
-      }
+      },
+      rejectWithValue
     );
     return data;
   }
@@ -112,7 +103,7 @@ const transactionsSlice = createSlice({
       })
       .addCase(fetchTransactions.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message;
+        state.error = action.payload;
       })
       // Fetch Transactions of Specific Type
       .addCase(getTransactionsOfType.pending, (state) => {
@@ -125,9 +116,9 @@ const transactionsSlice = createSlice({
       })
       .addCase(getTransactionsOfType.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message;
+        state.error = action.payload;
       })
-      // Fetch Transaction by Id
+      // Fetch Transaction by Product Id
       .addCase(getTransactionsByProductId.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -138,7 +129,7 @@ const transactionsSlice = createSlice({
       })
       .addCase(getTransactionsByProductId.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message;
+        state.error = action.payload;
       })
       // Fetch Transaction by Invoice Number
       .addCase(getTransactionByInvoiceNumber.pending, (state) => {
@@ -151,7 +142,7 @@ const transactionsSlice = createSlice({
       })
       .addCase(getTransactionByInvoiceNumber.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message;
+        state.error = action.payload;
       })
       // Add Transaction
       .addCase(addTransaction.pending, (state) => {
@@ -164,7 +155,7 @@ const transactionsSlice = createSlice({
       })
       .addCase(addTransaction.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message;
+        state.error = action.payload;
       });
   },
 });

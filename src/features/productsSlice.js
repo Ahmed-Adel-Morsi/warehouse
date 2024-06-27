@@ -1,54 +1,68 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import apiCall from "../elements/apiCall";
 
+// Thunk for fetching products
 export const fetchProducts = createAsyncThunk(
   "productsSlice/fetchProducts",
-  async () => {
-    const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/products`);
-    if (!response.ok) throw new Error('Network response was not ok');
-    const data = await response.json();
+  async (_, { rejectWithValue }) => {
+    const data = await apiCall(
+      `${process.env.REACT_APP_API_BASE_URL}/products`,
+      undefined,
+      rejectWithValue
+    );
     return data;
   }
 );
 
+// Thunk for adding a product
 export const addProduct = createAsyncThunk(
   "productsSlice/addProduct",
-  async (product) => {
-    const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/products`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+  async (product, { rejectWithValue }) => {
+    const data = await apiCall(
+      `${process.env.REACT_APP_API_BASE_URL}/products`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(product),
       },
-      body: JSON.stringify(product),
-    });
-    if (!response.ok) throw new Error('Network response was not ok');
-    const data = await response.json();
+      rejectWithValue
+    );
     return data;
   }
 );
 
+// Thunk for deleting a product
 export const deleteProduct = createAsyncThunk(
   "productsSlice/deleteProduct",
-  async (productId) => {
-    const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/products/${productId}`, {
-      method: "DELETE",
-    });
-    if (!response.ok) throw new Error('Network response was not ok');
+  async (productId, { rejectWithValue }) => {
+    await apiCall(
+      `${process.env.REACT_APP_API_BASE_URL}/products/${productId}`,
+      {
+        method: "DELETE",
+      },
+      rejectWithValue
+    );
     return productId;
   }
 );
 
+// Thunk for editing a product
 export const editProduct = createAsyncThunk(
   "productsSlice/editProduct",
-  async (product) => {
-    const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/products/${product.id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
+  async (product, { rejectWithValue }) => {
+    const data = await apiCall(
+      `${process.env.REACT_APP_API_BASE_URL}/products/${product.id}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(product),
       },
-      body: JSON.stringify(product),
-    });
-    if (!response.ok) throw new Error('Network response was not ok');
-    const data = await response.json();
+      rejectWithValue
+    );
     return data;
   }
 );
@@ -96,7 +110,9 @@ const productsSlice = createSlice({
       })
       .addCase(deleteProduct.fulfilled, (state, action) => {
         state.loading = false;
-        state.data = state.data.filter((product) => product.id !== action.payload);
+        state.data = state.data.filter(
+          (product) => product.id !== action.payload
+        );
       })
       .addCase(deleteProduct.rejected, (state, action) => {
         state.loading = false;
@@ -109,7 +125,9 @@ const productsSlice = createSlice({
       })
       .addCase(editProduct.fulfilled, (state, action) => {
         state.loading = false;
-        const index = state.data.findIndex((product) => product.id === action.payload.id);
+        const index = state.data.findIndex(
+          (product) => product.id === action.payload.id
+        );
         if (index !== -1) {
           state.data[index] = action.payload;
         }

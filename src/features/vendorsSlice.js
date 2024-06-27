@@ -1,20 +1,23 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import apiCall from "../elements/apiCall";
 
+// Thunk for fetching vendors
 export const fetchVendors = createAsyncThunk(
   "vendorsSlice/fetchVendors",
-  async () => {
-    const response = await fetch(
-      `${process.env.REACT_APP_API_BASE_URL}/vendors`
+  async (_, { rejectWithValue }) => {
+    const data = await apiCall(
+      `${process.env.REACT_APP_API_BASE_URL}/vendors`,
+      undefined,
+      rejectWithValue
     );
-    if (!response.ok) throw new Error("Network response was not ok");
-    const data = await response.json();
     return data;
   }
 );
 
+// Thunk for adding a vendor
 export const addVendor = createAsyncThunk(
   "vendorsSlice/addVendor",
-  async (vendor, { getState }) => {
+  async (vendor, { getState, rejectWithValue }) => {
     const { data: vendors } = getState().vendors;
     const lastVendor = vendors.reduce(
       (prev, curr) => {
@@ -25,7 +28,7 @@ export const addVendor = createAsyncThunk(
     const lastCode = lastVendor ? lastVendor.code : 0;
     const newVendor = { ...vendor, code: lastCode + 1 };
 
-    const response = await fetch(
+    const data = await apiCall(
       `${process.env.REACT_APP_API_BASE_URL}/vendors`,
       {
         method: "POST",
@@ -33,32 +36,33 @@ export const addVendor = createAsyncThunk(
           "Content-Type": "application/json",
         },
         body: JSON.stringify(newVendor),
-      }
+      },
+      rejectWithValue
     );
-    if (!response.ok) throw new Error("Network response was not ok");
-    const data = await response.json();
     return data;
   }
 );
 
+// Thunk for deleting a vendor
 export const deleteVendor = createAsyncThunk(
   "vendorsSlice/deleteVendor",
-  async (vendorId) => {
-    const response = await fetch(
+  async (vendorId, { rejectWithValue }) => {
+    await apiCall(
       `${process.env.REACT_APP_API_BASE_URL}/vendors/${vendorId}`,
       {
         method: "DELETE",
-      }
+      },
+      rejectWithValue
     );
-    if (!response.ok) throw new Error("Network response was not ok");
     return vendorId;
   }
 );
 
+// Thunk for editing a vendor
 export const editVendor = createAsyncThunk(
   "vendorsSlice/editVendor",
-  async (vendor) => {
-    const response = await fetch(
+  async (vendor, { rejectWithValue }) => {
+    const data = await apiCall(
       `${process.env.REACT_APP_API_BASE_URL}/vendors/${vendor.id}`,
       {
         method: "PUT",
@@ -66,10 +70,9 @@ export const editVendor = createAsyncThunk(
           "Content-Type": "application/json",
         },
         body: JSON.stringify(vendor),
-      }
+      },
+      rejectWithValue
     );
-    if (!response.ok) throw new Error("Network response was not ok");
-    const data = await response.json();
     return data;
   }
 );

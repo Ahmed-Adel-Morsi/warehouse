@@ -1,20 +1,23 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import apiCall from "../elements/apiCall";
 
+// Thunk for fetching customers
 export const fetchCustomers = createAsyncThunk(
   "customersSlice/fetchCustomers",
-  async () => {
-    const response = await fetch(
-      `${process.env.REACT_APP_API_BASE_URL}/customers`
+  async (_, { rejectWithValue }) => {
+    const data = await apiCall(
+      `${process.env.REACT_APP_API_BASE_URL}/customers`,
+      undefined,
+      rejectWithValue
     );
-    if (!response.ok) throw new Error("Network response was not ok");
-    const data = await response.json();
     return data;
   }
 );
 
+// Thunk for adding a customer
 export const addCustomer = createAsyncThunk(
   "customersSlice/addCustomer",
-  async (customer, { getState }) => {
+  async (customer, { getState, rejectWithValue }) => {
     const { data: customers } = getState().customers;
     const lastCustomer = customers.reduce(
       (prev, curr) => {
@@ -25,7 +28,7 @@ export const addCustomer = createAsyncThunk(
     const lastCode = lastCustomer ? lastCustomer.code : 0;
     const newCustomer = { ...customer, code: lastCode + 1 };
 
-    const response = await fetch(
+    const data = await apiCall(
       `${process.env.REACT_APP_API_BASE_URL}/customers`,
       {
         method: "POST",
@@ -33,32 +36,33 @@ export const addCustomer = createAsyncThunk(
           "Content-Type": "application/json",
         },
         body: JSON.stringify(newCustomer),
-      }
+      },
+      rejectWithValue
     );
-    if (!response.ok) throw new Error("Network response was not ok");
-    const data = await response.json();
     return data;
   }
 );
 
+// Thunk for deleting a customer
 export const deleteCustomer = createAsyncThunk(
   "customersSlice/deleteCustomer",
-  async (customerId) => {
-    const response = await fetch(
+  async (customerId, { rejectWithValue }) => {
+    await apiCall(
       `${process.env.REACT_APP_API_BASE_URL}/customers/${customerId}`,
       {
         method: "DELETE",
-      }
+      },
+      rejectWithValue
     );
-    if (!response.ok) throw new Error("Network response was not ok");
     return customerId;
   }
 );
 
+// Thunk for editing a customer
 export const editCustomer = createAsyncThunk(
   "customersSlice/editCustomer",
-  async (customer) => {
-    const response = await fetch(
+  async (customer, { rejectWithValue }) => {
+    const data = await apiCall(
       `${process.env.REACT_APP_API_BASE_URL}/customers/${customer.id}`,
       {
         method: "PUT",
@@ -66,10 +70,9 @@ export const editCustomer = createAsyncThunk(
           "Content-Type": "application/json",
         },
         body: JSON.stringify(customer),
-      }
+      },
+      rejectWithValue
     );
-    if (!response.ok) throw new Error("Network response was not ok");
-    const data = await response.json();
     return data;
   }
 );
@@ -95,7 +98,7 @@ const customersSlice = createSlice({
       })
       .addCase(fetchCustomers.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message;
+        state.error = action.payload;
       })
       // Add Customer
       .addCase(addCustomer.pending, (state) => {
@@ -108,7 +111,7 @@ const customersSlice = createSlice({
       })
       .addCase(addCustomer.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message;
+        state.error = action.payload;
       })
       // Delete Customer
       .addCase(deleteCustomer.pending, (state) => {
@@ -123,7 +126,7 @@ const customersSlice = createSlice({
       })
       .addCase(deleteCustomer.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message;
+        state.error = action.payload;
       })
       // Edit Customer
       .addCase(editCustomer.pending, (state) => {
@@ -141,7 +144,7 @@ const customersSlice = createSlice({
       })
       .addCase(editCustomer.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message;
+        state.error = action.payload;
       });
   },
 });
