@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { getTransactionByInvoiceNumber } from "../features/transactionsSlice";
 import { printerSvg } from "../svgs/pageContentSVGs";
-import convertDateFormat from "../elements/convertDateFormat";
+import convertDateFormat from "../utils/convertDateFormat";
 import PageHeader from "../components/PageHeader";
 import { Spinner } from "react-bootstrap";
 import MainButton from "../components/MainButton";

@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getTransactionsOfType } from "../features/transactionsSlice";
 import { showInvoicesSvg } from "../svgs/actionsSVGs";
 import { Link } from "react-router-dom";
-import convertDateFormat from "../elements/convertDateFormat";
+import convertDateFormat from "../utils/convertDateFormat";
 import TableContainer from "../components/TableContainer";
 import CustomTable from "../components/CustomTable";
 import SearchInput from "../components/SearchInput";

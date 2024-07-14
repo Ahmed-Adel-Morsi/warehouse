@@ -1,6 +1,6 @@
 import { useState, createContext, useContext } from "react";
 import { Modal, Spinner } from "react-bootstrap";
-import { toastFire } from "../elements/toastFire";
+import { toastFire } from "../utils/toastFire";
 import MainButton from "./MainButton";
 import { useSelector } from "react-redux";
 

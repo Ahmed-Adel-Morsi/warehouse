@@ -9,7 +9,7 @@ function CustomTable({ children }) {
 CustomTable.Row = function ({ children, header = false, last = false }) {
   return (
     <tr
-      className={`text-center${header ? " table-head" : ""}${
+      className={`text-center btn-hov${header ? " table-head" : ""}${
         !last ? " border-bottom" : ""
       }`}
     >

@@ -1,6 +1,8 @@
 import { Outlet, Route, Routes } from "react-router-dom";
-import PageContent from "./components/PageContent";
-import Sidebar from "./components/Sidebar";
+import { ROUTES } from "./routes/routes";
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { validateToken } from "./features/authSlice";
 import Home from "./pages/Home";
 import Products from "./pages/Products";
 import Customers from "./pages/Customers";
@@ -10,22 +12,33 @@ import SoldPermission from "./pages/SoldPermission";
 import AdditionPermission from "./pages/AdditionPermission";
 import SoldInvoices from "./pages/SoldInvoices";
 import AdditionInvoices from "./pages/AdditionInvoices";
-import Navbar from "./components/Navbar";
-import "./App.css";
-import { ROUTES } from "./routes/routes";
 import ItemDetails from "./pages/ItemDetails";
 import InvoiceDetails from "./pages/InvoiceDetails";
+import Login from "./pages/Login";
+// import Register from "./pages/Register";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Layout from "./components/Layout";
+import NotFound from "./pages/NotFound";
+import "./App.css";
 
 function App() {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      dispatch(validateToken(token));
+    }
+  }, [dispatch]);
+
   return (
     <div className="App">
-      <div className="bg-dark d-none opacity-50 vh-100 vw-100 position-fixed overlay"></div>
-      <Navbar />
-      <div className="d-flex">
-        <Sidebar forOffcanvas={false} />
-        <PageContent>
-          <Routes>
-            <Route path={ROUTES.HOME} element={<Home />} />
+      <Routes>
+        <Route path={ROUTES.LOGIN} element={<Login />} />
+        {/* <Route path={ROUTES.REGISTER} element={<Register />} /> */}
+        <Route element={<Layout />}>
+          <Route path={ROUTES.HOME} element={<Home />} />
+          <Route element={<ProtectedRoute />}>
             <Route path={ROUTES.PRODUCTS} element={<Outlet />}>
               <Route path="" element={<Products />} />
               <Route path={ROUTES.PRODUCT_INVOICES} element={<ItemDetails />} />
@@ -52,9 +65,10 @@ function App() {
                 element={<InvoiceDetails type="buy" />}
               />
             </Route>
-          </Routes>
-        </PageContent>
-      </div>
+          </Route>
+          <Route path="*" element={<NotFound />} />
+        </Route>
+      </Routes>
     </div>
   );
 }

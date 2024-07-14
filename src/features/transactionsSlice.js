@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import apiCall from "../elements/apiCall";
+import apiCall from "../utils/apiCall";
 
 export const fetchTransactions = createAsyncThunk(
   "transactionsSlice/fetchTransactions",
@@ -17,23 +17,25 @@ export const getTransactionsOfType = createAsyncThunk(
   "transactionsSlice/getTransactionsOfType",
   async (type, { rejectWithValue }) => {
     const data = await apiCall(
-      `${process.env.REACT_APP_API_BASE_URL}/transactions?type=${type}`,
+      `${process.env.REACT_APP_API_BASE_URL}/transactions`,
       undefined,
       rejectWithValue
     );
-    return data;
+    return data.filter((transaction) => transaction.transactionType === type);
   }
 );
 
 export const getTransactionsByProductId = createAsyncThunk(
-  "transactionsSlice/getTransactionsByProductId",
+  "transactionsSlice/getTransactionById",
   async (productId, { rejectWithValue }) => {
     const data = await apiCall(
-      `${process.env.REACT_APP_API_BASE_URL}/transactions?productId=${productId}`,
+      `${process.env.REACT_APP_API_BASE_URL}/transactions`,
       undefined,
       rejectWithValue
     );
-    return data;
+    return data.filter(
+      (transaction) => transaction.productDetails.id === productId
+    );
   }
 );
 
@@ -41,11 +43,15 @@ export const getTransactionByInvoiceNumber = createAsyncThunk(
   "transactionsSlice/getTransactionByInvoiceNumber",
   async ({ type, invoiceNumber }, { rejectWithValue }) => {
     const data = await apiCall(
-      `${process.env.REACT_APP_API_BASE_URL}/transactions?type=${type}&invoiceNumber=${invoiceNumber}`,
+      `${process.env.REACT_APP_API_BASE_URL}/transactions`,
       undefined,
       rejectWithValue
     );
-    return data[0]; // Assuming only one transaction matches
+    return data.find(
+      (transaction) =>
+        transaction.transactionType === type &&
+        transaction.invoiceNumber === invoiceNumber
+    );
   }
 );
 
@@ -54,13 +60,17 @@ export const addTransaction = createAsyncThunk(
   async (transaction, { getState, rejectWithValue }) => {
     const { data: transactions } = getState().transactions;
 
-    const lastTransaction = transactions.reduce(
-      (prev, curr) => (prev.invoiceNumber > curr.invoiceNumber ? prev : curr),
-      { invoiceNumber: 0 }
-    );
+    const lastTransaction = transactions
+      .filter((curr) => curr.transactionType === transaction.transactionType)
+      .reduce(
+        (prev, curr) => (prev.invoiceNumber > curr.invoiceNumber ? prev : curr),
+        { invoiceNumber: 0 }
+      );
+
+    const lastInvoiceNumber = lastTransaction.invoiceNumber || 0;
 
     const newTransaction = {
-      invoiceNumber: lastTransaction.invoiceNumber + 1,
+      invoiceNumber: lastInvoiceNumber + 1,
       ...transaction,
     };
 

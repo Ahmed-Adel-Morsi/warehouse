@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { getTransactionsByProductId } from "../features/transactionsSlice";
 import { printerSvg } from "../svgs/pageContentSVGs";
-import convertDateFormat from "../elements/convertDateFormat";
+import convertDateFormat from "../utils/convertDateFormat";
 import PageHeader from "../components/PageHeader";
 import { Spinner } from "react-bootstrap";
 import MainButton from "../components/MainButton";
@@ -30,10 +30,9 @@ function ItemDetails() {
     <>
       <PageHeader>
         حركة الصنف -{" "}
-        {!loading &&
-          !error &&
-          transactions.length > 0 &&
-          transactions[0].productDetails.name}
+        {!loading && !error && transactions.length > 0
+          ? transactions[0].productDetails.name
+          : "لا يوجد"}
       </PageHeader>
       {loading ? (
         <div className="p-4 text-center fs-small fw-medium">

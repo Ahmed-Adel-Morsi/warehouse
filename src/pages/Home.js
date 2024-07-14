@@ -2,7 +2,9 @@ import { useNavigate } from "react-router-dom";
 import homeVector from "../assets/homeVector.svg";
 import PageHeader from "../components/PageHeader";
 import MainButton from "../components/MainButton";
+import { useSelector } from "react-redux";
 function Home() {
+  const token = useSelector((state) => state.auth.token);
   const navigate = useNavigate();
   return (
     <>
@@ -20,7 +22,7 @@ function Home() {
             <MainButton
               btnTitle="بدء الاستخدام"
               clickHandler={() => {
-                navigate("/products");
+                navigate(token ? "/products" : "/login");
               }}
             />
           </div>

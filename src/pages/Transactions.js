@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchTransactions } from "../features/transactionsSlice";
-import convertDateFormat from "../elements/convertDateFormat";
+import convertDateFormat from "../utils/convertDateFormat";
 import CustomTable from "../components/CustomTable";
 import TableContainer from "../components/TableContainer";
 import SearchInput from "../components/SearchInput";

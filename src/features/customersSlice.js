@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import apiCall from "../elements/apiCall";
+import apiCall from "../utils/apiCall";
 
 // Thunk for fetching customers
 export const fetchCustomers = createAsyncThunk(
