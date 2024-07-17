@@ -1,8 +1,5 @@
 import { Outlet, Route, Routes } from "react-router-dom";
 import { ROUTES } from "./routes/routes";
-import { useEffect } from "react";
-import { useDispatch } from "react-redux";
-import { validateToken } from "./features/authSlice";
 import Home from "./pages/Home";
 import Products from "./pages/Products";
 import Customers from "./pages/Customers";
@@ -15,27 +12,16 @@ import AdditionInvoices from "./pages/AdditionInvoices";
 import ItemDetails from "./pages/ItemDetails";
 import InvoiceDetails from "./pages/InvoiceDetails";
 import Login from "./pages/Login";
-// import Register from "./pages/Register";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Layout from "./components/Layout";
 import NotFound from "./pages/NotFound";
 import "./App.css";
 
 function App() {
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      dispatch(validateToken(token));
-    }
-  }, [dispatch]);
-
   return (
     <div className="App">
       <Routes>
         <Route path={ROUTES.LOGIN} element={<Login />} />
-        {/* <Route path={ROUTES.REGISTER} element={<Register />} /> */}
         <Route element={<Layout />}>
           <Route path={ROUTES.HOME} element={<Home />} />
           <Route element={<ProtectedRoute />}>
