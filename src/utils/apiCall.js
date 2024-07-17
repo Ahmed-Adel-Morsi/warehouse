@@ -1,13 +1,16 @@
-const apiCall = async (url, options, rejectWithValue) => {
+const apiCall = async (route, options, rejectWithValue) => {
   try {
-    const response = await fetch(url, options);
+    const response = await fetch(
+      `${process.env.REACT_APP_API_BASE_URL}${route}`,
+      options
+    );
+    const data = await response.json();
+
     if (!response.ok) {
-      const errorData = await response.json();
-      return rejectWithValue(
-        errorData.message || "Network response was not ok"
-      );
+      return rejectWithValue(data.errors || "Network response was not ok");
     }
-    return await response.json();
+
+    return data;
   } catch (error) {
     return rejectWithValue(error.message || "An unknown error occurred");
   }

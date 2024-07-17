@@ -167,8 +167,8 @@ function ChooseProductToBuy({
             <div className="overflow-y-auto mh-6rem sm-scroll">
               {filteredProducts.map(
                 (product) =>
-                  !ordersIds.includes(product.id) && (
-                    <li className="text-end" key={product.id}>
+                  !ordersIds.includes(product._id) && (
+                    <li className="text-end" key={product._id}>
                       <a
                         className={`dropdown-item rounded py-1 pe-30px btn-hov ${
                           chosenProductToBuy &&

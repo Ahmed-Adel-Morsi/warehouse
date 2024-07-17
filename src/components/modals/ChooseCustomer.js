@@ -73,7 +73,7 @@ function ChooseCustomer({ setChosenCustomer }) {
             />
             <div className="overflow-y-auto mh-6rem sm-scroll">
               {filteredCustomers.map((customer) => (
-                <li className="px-1 text-end" key={customer.id}>
+                <li className="px-1 text-end" key={customer._id}>
                   <a
                     className="dropdown-item rounded py-1 pe-4 btn-hov"
                     href="/"

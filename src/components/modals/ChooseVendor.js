@@ -73,7 +73,7 @@ function ChooseVendor({ setChosenVendor }) {
             />
             <div className="overflow-y-auto mh-6rem sm-scroll">
               {filteredVendors.map((vendor) => (
-                <li className="px-1 text-end" key={vendor.id}>
+                <li className="px-1 text-end" key={vendor._id}>
                   <a
                     className="dropdown-item rounded py-1 pe-4"
                     href="/"

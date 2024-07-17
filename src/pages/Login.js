@@ -8,12 +8,12 @@ import { Spinner } from "react-bootstrap";
 import { toastFire } from "../utils/toastFire";
 
 function Login() {
-  const [submitted, setSubmitted] = useState(false);
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
+  const [fieldErrors, setFieldErrors] = useState({});
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { token, isLoading } = useSelector((state) => state.auth);
+  const { token, isLoading, error } = useSelector((state) => state.auth);
 
   useEffect(() => {
     if (token) {
@@ -21,50 +21,29 @@ function Login() {
     }
   }, [token, navigate]);
 
-  const handleChange = (e) => {
-    if (isFieldValid(e)) {
-      e.target.removeAttribute("required");
-      e.target.classList.remove("is-invalid");
-      e.target.setCustomValidity("");
-    } else {
-      e.target.required = true;
-      e.target.classList.add("is-invalid");
-      e.target.setCustomValidity("Invalid field.");
-    }
-  };
-
-  const isFieldValid = (e) => {
-    let value = e.target.value;
-
-    switch (e.target.name) {
-      case "userName":
-      case "password":
-        return value !== "";
-
-      default:
-        return false;
-    }
-  };
-
-  const handleSumbit = async (e) => {
-    e.preventDefault();
-    setSubmitted(true);
-    if (e.currentTarget.checkValidity()) {
-      try {
-        await dispatch(loginUser({ userName, password })).then((result) => {
-          if (result.meta.requestStatus === "fulfilled") {
-            toastFire("success", "مرحبا بعودتك تم تسجيل الدخول بنجاح");
-            setUserName("");
-            setPassword("");
-            navigate("/");
-          } else {
-            toastFire("error", "اسم المستخدم أو كلمة المرور غير صحيحة");
+  useEffect(() => {
+    if (error) {
+      if (Array.isArray(error)) {
+        const errors = {};
+        error.forEach((err) => {
+          if (!errors[err.path]) {
+            errors[err.path] = err.msg;
           }
         });
-      } catch (error) {
-        console.log("Login error:", error);
+        setFieldErrors(errors);
+      } else {
+        toastFire("error", error.msg);
+        setFieldErrors({});
       }
+    } else {
+      setFieldErrors({});
     }
+  }, [error]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    await dispatch(loginUser({ userName, password }));
+    toastFire("success", "مرحبا بعودتك تم تسجيل الدخول بنجاح");
   };
 
   return (
@@ -79,10 +58,8 @@ function Login() {
           الدخول وتجربة البرنامج.
         </p>
         <form
-          onSubmit={handleSumbit}
-          className={`needs-validation d-flex flex-column gap-3 ${
-            submitted ? "was-validated" : ""
-          }`}
+          onSubmit={handleSubmit}
+          className={`d-flex flex-column gap-3`}
           noValidate
         >
           <div>
@@ -94,12 +71,15 @@ function Login() {
               id="userName"
               type="text"
               name="userName"
-              onBlur={handleChange}
               onChange={(e) => setUserName(e.target.value)}
               autoComplete="username"
               required
             />
-            <div className="invalid-feedback">يجب إدخال اسم المستخدم</div>
+            {error && (
+              <div className="invalid-feedback d-block">
+                {fieldErrors.userName}
+              </div>
+            )}
           </div>
           <div>
             <label className="mb-2 fs-small" htmlFor="pass">
@@ -110,12 +90,15 @@ function Login() {
               id="pass"
               type="password"
               name="password"
-              onBlur={handleChange}
               onChange={(e) => setPassword(e.target.value)}
               autoComplete="current-password"
               required
             />
-            <div className="invalid-feedback">يجب إدخال كلمة المرور</div>
+            {error && (
+              <div className="invalid-feedback d-block">
+                {fieldErrors.password}
+              </div>
+            )}
           </div>
           <MainButton
             type="submit"

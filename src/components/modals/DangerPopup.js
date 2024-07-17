@@ -27,7 +27,7 @@ function DangerPopup({
     } else {
       try {
         setLoading(true);
-        await dispatch(handler(itemToRemove.id)).unwrap();
+        await dispatch(handler(itemToRemove._id)).unwrap();
         setLoading(false);
         return true;
       } catch (error) {

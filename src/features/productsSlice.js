@@ -4,43 +4,52 @@ import apiCall from "../utils/apiCall";
 // Thunk for fetching products
 export const fetchProducts = createAsyncThunk(
   "productsSlice/fetchProducts",
-  async (_, { rejectWithValue }) => {
-    const data = await apiCall(
-      `${process.env.REACT_APP_API_BASE_URL}/products`,
-      undefined,
+  async (_, { rejectWithValue, getState }) => {
+    const { token } = getState().auth;
+    return await apiCall(
+      `/products`,
+      {
+        headers: {
+          Authorization: token,
+        },
+      },
       rejectWithValue
     );
-    return data;
   }
 );
 
 // Thunk for adding a product
 export const addProduct = createAsyncThunk(
   "productsSlice/addProduct",
-  async (product, { rejectWithValue }) => {
-    const data = await apiCall(
-      `${process.env.REACT_APP_API_BASE_URL}/products`,
+  async (product, { rejectWithValue, getState }) => {
+    const { token } = getState().auth;
+    return await apiCall(
+      `/products`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: token,
         },
         body: JSON.stringify(product),
       },
       rejectWithValue
     );
-    return data;
   }
 );
 
 // Thunk for deleting a product
 export const deleteProduct = createAsyncThunk(
   "productsSlice/deleteProduct",
-  async (productId, { rejectWithValue }) => {
+  async (productId, { rejectWithValue, getState }) => {
+    const { token } = getState().auth;
     await apiCall(
-      `${process.env.REACT_APP_API_BASE_URL}/products/${productId}`,
+      `/products/${productId}`,
       {
         method: "DELETE",
+        headers: {
+          Authorization: token,
+        },
       },
       rejectWithValue
     );
@@ -51,19 +60,20 @@ export const deleteProduct = createAsyncThunk(
 // Thunk for editing a product
 export const editProduct = createAsyncThunk(
   "productsSlice/editProduct",
-  async (product, { rejectWithValue }) => {
-    const data = await apiCall(
-      `${process.env.REACT_APP_API_BASE_URL}/products/${product.id}`,
+  async (product, { rejectWithValue, getState }) => {
+    const { token } = getState().auth;
+    return await apiCall(
+      `/products/${product._id}`,
       {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          Authorization: token,
         },
         body: JSON.stringify(product),
       },
       rejectWithValue
     );
-    return data;
   }
 );
 
@@ -111,7 +121,7 @@ const productsSlice = createSlice({
       .addCase(deleteProduct.fulfilled, (state, action) => {
         state.loading = false;
         state.data = state.data.filter(
-          (product) => product.id !== action.payload
+          (product) => product._id !== action.payload
         );
       })
       .addCase(deleteProduct.rejected, (state, action) => {
@@ -126,7 +136,7 @@ const productsSlice = createSlice({
       .addCase(editProduct.fulfilled, (state, action) => {
         state.loading = false;
         const index = state.data.findIndex(
-          (product) => product.id === action.payload.id
+          (product) => product._id === action.payload._id
         );
         if (index !== -1) {
           state.data[index] = action.payload;

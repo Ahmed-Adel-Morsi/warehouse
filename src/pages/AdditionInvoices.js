@@ -75,7 +75,7 @@ function AdditionInvoices() {
             <tbody>
               {filteredTransactions.map((transaction, index, arr) => (
                 <CustomTable.Row
-                  key={transaction.id}
+                  key={transaction._id}
                   last={index === arr.length - 1}
                 >
                   <CustomTable.Data body={transaction.customerDetails.name} />

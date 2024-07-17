@@ -79,7 +79,7 @@ function Vendors() {
             <tbody>
               {filteredVendors.map((vendor, index, arr) => (
                 <CustomTable.Row
-                  key={vendor.id}
+                  key={vendor._id}
                   last={index === arr.length - 1}
                 >
                   <CustomTable.Data body={vendor.name} />

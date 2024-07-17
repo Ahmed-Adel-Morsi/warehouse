@@ -4,13 +4,17 @@ import apiCall from "../utils/apiCall";
 // Thunk for fetching vendors
 export const fetchVendors = createAsyncThunk(
   "vendorsSlice/fetchVendors",
-  async (_, { rejectWithValue }) => {
-    const data = await apiCall(
-      `${process.env.REACT_APP_API_BASE_URL}/vendors`,
-      undefined,
+  async (_, { rejectWithValue, getState }) => {
+    const { token } = getState().auth;
+    return await apiCall(
+      `/vendors`,
+      {
+        headers: {
+          Authorization: token,
+        },
+      },
       rejectWithValue
     );
-    return data;
   }
 );
 
@@ -18,24 +22,17 @@ export const fetchVendors = createAsyncThunk(
 export const addVendor = createAsyncThunk(
   "vendorsSlice/addVendor",
   async (vendor, { getState, rejectWithValue }) => {
-    const { data: vendors } = getState().vendors;
-    const lastVendor = vendors.reduce(
-      (prev, curr) => {
-        return prev.code > curr.code ? prev : curr;
-      },
-      { code: 0 }
-    );
-    const lastCode = lastVendor ? lastVendor.code : 0;
-    const newVendor = { ...vendor, code: lastCode + 1 };
+    const { token } = getState().auth;
 
     const data = await apiCall(
-      `${process.env.REACT_APP_API_BASE_URL}/vendors`,
+      `/vendors`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: token,
         },
-        body: JSON.stringify(newVendor),
+        body: JSON.stringify(vendor),
       },
       rejectWithValue
     );
@@ -46,11 +43,15 @@ export const addVendor = createAsyncThunk(
 // Thunk for deleting a vendor
 export const deleteVendor = createAsyncThunk(
   "vendorsSlice/deleteVendor",
-  async (vendorId, { rejectWithValue }) => {
+  async (vendorId, { getState, rejectWithValue }) => {
+    const { token } = getState().auth;
     await apiCall(
-      `${process.env.REACT_APP_API_BASE_URL}/vendors/${vendorId}`,
+      `/vendors/${vendorId}`,
       {
         method: "DELETE",
+        headers: {
+          Authorization: token,
+        },
       },
       rejectWithValue
     );
@@ -61,13 +62,15 @@ export const deleteVendor = createAsyncThunk(
 // Thunk for editing a vendor
 export const editVendor = createAsyncThunk(
   "vendorsSlice/editVendor",
-  async (vendor, { rejectWithValue }) => {
+  async (vendor, { getState, rejectWithValue }) => {
+    const { token } = getState().auth;
     const data = await apiCall(
-      `${process.env.REACT_APP_API_BASE_URL}/vendors/${vendor.id}`,
+      `/vendors/${vendor._id}`,
       {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          Authorization: token,
         },
         body: JSON.stringify(vendor),
       },
@@ -121,7 +124,7 @@ const vendorsSlice = createSlice({
       .addCase(deleteVendor.fulfilled, (state, action) => {
         state.loading = false;
         state.data = state.data.filter(
-          (vendor) => vendor.id !== action.payload
+          (vendor) => vendor._id !== action.payload
         );
       })
       .addCase(deleteVendor.rejected, (state, action) => {
@@ -136,7 +139,7 @@ const vendorsSlice = createSlice({
       .addCase(editVendor.fulfilled, (state, action) => {
         state.loading = false;
         const index = state.data.findIndex(
-          (vendor) => vendor.id === action.payload.id
+          (vendor) => vendor._id === action.payload._id
         );
         if (index !== -1) {
           state.data[index] = action.payload;

@@ -31,11 +31,7 @@ function Products() {
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        await dispatch(fetchProducts()).unwrap();
-      } catch (err) {
-        console.error("Failed to fetch products:", err);
-      }
+      await dispatch(fetchProducts());
     };
     fetchData();
   }, [dispatch]);
@@ -84,7 +80,7 @@ function Products() {
             <tbody>
               {filteredProducts.map((product, index, arr) => (
                 <CustomTable.Row
-                  key={product.id}
+                  key={product._id}
                   last={index === arr.length - 1}
                 >
                   <CustomTable.Data body={product.name} />
@@ -128,7 +124,7 @@ function Products() {
                           </li>
                           <li>
                             <Link
-                              to={`${product.id}`}
+                              to={`${product._id}`}
                               className="dropdown-item rounded d-flex align-items-center gap-1 px-2 fs-small fw-medium"
                             >
                               {productTransactionsSvg}

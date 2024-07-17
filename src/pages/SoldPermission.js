@@ -24,10 +24,10 @@ function SoldPermission() {
       );
       setSoldPermissionOrders(
         savedProducts.filter(
-          (product) => product.productDetails.id !== currentProduct.id
+          (product) => product.productDetails._id !== currentProduct._id
         )
       );
-      setOrdersIds(ordersIds.filter((id) => id !== currentProduct.id));
+      setOrdersIds(ordersIds.filter((id) => id !== currentProduct._id));
       return true;
     } catch (error) {
       console.error("Failed to delete the Product:", error);
@@ -108,7 +108,7 @@ function SoldPermission() {
 
   useEffect(() => {
     soldPermissionOrders.forEach((e) => {
-      setOrdersIds((prev) => [...prev, e.productDetails.id]);
+      setOrdersIds((prev) => [...prev, e.productDetails._id]);
     });
   }, [soldPermissionOrders]);
 
@@ -190,7 +190,7 @@ function SoldPermission() {
             <tbody>
               {soldPermissionOrders.map((order, index, arr) => (
                 <CustomTable.Row
-                  key={order.productDetails.id}
+                  key={order.productDetails._id}
                   last={index === arr.length - 1}
                 >
                   <CustomTable.Data body={order.productDetails.name} />

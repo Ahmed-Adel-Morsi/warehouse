@@ -69,9 +69,9 @@ function ItemDetails() {
               <tbody>
                 {transactions.map(
                   (transaction, index, arr) =>
-                    transaction.productDetails.id === productId && (
+                    transaction.productDetails._id === productId && (
                       <CustomTable.Row
-                        key={transaction.id}
+                        key={transaction._id}
                         last={index === arr.length - 1}
                       >
                         <CustomTable.Data

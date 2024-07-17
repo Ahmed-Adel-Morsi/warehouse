@@ -3,22 +3,31 @@ import apiCall from "../utils/apiCall";
 
 export const fetchTransactions = createAsyncThunk(
   "transactionsSlice/fetchTransactions",
-  async (_, { rejectWithValue }) => {
-    const data = await apiCall(
-      `${process.env.REACT_APP_API_BASE_URL}/transactions`,
-      undefined,
+  async (_, { rejectWithValue, getState }) => {
+    const { token } = getState().auth;
+    return await apiCall(
+      `/transactions`,
+      {
+        headers: {
+          Authorization: token,
+        },
+      },
       rejectWithValue
     );
-    return data;
   }
 );
 
 export const getTransactionsOfType = createAsyncThunk(
   "transactionsSlice/getTransactionsOfType",
-  async (type, { rejectWithValue }) => {
+  async (type, { rejectWithValue, getState }) => {
+    const { token } = getState().auth;
     const data = await apiCall(
-      `${process.env.REACT_APP_API_BASE_URL}/transactions`,
-      undefined,
+      `/transactions`,
+      {
+        headers: {
+          Authorization: token,
+        },
+      },
       rejectWithValue
     );
     return data.filter((transaction) => transaction.transactionType === type);
@@ -27,24 +36,34 @@ export const getTransactionsOfType = createAsyncThunk(
 
 export const getTransactionsByProductId = createAsyncThunk(
   "transactionsSlice/getTransactionById",
-  async (productId, { rejectWithValue }) => {
+  async (productId, { rejectWithValue, getState }) => {
+    const { token } = getState().auth;
     const data = await apiCall(
-      `${process.env.REACT_APP_API_BASE_URL}/transactions`,
-      undefined,
+      `/transactions`,
+      {
+        headers: {
+          Authorization: token,
+        },
+      },
       rejectWithValue
     );
     return data.filter(
-      (transaction) => transaction.productDetails.id === productId
+      (transaction) => transaction.productDetails._id === productId
     );
   }
 );
 
 export const getTransactionByInvoiceNumber = createAsyncThunk(
   "transactionsSlice/getTransactionByInvoiceNumber",
-  async ({ type, invoiceNumber }, { rejectWithValue }) => {
+  async ({ type, invoiceNumber }, { rejectWithValue, getState }) => {
+    const { token } = getState().auth;
     const data = await apiCall(
-      `${process.env.REACT_APP_API_BASE_URL}/transactions`,
-      undefined,
+      `/transactions`,
+      {
+        headers: {
+          Authorization: token,
+        },
+      },
       rejectWithValue
     );
     return data.find(
@@ -58,30 +77,16 @@ export const getTransactionByInvoiceNumber = createAsyncThunk(
 export const addTransaction = createAsyncThunk(
   "transactionsSlice/addTransaction",
   async (transaction, { getState, rejectWithValue }) => {
-    const { data: transactions } = getState().transactions;
-
-    const lastTransaction = transactions
-      .filter((curr) => curr.transactionType === transaction.transactionType)
-      .reduce(
-        (prev, curr) => (prev.invoiceNumber > curr.invoiceNumber ? prev : curr),
-        { invoiceNumber: 0 }
-      );
-
-    const lastInvoiceNumber = lastTransaction.invoiceNumber || 0;
-
-    const newTransaction = {
-      invoiceNumber: lastInvoiceNumber + 1,
-      ...transaction,
-    };
-
+    const { token } = getState().auth;
     const data = await apiCall(
-      `${process.env.REACT_APP_API_BASE_URL}/transactions`,
+      `/transactions`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: token,
         },
-        body: JSON.stringify(newTransaction),
+        body: JSON.stringify(transaction),
       },
       rejectWithValue
     );
