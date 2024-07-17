@@ -7,6 +7,7 @@ function ModalInput({
   disabled,
   onChange,
   onBlur,
+  isInvalid,
   invalidFeedback,
 }) {
   return (
@@ -20,7 +21,7 @@ function ModalInput({
           id={name}
           name={name}
           value={value}
-          className="form-control fs-small fw-medium h-input"
+          className={`form-control fs-small fw-medium h-input${isInvalid ? " is-invalid" : ""}`}
           required={required}
           disabled={disabled}
           onChange={onChange}
