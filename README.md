@@ -1,6 +1,6 @@
-# MyWarehouse
+# Warehouse
 
-Welcome to MyWarehouse, a comprehensive warehouse management system designed to streamline your inventory and order management processes.
+Welcome to Warehouse Website, a comprehensive warehouse management system designed to streamline your inventory and order management processes.
 
 ## Live Demo
 
@@ -34,8 +34,8 @@ Check out the live demo of the application [here](https://mywarehouse.vercel.app
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/Ahmed-Adel-Morsi/mywarehouse.git
-   cd mywarehouse
+   git clone https://github.com/Ahmed-Adel-Morsi/warehouse.git
+   cd warehouse
    ```
 
 2. Install the dependencies:
@@ -70,7 +70,7 @@ Check out the live demo of the application [here](https://mywarehouse.vercel.app
 
 ## Contributing
 
-We welcome contributions to improve MyWarehouse. To contribute, please follow these steps:
+We welcome contributions to improve Warehouse. To contribute, please follow these steps:
 
 1. Fork the repository.
 2. Create a new branch (`git checkout -b feature/your-feature-name`).
@@ -88,4 +88,4 @@ If you have any questions or feedback, please feel free to reach out to us at [a
 
 ---
 
-Thank you for using MyWarehouse!
+Thank you for using Warehouse!
