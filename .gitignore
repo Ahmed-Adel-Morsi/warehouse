@@ -25,4 +25,3 @@ yarn-error.log*
 
 # components
 /src/pages/Register.js
-/src/pages/Test.js
