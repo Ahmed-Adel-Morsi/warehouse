@@ -12,20 +12,18 @@ import AdditionInvoices from "./pages/AdditionInvoices";
 import ItemDetails from "./pages/ItemDetails";
 import InvoiceDetails from "./pages/InvoiceDetails";
 import Login from "./pages/Login";
-// import Register from "./pages/Register";
+import Register from "./pages/Register";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Layout from "./components/Layout";
 import NotFound from "./pages/NotFound";
 import "./App.css";
-// import Test from "./pages/Test";
 
 function App() {
   return (
     <div className="App">
       <Routes>
         <Route path={ROUTES.LOGIN} element={<Login />} />
-        {/* <Route path="test" element={<Test />} />
-        <Route path={ROUTES.REGISTER} element={<Register />} /> */}
+        <Route path={ROUTES.REGISTER} element={<Register />} />
         <Route element={<Layout />}>
           <Route path={ROUTES.HOME} element={<Home />} />
           <Route element={<ProtectedRoute />}>

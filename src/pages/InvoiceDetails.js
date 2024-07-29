@@ -1,43 +1,42 @@
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { getTransactionByInvoiceNumber } from "../features/transactionsSlice";
 import { printerSvg } from "../svgs/pageContentSVGs";
 import convertDateFormat from "../utils/convertDateFormat";
 import PageHeader from "../components/PageHeader";
-import { Spinner } from "react-bootstrap";
 import MainButton from "../components/MainButton";
 import CustomTable from "../components/CustomTable";
 import TableContainer from "../components/TableContainer";
+import useFetch from "../hooks/useFetch";
+import { useEffect, useMemo, useState } from "react";
 
 function InvoiceDetails({ type }) {
   const { invoiceNumber } = useParams();
+  const params = useMemo(
+    () => ({ type, invoiceNumber }),
+    [type, invoiceNumber]
+  );
+
   const {
-    transactionByInvoice: transaction,
+    data: transactions,
     error,
     loading,
-  } = useSelector((state) => state.transactions);
-  const dispatch = useDispatch();
+  } = useFetch(getTransactionByInvoiceNumber, "transactions", params);
+  const [transaction, setTransaction] = useState(null);
 
   const handlePrint = () => {
     window.print();
   };
 
   useEffect(() => {
-    dispatch(
-      getTransactionByInvoiceNumber({
-        type,
-        invoiceNumber: parseInt(invoiceNumber),
-      })
-    );
-  }, [dispatch, type, invoiceNumber]);
+    setTransaction(transactions.length > 0 ? transactions[0] : null);
+  }, [transactions]);
 
   return (
     <>
       <PageHeader>فاتورة {type === "sell" ? "بيع" : "إضافة"}</PageHeader>
       {loading ? (
         <div className="p-4 text-center fs-small fw-medium">
-          <Spinner animation="border" size="sm" />
+          جارى التحميل...
         </div>
       ) : error ? (
         <div className="p-4 text-center fs-small fw-medium">

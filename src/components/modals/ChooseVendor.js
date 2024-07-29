@@ -1,99 +1,128 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import CustomModal from "../CustomModal";
-import { useDispatch, useSelector } from "react-redux";
 import { selectTogglerSvg } from "../../svgs/pageContentSVGs";
 import { fetchVendors } from "../../features/vendorsSlice";
 import { vendorsSvg } from "../../svgs/sidebarSVGs";
+import useFetch from "../../hooks/useFetch";
+import { toastFire } from "../../utils/toastFire";
+import MainButton from "../MainButton";
+import { Modal } from "react-bootstrap";
+import useModal from "../../hooks/useModal";
+import useSearch from "../../hooks/useSearch";
 
 function ChooseVendor({ setChosenVendor }) {
-  const { data: vendors, loading } = useSelector((state) => state.vendors);
   const [currentChoice, setCurrentChoice] = useState({});
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filteredVendors, setFilteredVendors] = useState([]);
-  const dispatch = useDispatch();
-
-  const handleInput = (e) => {
-    setSearchQuery(e.target.value);
-  };
+  const [loading, setLoading] = useState(false);
+  const { show, handleClose, handleShow } = useModal();
+  const {
+    data: vendors,
+    error,
+    loading: fetchLoading,
+  } = useFetch(fetchVendors, "vendors");
+  const { filteredData: filteredVendors, filterItems } = useSearch(vendors, [
+    "name",
+  ]);
 
   const handleVendorChoice = () => {
+    setLoading(true);
     if (Object.keys(currentChoice).length !== 0) {
       setChosenVendor(currentChoice);
-      return true;
+      toastFire("success", `تم اختيار المورد ${currentChoice.name} بنجاح`);
+    } else {
+      toastFire("warning", "يرجى اختيار المورد من فضلك");
     }
-    return false;
+    setLoading(false);
   };
 
-  useEffect(() => {
-    const filtered = vendors.filter((vendor) =>
-      vendor.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-    setFilteredVendors(filtered);
-  }, [vendors, searchQuery]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      await dispatch(fetchVendors()).unwrap();
-    };
-    fetchData();
-  }, [dispatch]);
-
   return (
-    <CustomModal btnTitle="اختر المورد" btnIcon={vendorsSvg}>
-      <CustomModal.Header title="اختر المورد">
-        يرجي اختيار المورد من فضلك
-      </CustomModal.Header>
-      <CustomModal.Body
-        btnTitle="اضافة"
-        submitHandler={handleVendorChoice}
-        loadingState={loading}
-        successMessage={`تم اختيار المورد ${currentChoice.name} بنجاح`}
-        warningMessage="يرجى اختيار المورد"
+    <>
+      <MainButton
+        btnTitle="اختر المورد"
+        btnIcon={vendorsSvg}
+        clickHandler={handleShow}
+      />
+
+      <Modal
+        show={show}
+        onHide={handleClose}
+        backdrop="static"
+        keyboard={false}
+        centered
       >
-        <div className="dropdown dropdown-center w-100">
-          <button
-            className="btn border w-100 d-flex justify-content-between align-items-center"
-            type="button"
-            id="dropdownMenuButton1"
-            data-bs-toggle="dropdown"
-            aria-expanded="false"
-          >
-            اختر المورد
-            {selectTogglerSvg}
-          </button>
-          <ul
-            className="dropdown-menu pt-0 position-fixed overflow-hidden"
-            aria-labelledby="dropdownMenuButton1"
-          >
-            <input
-              type="text"
-              className="form-control border-0 border-bottom rounded-0 shadow-none mb-2 no-outline search-input pe-30px"
-              placeholder="ابحث عن المورد بالإسم"
-              onInput={handleInput}
-            />
-            <div className="overflow-y-auto mh-6rem sm-scroll">
-              {filteredVendors.map((vendor) => (
-                <li className="px-1 text-end" key={vendor._id}>
-                  <a
-                    className="dropdown-item rounded py-1 pe-4"
-                    href="/"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      document.getElementById(
-                        "dropdownMenuButton1"
-                      ).firstChild.textContent = vendor.name;
-                      setCurrentChoice(vendor);
-                    }}
-                  >
-                    {vendor.name}
-                  </a>
-                </li>
-              ))}
+        <CustomModal handleClose={handleClose}>
+          <CustomModal.Header
+            title="اختر المورد"
+            description="يرجي اختيار المورد من فضلك"
+          />
+          <CustomModal.Body>
+            <div className="dropdown dropdown-center w-100">
+              <button
+                className="btn border w-100 d-flex justify-content-between align-items-center"
+                type="button"
+                id="dropdownMenuButton1"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                اختر المورد
+                {selectTogglerSvg}
+              </button>
+              <ul
+                className="dropdown-menu pt-0 position-fixed overflow-hidden"
+                aria-labelledby="dropdownMenuButton1"
+              >
+                <input
+                  type="text"
+                  className="form-control border-0 border-bottom rounded-0 shadow-none mb-2 no-outline search-input pe-30px"
+                  placeholder="ابحث عن المورد بالإسم"
+                  onInput={filterItems}
+                />
+                {fetchLoading ? (
+                  <div className="p-4 text-center fs-small fw-medium">
+                    جارى التحميل...
+                  </div>
+                ) : error ? (
+                  <div className="p-4 text-center fs-small fw-medium">
+                    حدث خطأ ما
+                    <p>Error: {error.msg}</p>
+                  </div>
+                ) : (
+                  <div className="overflow-y-auto mh-6rem sm-scroll">
+                    {filteredVendors.map((vendor) => (
+                      <li className="text-end" key={vendor._id}>
+                        <a
+                          className="dropdown-item rounded py-1 pe-30px btn-hov"
+                          href="/"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            document.getElementById(
+                              "dropdownMenuButton1"
+                            ).firstChild.textContent = vendor.name;
+                            setCurrentChoice(vendor);
+                            document
+                              .querySelectorAll(".dropdown-item")
+                              .forEach((e) => {
+                                e.classList.remove("selected-item");
+                              });
+                            e.target.classList.add("selected-item");
+                          }}
+                        >
+                          {vendor.name}
+                        </a>
+                      </li>
+                    ))}
+                  </div>
+                )}
+              </ul>
             </div>
-          </ul>
-        </div>
-      </CustomModal.Body>
-    </CustomModal>
+          </CustomModal.Body>
+          <CustomModal.Footer
+            confirmBtnTitle="اضافة"
+            clickHandler={handleVendorChoice}
+            loadingState={loading}
+          />
+        </CustomModal>
+      </Modal>
+    </>
   );
 }
 

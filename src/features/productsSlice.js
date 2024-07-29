@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import apiCall from "../utils/apiCall";
+import { toastFire } from "../utils/toastFire";
 
-// Thunk for fetching products
 export const fetchProducts = createAsyncThunk(
   "productsSlice/fetchProducts",
   async (_, { rejectWithValue, getState }) => {
@@ -18,7 +18,6 @@ export const fetchProducts = createAsyncThunk(
   }
 );
 
-// Thunk for adding a product
 export const addProduct = createAsyncThunk(
   "productsSlice/addProduct",
   async (product, { rejectWithValue, getState }) => {
@@ -38,7 +37,6 @@ export const addProduct = createAsyncThunk(
   }
 );
 
-// Thunk for deleting a product
 export const deleteProduct = createAsyncThunk(
   "productsSlice/deleteProduct",
   async (productId, { rejectWithValue, getState }) => {
@@ -57,7 +55,6 @@ export const deleteProduct = createAsyncThunk(
   }
 );
 
-// Thunk for editing a product
 export const editProduct = createAsyncThunk(
   "productsSlice/editProduct",
   async (product, { rejectWithValue, getState }) => {
@@ -79,72 +76,29 @@ export const editProduct = createAsyncThunk(
 
 const productsSlice = createSlice({
   name: "productsSlice",
-  initialState: {
-    data: [],
-    loading: false,
-    error: null,
-  },
+  initialState: [],
   reducers: {},
   extraReducers: (builder) => {
     builder
-      // Fetch Products
-      .addCase(fetchProducts.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
       .addCase(fetchProducts.fulfilled, (state, action) => {
-        state.loading = false;
-        state.data = action.payload;
-      })
-      .addCase(fetchProducts.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error.message;
-      })
-      // Add Product
-      .addCase(addProduct.pending, (state) => {
-        state.loading = true;
-        state.error = null;
+        return action.payload;
       })
       .addCase(addProduct.fulfilled, (state, action) => {
-        state.loading = false;
-        state.data.push(action.payload);
-      })
-      .addCase(addProduct.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error.message;
-      })
-      // Delete Product
-      .addCase(deleteProduct.pending, (state) => {
-        state.loading = true;
-        state.error = null;
+        toastFire("success", `تم اضافة ${action.payload.name} بنجاح`);
+        state.push(action.payload);
       })
       .addCase(deleteProduct.fulfilled, (state, action) => {
-        state.loading = false;
-        state.data = state.data.filter(
-          (product) => product._id !== action.payload
-        );
-      })
-      .addCase(deleteProduct.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error.message;
-      })
-      // Edit Product
-      .addCase(editProduct.pending, (state) => {
-        state.loading = true;
-        state.error = null;
+        toastFire("success", `تم حذف الصنف بنجاح`);
+        return state.filter((product) => product._id !== action.payload);
       })
       .addCase(editProduct.fulfilled, (state, action) => {
-        state.loading = false;
-        const index = state.data.findIndex(
+        toastFire("success", `تم تعديل ${action.payload.name} بنجاح`);
+        const index = state.findIndex(
           (product) => product._id === action.payload._id
         );
         if (index !== -1) {
-          state.data[index] = action.payload;
+          state[index] = action.payload;
         }
-      })
-      .addCase(editProduct.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error.message;
       });
   },
 });

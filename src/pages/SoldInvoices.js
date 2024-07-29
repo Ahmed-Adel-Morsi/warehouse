@@ -1,5 +1,3 @@
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { getTransactionsOfType } from "../features/transactionsSlice";
 import { showInvoicesSvg } from "../svgs/actionsSVGs";
 import { Link } from "react-router-dom";
@@ -8,41 +6,19 @@ import CustomTable from "../components/CustomTable";
 import TableContainer from "../components/TableContainer";
 import SearchInput from "../components/SearchInput";
 import PageHeader from "../components/PageHeader";
+import useFetch from "../hooks/useFetch";
+import useSearch from "../hooks/useSearch";
 
 function SoldInvoices() {
   const {
-    filteredData: transactions,
-    loading,
+    data: transactions,
     error,
-  } = useSelector((state) => state.transactions);
-  const dispatch = useDispatch();
-  const [filteredTransactions, setFilteredTransactions] = useState([]);
-
-  const filterItems = (e) => {
-    const value = e.target.value;
-    setFilteredTransactions(
-      transactions.filter(function (transaction) {
-        return `${transaction.customerDetails.name} ${transaction.invoiceNumber}`
-          .toLowerCase()
-          .includes(value.toString().toLowerCase());
-      })
-    );
-  };
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        await dispatch(getTransactionsOfType("sell")).unwrap();
-      } catch (err) {
-        console.error("Failed to fetch transactions:", err);
-      }
-    };
-    fetchData();
-  }, [dispatch]);
-
-  useEffect(() => {
-    setFilteredTransactions(transactions);
-  }, [transactions]);
+    loading,
+  } = useFetch(getTransactionsOfType, "transactions", "sell");
+  const { filteredData: filteredTransactions, filterItems } = useSearch(
+    transactions,
+    ["invoiceNumber", ["customerDetails", "name"]]
+  );
 
   return (
     <>

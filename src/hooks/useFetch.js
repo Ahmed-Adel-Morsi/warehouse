@@ -2,53 +2,30 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 const useFetch = (fetchHandler, stateName, params) => {
-  const [loading, setLoading] = useState(false);
   const data = useSelector((state) => state[stateName]);
-  const [filteredData, setFilteredData] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const dispatch = useDispatch();
 
-  const filterItems = (e) => {
-    const value = e.target.value;
-    setFilteredData(
-      data.filter((record) => {
-        const codeAndName = `${record.name} ${record.code ? record.code : ""} ${
-          record.invoiceNumber ? record.invoiceNumber : ""
-        }`.toLowerCase();
-        return codeAndName.includes(value.toString().toLowerCase());
-      })
-    );
-  };
-
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        if (params) {
-          await dispatch(fetchHandler(params)).unwrap();
-        } else {
-          await dispatch(fetchHandler()).unwrap();
-        }
+    setLoading(true);
+    dispatch(fetchHandler(params))
+      .unwrap()
+      .then(() => {
         setError(null);
-      } catch (error) {
+      })
+      .catch((error) => {
         setError(error);
-      } finally {
+      })
+      .finally(() => {
         setLoading(false);
-      }
-    };
-
-    fetchData();
+      });
   }, [dispatch, fetchHandler, params]);
 
-  useEffect(() => {
-    setFilteredData(data);
-  }, [data]);
-
   return {
-    filteredData,
+    data,
     error,
     loading,
-    filterItems,
   };
 };
 

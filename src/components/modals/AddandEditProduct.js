@@ -1,10 +1,15 @@
-import { useDispatch } from "react-redux";
 import { addProductSvg } from "../../svgs/pageContentSVGs";
 import CustomModal from "../CustomModal";
 import { addProduct, editProduct } from "../../features/productsSlice";
-import { useState } from "react";
+import { useEffect } from "react";
 import ModalInput from "../CustomInput";
 import { editSvg } from "../../svgs/actionsSVGs";
+import useForm from "../../hooks/useForm";
+import DropdownSmallButton from "../DropdownSmallButton";
+import MainButton from "../MainButton";
+import { Modal } from "react-bootstrap";
+import CustomForm from "../CustomForm";
+import useModal from "../../hooks/useModal";
 
 function AddandEditProduct({
   forEdit = false,
@@ -21,168 +26,163 @@ function AddandEditProduct({
   },
   btnTitle = "إضافة صنف",
 }) {
-  const [formData, setFormData] = useState(initialFormData);
-  const [loading, setLoading] = useState(false);
-  const dispatch = useDispatch();
+  const { show, handleClose, handleShow } = useModal();
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
+  const {
+    formData,
+    setFormData,
+    fieldErrors,
+    loading,
+    handleChange,
+    handleSubmit,
+  } = useForm(initialFormData, forEdit ? editProduct : addProduct, handleClose);
 
-  const handleBlur = (e) => {
-    if (isFieldValid(e)) {
-      e.target.removeAttribute("required");
-      e.target.classList.remove("is-invalid");
-      e.target.setCustomValidity("");
-    } else {
-      e.target.required = true;
-      e.target.classList.add("is-invalid");
-      e.target.setCustomValidity("Invalid field.");
+  useEffect(() => {
+    if (forEdit && initialFormData) {
+      setFormData(initialFormData);
     }
-  };
-
-  const handleSubmit = async (e) => {
-    if (e.currentTarget.checkValidity()) {
-      try {
-        setLoading(true);
-        await dispatch(
-          forEdit ? editProduct(formData) : addProduct(formData)
-        ).unwrap();
-        setFormData(initialFormData);
-        setLoading(false);
-        return true;
-      } catch (error) {
-        console.error("Error:", error);
-        setLoading(false);
-        return false;
-      }
-    }
-    return false;
-  };
-
-  const isFieldValid = (e) => {
-    let value = e.target.value;
-
-    switch (e.target.name) {
-      case "code":
-      case "name":
-        return value !== "";
-
-      case "quantity":
-      case "size":
-        return value !== "" ? !isNaN(parseInt(value)) : true;
-
-      case "price":
-        return value !== "" ? !isNaN(parseFloat(value)) : true;
-
-      default:
-        return true;
-    }
-  };
+  }, [initialFormData, forEdit, setFormData]);
 
   return (
-    <CustomModal
-      btnTitle={forEdit ? "تعديل" : btnTitle}
-      btnIcon={forEdit ? editSvg : addProductSvg}
-      modalFor={forEdit ? "edit" : false}
-    >
-      <CustomModal.Header
-        title={forEdit ? `تعديل الصنف | ${initialFormData.name}` : "إضافة صنف"}
+    <>
+      {forEdit ? (
+        <DropdownSmallButton
+          btnTitle="تعديل"
+          btnIcon={editSvg}
+          clickHandler={handleShow}
+        />
+      ) : (
+        <MainButton
+          btnTitle={btnTitle}
+          btnIcon={addProductSvg}
+          clickHandler={handleShow}
+        />
+      )}
+
+      <Modal
+        show={show}
+        onHide={handleClose}
+        backdrop="static"
+        keyboard={false}
+        centered
       >
-        {forEdit
-          ? "يجب عليك ملء الخانات المراد تعديلها"
-          : "يجب عليك ملء اسم الصنف و الكود اولاً لأضافة صنف جديد"}
-      </CustomModal.Header>
-      <CustomModal.Body
-        btnTitle={forEdit ? "تعديل" : "إضافة"}
-        submitHandler={handleSubmit}
-        successMessage={`تم ${forEdit ? "تعديل" : "اضافة"} ${
-          formData.name
-        } بنجاح`}
-        loadingState={loading}
-      >
-        <ModalInput
-          type="text"
-          name="name"
-          label="اسم الصنف"
-          value={formData.name}
-          onChange={handleChange}
-          onBlur={handleBlur}
-          invalidFeedback="يجب إدخال اسم الصنف"
-          required
-        />
-        <ModalInput
-          type="text"
-          name="code"
-          label="الكود"
-          value={formData.code}
-          onChange={handleChange}
-          onBlur={handleBlur}
-          invalidFeedback="يجب إدخال الكود"
-          required
-          disabled={forEdit}
-        />
-        <ModalInput
-          type="text"
-          name="quantity"
-          label="العدد"
-          value={formData.quantity}
-          onChange={handleChange}
-          onBlur={handleBlur}
-          invalidFeedback="يجب إدخال ارقام فقط"
-          disabled={forEdit}
-        />
-        <ModalInput
-          type="text"
-          name="price"
-          label="السعر"
-          value={formData.price}
-          onChange={handleChange}
-          onBlur={handleBlur}
-          invalidFeedback="يجب إدخال ارقام فقط"
-        />
-        <ModalInput
-          type="text"
-          name="brand"
-          label="الماركة"
-          value={formData.brand}
-          onChange={handleChange}
-        />
-        <ModalInput
-          type="text"
-          name="countryOfOrigin"
-          label="بلد المنشـأ"
-          value={formData.countryOfOrigin}
-          onChange={handleChange}
-        />
-        <ModalInput
-          type="text"
-          name="location"
-          label="المكان"
-          value={formData.location}
-          onChange={handleChange}
-        />
-        <ModalInput
-          type="text"
-          name="color"
-          label="اللون"
-          value={formData.color}
-          onChange={handleChange}
-        />
-        <ModalInput
-          type="text"
-          name="size"
-          label="الحجم"
-          value={formData.size}
-          onChange={handleChange}
-          onBlur={handleBlur}
-          invalidFeedback="يجب إدخال ارقام فقط"
-        />
-      </CustomModal.Body>
-    </CustomModal>
+        <CustomModal handleClose={handleClose}>
+          <CustomModal.Header
+            title={
+              forEdit ? `تعديل الصنف | ${initialFormData.name}` : "إضافة صنف"
+            }
+            description={
+              forEdit
+                ? "يجب عليك ملء الخانات المراد تعديلها"
+                : "يجب عليك ملء اسم الصنف و الكود اولاً لأضافة صنف جديد"
+            }
+          />
+          <CustomModal.Body>
+            <CustomForm
+              id={forEdit ? "editProduct" : "addProduct"}
+              onSubmit={handleSubmit}
+            >
+              <ModalInput
+                type="text"
+                name="name"
+                label="اسم الصنف"
+                value={formData.name}
+                onChange={handleChange}
+                isInvalid={fieldErrors.name}
+                invalidFeedback={fieldErrors.name ? fieldErrors.name : ""}
+                required
+              />
+              <ModalInput
+                type="text"
+                name="code"
+                label="الكود"
+                value={formData.code}
+                onChange={handleChange}
+                isInvalid={fieldErrors.code}
+                invalidFeedback={fieldErrors.code ? fieldErrors.code : ""}
+                required
+                disabled={forEdit}
+              />
+              <ModalInput
+                type="text"
+                name="quantity"
+                label="العدد"
+                value={formData.quantity}
+                onChange={handleChange}
+                isInvalid={fieldErrors.quantity}
+                invalidFeedback={
+                  fieldErrors.quantity ? fieldErrors.quantity : ""
+                }
+                disabled={forEdit}
+              />
+              <ModalInput
+                type="text"
+                name="price"
+                label="السعر"
+                value={formData.price}
+                onChange={handleChange}
+                isInvalid={fieldErrors.price}
+                invalidFeedback={fieldErrors.price ? fieldErrors.price : ""}
+              />
+              <ModalInput
+                type="text"
+                name="brand"
+                label="الماركة"
+                value={formData.brand}
+                onChange={handleChange}
+                isInvalid={fieldErrors.brand}
+                invalidFeedback={fieldErrors.brand ? fieldErrors.brand : ""}
+              />
+              <ModalInput
+                type="text"
+                name="countryOfOrigin"
+                label="بلد المنشـأ"
+                value={formData.countryOfOrigin}
+                onChange={handleChange}
+                isInvalid={fieldErrors.countryOfOrigin}
+                invalidFeedback={
+                  fieldErrors.countryOfOrigin ? fieldErrors.countryOfOrigin : ""
+                }
+              />
+              <ModalInput
+                type="text"
+                name="location"
+                label="المكان"
+                value={formData.location}
+                onChange={handleChange}
+                isInvalid={fieldErrors.location}
+                invalidFeedback={
+                  fieldErrors.location ? fieldErrors.location : ""
+                }
+              />
+              <ModalInput
+                type="text"
+                name="color"
+                label="اللون"
+                value={formData.color}
+                onChange={handleChange}
+                isInvalid={fieldErrors.color}
+                invalidFeedback={fieldErrors.color ? fieldErrors.color : ""}
+              />
+              <ModalInput
+                type="text"
+                name="size"
+                label="الحجم"
+                value={formData.size}
+                onChange={handleChange}
+                isInvalid={fieldErrors.size}
+                invalidFeedback={fieldErrors.size ? fieldErrors.size : ""}
+              />
+            </CustomForm>
+          </CustomModal.Body>
+          <CustomModal.Footer
+            formId={forEdit ? "editProduct" : "addProduct"}
+            confirmBtnTitle={forEdit ? "تعديل" : "إضافة"}
+            loadingState={loading}
+          />
+        </CustomModal>
+      </Modal>
+    </>
   );
 }
 export default AddandEditProduct;

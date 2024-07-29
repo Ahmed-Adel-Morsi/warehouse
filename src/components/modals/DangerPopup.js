@@ -1,59 +1,53 @@
-import { useDispatch } from "react-redux";
-import { removeSvg } from "../../svgs/actionsSVGs";
 import CustomModal from "../CustomModal";
-import { useState } from "react";
+import MainButton from "../MainButton";
+import { Modal } from "react-bootstrap";
+import useModal from "../../hooks/useModal";
 
 function DangerPopup({
   handler,
-  icon = removeSvg,
-  buttonTitle,
+  btnIcon,
+  btnTitle,
   title,
-  submitBtnTitle,
-  successMessage,
-  itemToRemove,
   description,
-  notRemove = false,
-  btnStyle = false,
+  confirmBtnTitle,
+  loadingState,
+  btnStyle,
 }) {
-  const [loading, setLoading] = useState(false);
-  const dispatch = useDispatch();
-
-  const handleSubmit = async () => {
-    if (notRemove) {
-      setLoading(true);
-      await handler();
-      setLoading(false);
-      return true;
-    } else {
-      try {
-        setLoading(true);
-        await dispatch(handler(itemToRemove._id)).unwrap();
-        setLoading(false);
-        return true;
-      } catch (error) {
-        console.error("Error:", error);
-        setLoading(false);
-        return false;
-      }
-    }
-  };
+  const { show, handleClose, handleShow } = useModal();
 
   return (
-    <CustomModal
-      modalFor={!notRemove && "remove"}
-      btnIcon={icon}
-      btnTitle={buttonTitle}
-      dangerVariant={true}
-      btnStyle={btnStyle}
-    >
-      <CustomModal.Header title={title}>{description}</CustomModal.Header>
-      <CustomModal.Body
-        btnTitle={submitBtnTitle}
-        successMessage={successMessage || `تم حذف ${itemToRemove.name} بنجاح`}
-        submitHandler={handleSubmit}
-        loadingState={loading}
-      />
-    </CustomModal>
+    <>
+      {btnStyle ? (
+        <button type="button" className={btnStyle} onClick={handleShow}>
+          {btnIcon}
+          {btnTitle}
+        </button>
+      ) : (
+        <MainButton
+          clickHandler={handleShow}
+          btnTitle={btnTitle}
+          btnIcon={btnIcon}
+        />
+      )}
+
+      <Modal
+        show={show}
+        onHide={handleClose}
+        backdrop="static"
+        keyboard={false}
+        centered
+      >
+        <CustomModal handleClose={handleClose}>
+          <CustomModal.Header title={title} description={description} />
+          <CustomModal.Footer
+            dangerVariantConfirmBtn
+            loadingState={loadingState}
+            confirmBtnTitle={confirmBtnTitle}
+            clickHandler={handler}
+          />
+        </CustomModal>
+      </Modal>
+    </>
   );
 }
 

@@ -1,62 +1,20 @@
-import { useState, createContext, useContext } from "react";
-import { Modal, Spinner } from "react-bootstrap";
-import { toastFire } from "../utils/toastFire";
-import MainButton from "./MainButton";
+import { createContext, useContext } from "react";
+import { Spinner } from "react-bootstrap";
 import { useSelector } from "react-redux";
 
-const ModalContext = createContext();
+const CloseContext = createContext();
 
-function CustomModal({
-  children,
-  btnTitle,
-  btnIcon,
-  modalFor,
-  btnStyle = false,
-  dangerVariant = false,
-}) {
-  const [show, setShow] = useState(false);
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
-
+function CustomModal({ handleClose, children }) {
   return (
-    <ModalContext.Provider value={{ handleClose, dangerVariant }}>
-      {btnStyle ? (
-        <button type="button" className={btnStyle} onClick={handleShow}>
-          {btnIcon}
-          {btnTitle}
-        </button>
-      ) : ["edit", "remove"].includes(modalFor) ? (
-        <button
-          type="button"
-          className="dropdown-item rounded d-flex align-items-center gap-1 px-2 fs-small fw-medium"
-          onClick={handleShow}
-        >
-          {btnIcon}
-          {btnTitle}
-        </button>
-      ) : (
-        <MainButton
-          btnIcon={btnIcon}
-          clickHandler={handleShow}
-          btnTitle={btnTitle}
-        />
-      )}
-      <Modal
-        show={show}
-        onHide={handleClose}
-        backdrop="static"
-        keyboard={false}
-        aria-labelledby="contained-modal-title-vcenter"
-        centered
-      >
-        <div className="p-4">{children}</div>
-      </Modal>
-    </ModalContext.Provider>
+    <CloseContext.Provider value={handleClose}>
+      <div className="p-4">{children}</div>
+    </CloseContext.Provider>
   );
 }
 
-function ModalHeader({ children, title }) {
-  const { handleClose } = useContext(ModalContext);
+function CustomModalHeader({ title, description }) {
+  const handleClose = useContext(CloseContext);
+
   return (
     <>
       <div className="modal-header border-bottom-0 p-0 mb-2 text-center text-sm-end">
@@ -74,90 +32,69 @@ function ModalHeader({ children, title }) {
         ></button>
       </div>
       <p className="text-body-secondary fs-small text-center text-sm-end m-0">
-        {children}
+        {description}
       </p>
     </>
   );
 }
 
-function ModalBody({
-  children,
-  submitHandler,
-  btnTitle,
-  successMessage = false,
-  warningMessage = false,
-  loadingState,
-  disableSubmit,
-}) {
-  const { handleClose, dangerVariant } = useContext(ModalContext);
-  const [submitted, setSubmitted] = useState(false);
-  const { theme } = useSelector((state) => state.theme);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setSubmitted(true);
-    try {
-      if (await submitHandler(e)) {
-        handleClose();
-        if (successMessage) {
-          toastFire("success", successMessage);
-        }
-      } else {
-        if (warningMessage) {
-          toastFire("warning", warningMessage);
-        }
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      toastFire("error", "Failed to submit the form.");
-    }
-  };
+CustomModal.Body = function ({ children }) {
   return (
-    <form
-      className={`needs-validation ${submitted ? "was-validated" : ""}`}
-      onSubmit={handleSubmit}
-      noValidate
-    >
-      {children && (
-        <div className="modal-body overflow-y-auto sm-scroll p-0 py-1 my-3">
-          <div className="d-flex flex-wrap gap-3">{children}</div>
-        </div>
-      )}
-      <div className="modal-footer border-top-0 p-0 d-flex flex-column flex-sm-row mt-3">
-        <button
-          type="submit"
-          className={`btn ${
-            dangerVariant
-              ? "btn-danger"
-              : theme === "dark"
-              ? "btn-light"
-              : "btn-dark"
-          } popup-btn d-flex justify-content-center align-items-center gap-2 fw-medium fs-small border-0 px-3 py-2 order-sm-2`}
-          disabled={loadingState || disableSubmit}
-        >
-          {btnTitle}
-          {loadingState && (
-            <Spinner
-              as="span"
-              animation="border"
-              size="sm"
-              role="status"
-              aria-hidden="true"
-            />
-          )}
-        </button>
-        <button
-          type="button"
-          className="btn popup-btn close-btn border fw-medium fs-small px-3 py-2"
-          onClick={handleClose}
-        >
-          إلغاء
-        </button>
-      </div>
-    </form>
+    <div className="modal-body overflow-y-auto sm-scroll p-0 py-1 my-3">
+      {children}
+    </div>
+  );
+};
+
+function CustomModalFooter({
+  formId,
+  dangerVariantConfirmBtn,
+  loadingState,
+  disableConfirmBtn,
+  confirmBtnTitle,
+  clickHandler,
+}) {
+  const { theme } = useSelector((state) => state.theme);
+  const handleClose = useContext(CloseContext);
+
+  return (
+    <div className="modal-footer border-top-0 p-0 d-flex flex-column flex-sm-row mt-3">
+      <button
+        type={formId ? "submit" : "button"}
+        {...(formId && { form: formId })}
+        className={`btn ${
+          dangerVariantConfirmBtn
+            ? "btn-danger"
+            : theme === "dark"
+            ? "btn-light"
+            : "btn-dark"
+        } popup-btn d-flex justify-content-center align-items-center gap-2 fw-medium fs-small border-0 px-3 py-2 order-sm-2`}
+        disabled={loadingState || disableConfirmBtn}
+        {...(!formId && clickHandler && { onClick: clickHandler })}
+      >
+        {confirmBtnTitle}
+        {loadingState && (
+          <Spinner
+            as="span"
+            animation="border"
+            size="sm"
+            role="status"
+            aria-hidden="true"
+          />
+        )}
+      </button>
+      <button
+        type="button"
+        className="btn popup-btn close-btn border fw-medium fs-small px-3 py-2"
+        onClick={handleClose}
+      >
+        إلغاء
+      </button>
+    </div>
   );
 }
 
-CustomModal.Header = ModalHeader;
-CustomModal.Body = ModalBody;
+CustomModal.Header = CustomModalHeader;
+CustomModal.Footer = CustomModalFooter;
+
 export default CustomModal;

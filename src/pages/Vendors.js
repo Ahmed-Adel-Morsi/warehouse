@@ -1,48 +1,23 @@
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+// import { useEffect, useState } from "react";
+// import { useDispatch, useSelector } from "react-redux";
 import { fetchVendors } from "../features/vendorsSlice";
 import { actionsSvg, productTransactionsSvg } from "../svgs/actionsSVGs";
 import { deleteVendor } from "../features/vendorsSlice";
 import AddandEditVendor from "../components/modals/AddandEditVendor";
-import DangerPopup from "../components/modals/DangerPopup";
 import CustomTable from "../components/CustomTable";
 import TableContainer from "../components/TableContainer";
 import SearchInput from "../components/SearchInput";
 import PageHeader from "../components/PageHeader";
+import RemoveItem from "../components/modals/RemoveItem";
+import useFetch from "../hooks/useFetch";
+import useSearch from "../hooks/useSearch";
 
 function Vendors() {
-  const {
-    data: vendors,
-    loading,
-    error,
-  } = useSelector((state) => state.vendors);
-  const dispatch = useDispatch();
-  const [filteredVendors, setFilteredVendors] = useState([]);
-
-  const filterItems = (e) => {
-    const value = e.target.value;
-    setFilteredVendors(
-      vendors.filter(function (vendor) {
-        const codeAndName = `${vendor.name} ${vendor.code}`.toLowerCase();
-        return codeAndName.includes(value.toString().toLowerCase());
-      })
-    );
-  };
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        await dispatch(fetchVendors()).unwrap();
-      } catch (err) {
-        console.error("Failed to fetch vendors:", err);
-      }
-    };
-    fetchData();
-  }, [dispatch]);
-
-  useEffect(() => {
-    setFilteredVendors(vendors);
-  }, [vendors]);
+  const { data: vendors, error, loading } = useFetch(fetchVendors, "vendors");
+  const { filteredData: filteredVendors, filterItems } = useSearch(vendors, [
+    "name",
+    "code",
+  ]);
 
   return (
     <>
@@ -63,16 +38,16 @@ function Vendors() {
         ) : error ? (
           <div className="p-4 text-center fs-small fw-medium">
             حدث خطأ ما
-            <p>Error: {error}</p>
+            <p>Error: {error.msg}</p>
           </div>
         ) : filteredVendors.length > 0 ? (
           <CustomTable>
             <thead>
               <CustomTable.Row header={true}>
-                <CustomTable.Data body="اسم العميل" />
-                <CustomTable.Data body="كود العميل" />
+                <CustomTable.Data body="اسم المورد" />
+                <CustomTable.Data body="كود المورد" />
                 <CustomTable.Data body="رقم الهاتف" />
-                <CustomTable.Data body="عنوان العميل" />
+                <CustomTable.Data body="عنوان المورد" />
                 <CustomTable.Data body="إجراءات" last={true} />
               </CustomTable.Row>
             </thead>
@@ -102,18 +77,17 @@ function Vendors() {
                           <hr className="my-1" />
                           <li>
                             <AddandEditVendor
-                              forEdit={true}
+                              forEdit
                               initialFormData={vendor}
                             />
                           </li>
                           <li>
-                            <DangerPopup
-                              buttonTitle="حذف"
+                            <RemoveItem
                               title="حذف المورد"
-                              itemToRemove={vendor}
-                              handler={deleteVendor}
                               description="هل انت متاكد؟ سيتم حذف المورد نهائياً"
-                              submitBtnTitle="حذف المورد"
+                              confirmBtnTitle="حذف المورد"
+                              handler={deleteVendor}
+                              itemIdToRemove={vendor._id}
                             />
                           </li>
                           <li>

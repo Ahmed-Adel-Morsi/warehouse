@@ -11,36 +11,50 @@ import { editProduct } from "../features/productsSlice";
 import CustomTable from "../components/CustomTable";
 import TableContainer from "../components/TableContainer";
 import PageHeader from "../components/PageHeader";
+import { toastFire } from "../utils/toastFire";
+import { removeSvg } from "../svgs/actionsSVGs";
+import MainButton from "../components/MainButton";
+import { Modal } from "react-bootstrap";
+import useModal from "../hooks/useModal";
 
 function SoldPermission() {
   const [loading, setLoading] = useState(false);
   const [chosenProductToSell, setChosenProductToSell] = useState(null);
+  const { show, handleClose, handleShow } = useModal();
+  const [ordersIds, setOrdersIds] = useState([]);
+  const [chosenCustomer, setChosenCustomer] = useState(() => {
+    const savedCustomer = localStorage.getItem("chosenCustomer");
+    return savedCustomer ? JSON.parse(savedCustomer) : null;
+  });
+  const [soldPermissionOrders, setSoldPermissionOrders] = useState(() => {
+    const savedProducts = localStorage.getItem("soldPermissionOrders");
+    return savedProducts ? JSON.parse(savedProducts) : [];
+  });
   const dispatch = useDispatch();
 
   const removeProductHandler = async (currentProduct) => {
-    try {
-      const savedProducts = JSON.parse(
-        localStorage.getItem("soldPermissionOrders")
-      );
-      setSoldPermissionOrders(
-        savedProducts.filter(
-          (product) => product.productDetails._id !== currentProduct._id
-        )
-      );
-      setOrdersIds(ordersIds.filter((id) => id !== currentProduct._id));
-      return true;
-    } catch (error) {
-      console.error("Failed to delete the Product:", error);
-      return false;
-    }
+    setLoading(true);
+    const savedProducts = JSON.parse(
+      localStorage.getItem("soldPermissionOrders")
+    );
+    setSoldPermissionOrders(
+      savedProducts.filter(
+        (product) => product.productDetails._id !== currentProduct._id
+      )
+    );
+    setOrdersIds(ordersIds.filter((id) => id !== currentProduct._id));
+    toastFire("success", `تم حذف ${currentProduct.name} بنجاح`);
+    setLoading(false);
   };
 
   const resetHandler = () => {
+    setLoading(true);
     setChosenCustomer(null);
     setChosenProductToSell(null);
     setSoldPermissionOrders([]);
     setOrdersIds([]);
-    return true;
+    toastFire("success", "تمت إعادة تهيئة البيانات بنجاح");
+    setLoading(false);
   };
 
   const submitHandler = async () => {
@@ -71,11 +85,6 @@ function SoldPermission() {
     }
   };
 
-  const [chosenCustomer, setChosenCustomer] = useState(() => {
-    const savedCustomer = localStorage.getItem("chosenCustomer");
-    return savedCustomer ? JSON.parse(savedCustomer) : null;
-  });
-
   useEffect(() => {
     setLoading(true);
     if (chosenCustomer !== null) {
@@ -85,11 +94,6 @@ function SoldPermission() {
     }
     setLoading(false);
   }, [chosenCustomer]);
-
-  const [soldPermissionOrders, setSoldPermissionOrders] = useState(() => {
-    const savedProducts = localStorage.getItem("soldPermissionOrders");
-    return savedProducts ? JSON.parse(savedProducts) : [];
-  });
 
   useEffect(() => {
     setLoading(true);
@@ -103,8 +107,6 @@ function SoldPermission() {
     }
     setLoading(false);
   }, [soldPermissionOrders]);
-
-  const [ordersIds, setOrdersIds] = useState([]);
 
   useEffect(() => {
     soldPermissionOrders.forEach((e) => {
@@ -140,28 +142,43 @@ function SoldPermission() {
                 ordersIds={ordersIds}
               />
               <DangerPopup
-                notRemove={true}
-                buttonTitle="إعادة تهيئة"
+                btnTitle="إعادة تهيئة"
+                btnIcon={resetSvg}
                 title="إعادة تهيئة البيانات"
-                icon={resetSvg}
-                handler={resetHandler}
                 description="هل أنت متأكد؟ سيتم إعادة تهيئة البيانات، إذا كنت ترغب في
                 الاحتفاظ بالبيانات، يُرجى الضغط على 'حفظ' قبل إعادة التهيئة."
-                submitBtnTitle="إعادة تهيئة"
-                successMessage="تمت إعادة تهيئة البيانات بنجاح"
+                confirmBtnTitle="إعادة تهيئة"
+                loadingState={loading}
+                handler={resetHandler}
               />
               {soldPermissionOrders.length > 0 && (
-                <CustomModal btnIcon={saveSvg} btnTitle="حفظ">
-                  <CustomModal.Header title="حفظ البيانات" />
-                  <CustomModal.Body
+                <>
+                  <MainButton
                     btnTitle="حفظ"
-                    successMessage="تم حفظ البيانات بنجاح"
-                    loadingState={loading}
-                    submitHandler={submitHandler}
+                    btnIcon={saveSvg}
+                    clickHandler={handleShow}
+                  />
+
+                  <Modal
+                    show={show}
+                    onHide={handleClose}
+                    backdrop="static"
+                    keyboard={false}
+                    centered
                   >
-                    يرجي تأكيد حفظ البيانات
-                  </CustomModal.Body>
-                </CustomModal>
+                    <CustomModal handleClose={handleClose}>
+                      <CustomModal.Header
+                        title="حفظ البيانات"
+                        description="يرجي تأكيد حفظ البيانات"
+                      />
+                      <CustomModal.Footer
+                        confirmBtnTitle="حفظ"
+                        clickHandler={submitHandler}
+                        loadingState={loading}
+                      />
+                    </CustomModal>
+                  </Modal>
+                </>
               )}
             </>
           )}
@@ -204,15 +221,15 @@ function SoldPermission() {
                   <CustomTable.Data
                     body={
                       <DangerPopup
-                        notRemove={true}
-                        title="حذف الصنف"
-                        handler={async () => {
-                          await removeProductHandler(order.productDetails);
-                        }}
-                        description="هل انت متاكد؟ سيتم حذف الصنف"
-                        successMessage={`تم حذف ${order.productDetails.name} بنجاح`}
-                        submitBtnTitle="حذف"
                         btnStyle="btn btn-hov"
+                        btnIcon={removeSvg}
+                        title="حذف الصنف"
+                        description="هل انت متاكد؟ سيتم حذف الصنف"
+                        confirmBtnTitle="حذف"
+                        loadingState={loading}
+                        handler={() => {
+                          removeProductHandler(order.productDetails);
+                        }}
                       />
                     }
                     last={true}

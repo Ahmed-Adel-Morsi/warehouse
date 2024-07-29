@@ -1,50 +1,22 @@
 import { useEffect } from "react";
-import { useState } from "react";
 import MainButton from "../components/MainButton";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { loginUser } from "../features/authSlice";
 import { useNavigate } from "react-router-dom";
 import { Spinner } from "react-bootstrap";
-import { toastFire } from "../utils/toastFire";
+import useForm from "../hooks/useForm";
 
 function Login() {
-  const [userName, setUserName] = useState("");
-  const [password, setPassword] = useState("");
-  const [fieldErrors, setFieldErrors] = useState({});
-  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { token, isLoading, error } = useSelector((state) => state.auth);
+  const { token } = useSelector((state) => state.auth);
+  const { formData, fieldErrors, loading, handleChange, handleSubmit } =
+    useForm({ userName: "", password: "" }, loginUser);
 
   useEffect(() => {
     if (token) {
       navigate("/");
     }
   }, [token, navigate]);
-
-  useEffect(() => {
-    if (error) {
-      if (Array.isArray(error)) {
-        const errors = {};
-        error.forEach((err) => {
-          if (!errors[err.path]) {
-            errors[err.path] = err.msg;
-          }
-        });
-        setFieldErrors(errors);
-      } else {
-        toastFire("error", error.msg);
-        setFieldErrors({});
-      }
-    } else {
-      setFieldErrors({});
-    }
-  }, [error]);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    await dispatch(loginUser({ userName, password }));
-    toastFire("success", "مرحبا بعودتك تم تسجيل الدخول بنجاح");
-  };
 
   return (
     <div className="d-flex min-vh-100 justify-content-center align-items-center">
@@ -71,11 +43,12 @@ function Login() {
               id="userName"
               type="text"
               name="userName"
-              onChange={(e) => setUserName(e.target.value)}
+              value={formData.userName}
+              onChange={handleChange}
               autoComplete="username"
               required
             />
-            {error && (
+            {fieldErrors.userName && (
               <div className="invalid-feedback d-block">
                 {fieldErrors.userName}
               </div>
@@ -90,11 +63,12 @@ function Login() {
               id="pass"
               type="password"
               name="password"
-              onChange={(e) => setPassword(e.target.value)}
+              value={formData.password}
+              onChange={handleChange}
               autoComplete="current-password"
               required
             />
-            {error && (
+            {fieldErrors.password && (
               <div className="invalid-feedback d-block">
                 {fieldErrors.password}
               </div>
@@ -103,7 +77,7 @@ function Login() {
           <MainButton
             type="submit"
             btnTitle={
-              isLoading ? (
+              loading ? (
                 <Spinner animation="border" size="sm" />
               ) : (
                 "تسجيل الدخول"

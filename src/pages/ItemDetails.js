@@ -1,31 +1,25 @@
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { getTransactionsByProductId } from "../features/transactionsSlice";
 import { printerSvg } from "../svgs/pageContentSVGs";
 import convertDateFormat from "../utils/convertDateFormat";
 import PageHeader from "../components/PageHeader";
-import { Spinner } from "react-bootstrap";
 import MainButton from "../components/MainButton";
 import CustomTable from "../components/CustomTable";
 import TableContainer from "../components/TableContainer";
+import useFetch from "../hooks/useFetch";
 
 function ItemDetails() {
   const { productId } = useParams();
   const {
-    transactionsByProductId: transactions,
+    data: transactions,
     error,
     loading,
-  } = useSelector((state) => state.transactions);
-  const dispatch = useDispatch();
+  } = useFetch(getTransactionsByProductId, "transactions", productId);
 
   const handlePrint = () => {
     window.print();
   };
 
-  useEffect(() => {
-    dispatch(getTransactionsByProductId(productId));
-  }, [dispatch, productId]);
   return (
     <>
       <PageHeader>
@@ -36,7 +30,7 @@ function ItemDetails() {
       </PageHeader>
       {loading ? (
         <div className="p-4 text-center fs-small fw-medium">
-          <Spinner animation="border" size="sm" />
+          جارى التحميل...
         </div>
       ) : error ? (
         <div className="p-4 text-center fs-small fw-medium">

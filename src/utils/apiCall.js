@@ -1,3 +1,5 @@
+import { handleErrors } from "./errorhandler";
+
 const apiCall = async (route, options, rejectWithValue) => {
   try {
     const response = await fetch(
@@ -7,12 +9,14 @@ const apiCall = async (route, options, rejectWithValue) => {
     const data = await response.json();
 
     if (!response.ok) {
-      return rejectWithValue(data.errors || "Network response was not ok");
+      return rejectWithValue(
+        handleErrors(data) || "Network response was not ok"
+      );
     }
 
     return data;
   } catch (error) {
-    return rejectWithValue(error.message || "An unknown error occurred");
+    return rejectWithValue(handleErrors(error) || "An unknown error occurred");
   }
 };
 

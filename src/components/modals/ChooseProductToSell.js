@@ -1,10 +1,16 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import CustomModal from "../CustomModal";
-import { useDispatch, useSelector } from "react-redux";
 import { selectTogglerSvg } from "../../svgs/pageContentSVGs";
 import { fetchProducts } from "../../features/productsSlice";
 import { productsSvg } from "../../svgs/sidebarSVGs";
 import ModalInput from "../CustomInput";
+import MainButton from "../MainButton";
+import { Modal } from "react-bootstrap";
+import CustomForm from "../CustomForm";
+import { toastFire } from "../../utils/toastFire";
+import useFetch from "../../hooks/useFetch";
+import useModal from "../../hooks/useModal";
+import useSearch from "../../hooks/useSearch";
 
 function ChooseProductToSell({
   setChosenProductToSell,
@@ -12,16 +18,20 @@ function ChooseProductToSell({
   setSoldPermissionOrders,
   ordersIds,
 }) {
-  const { data: products } = useSelector((state) => state.products);
   const [currentChoice, setCurrentChoice] = useState({});
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filteredProducts, setFilteredProducts] = useState([]);
-  let [invalidCountFeedbackMsg, setInvalidCountFeedbackMsg] = useState("");
-  let [invalidPriceFeedbackMsg, setInvalidPriceFeedbackMsg] = useState("");
-  const dispatch = useDispatch();
-
+  const [invalidCountFeedbackMsg, setInvalidCountFeedbackMsg] = useState("");
+  const [invalidPriceFeedbackMsg, setInvalidPriceFeedbackMsg] = useState("");
   const [formData, setFormData] = useState({});
   const [loading, setLoading] = useState(false);
+  const { show, handleClose, handleShow } = useModal();
+  const {
+    data: products,
+    error,
+    loading: fetchLoading,
+  } = useFetch(fetchProducts, "products");
+  const { filteredData: filteredProducts, filterItems } = useSearch(products, [
+    "name",
+  ]);
 
   const handleDropdownChoice = (e, product) => {
     e.preventDefault();
@@ -55,29 +65,22 @@ function ChooseProductToSell({
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
+    setLoading(true);
     if (e.currentTarget.checkValidity()) {
-      try {
-        setLoading(true);
-        await setSoldPermissionOrders((prevProducts) => [
-          ...prevProducts,
-          {
-            ...formData,
-            totalPrice:
-              parseInt(formData.quantity) * parseFloat(formData.price),
-            productDetails: chosenProductToSell,
-          },
-        ]);
-        await setChosenProductToSell(null);
-        setLoading(false);
-        return true;
-      } catch (error) {
-        console.error("Error:", error);
-        setLoading(false);
-        return false;
-      }
+      setSoldPermissionOrders((prevProducts) => [
+        ...prevProducts,
+        {
+          ...formData,
+          totalPrice: parseInt(formData.quantity) * parseFloat(formData.price),
+          productDetails: chosenProductToSell,
+        },
+      ]);
+      handleClose();
+      toastFire("success", `تم اختيار الصنف ${currentChoice.name} بنجاح`);
+      setChosenProductToSell(null);
     }
-    return false;
+    setLoading(false);
   };
 
   const isFieldValid = (e) => {
@@ -119,121 +122,137 @@ function ChooseProductToSell({
     }
   };
 
-  const handleInput = (e) => {
-    setSearchQuery(e.target.value);
-  };
-
-  useEffect(() => {
-    const filtered = products.filter((product) =>
-      product.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-    setFilteredProducts(filtered);
-  }, [products, searchQuery]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      await dispatch(fetchProducts()).unwrap();
-    };
-    fetchData();
-  }, [dispatch]);
-
   return (
-    <CustomModal btnTitle="اختر الصنف" btnIcon={productsSvg}>
-      <CustomModal.Header title="اختر الصنف">
-        يرجي اختيار الصنف من فضلك
-      </CustomModal.Header>
-      <CustomModal.Body
-        btnTitle="اضافة"
-        submitHandler={handleSubmit}
-        successMessage={`تم اختيار الصنف ${currentChoice.name} بنجاح`}
-        disableSubmit={chosenProductToSell ? false : true}
-        loadingState={loading}
+    <>
+      <MainButton
+        btnTitle="اختر الصنف"
+        btnIcon={productsSvg}
+        clickHandler={handleShow}
+      />
+
+      <Modal
+        show={show}
+        onHide={handleClose}
+        backdrop="static"
+        keyboard={false}
+        centered
       >
-        <div className="dropdown dropdown-center w-100">
-          <button
-            className="btn border w-100 d-flex justify-content-between align-items-center btn-hov"
-            type="button"
-            id="dropdownMenuButton1"
-            data-bs-toggle="dropdown"
-            aria-expanded="false"
-          >
-            {chosenProductToSell ? chosenProductToSell.name : "اختر الصنف"}
-            {selectTogglerSvg}
-          </button>
-          <ul
-            className="dropdown-menu pt-0 position-fixed overflow-hidden"
-            aria-labelledby="dropdownMenuButton1"
-          >
-            <input
-              type="text"
-              className="form-control border-0 border-bottom rounded-0 shadow-none mb-2 no-outline search-input pe-30px"
-              placeholder="ابحث عن الصنف بالإسم"
-              onInput={handleInput}
-            />
-            <div className="overflow-y-auto mh-6rem sm-scroll">
-              {filteredProducts.map(
-                (product) =>
-                  !ordersIds.includes(product._id) && (
-                    <li className="text-end" key={product._id}>
-                      <a
-                        className={`dropdown-item rounded py-1 pe-30px btn-hov ${
-                          chosenProductToSell &&
-                          chosenProductToSell.name === product.name
-                            ? "selected-item"
-                            : ""
-                        }`}
-                        href="/"
-                        onClick={(e) => handleDropdownChoice(e, product)}
-                      >
-                        {product.name}
-                      </a>
-                    </li>
-                  )
+        <CustomModal handleClose={handleClose}>
+          <CustomModal.Header
+            title="اختر الصنف"
+            description="يرجي اختيار الصنف من فضلك"
+          />
+          <CustomModal.Body>
+            <CustomForm id="chooseProductToSell" onSubmit={handleSubmit}>
+              <div className="dropdown dropdown-center w-100">
+                <button
+                  className="btn border w-100 d-flex justify-content-between align-items-center btn-hov"
+                  type="button"
+                  id="dropdownMenuButton1"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  {chosenProductToSell
+                    ? chosenProductToSell.name
+                    : "اختر الصنف"}
+                  {selectTogglerSvg}
+                </button>
+                <ul
+                  className="dropdown-menu pt-0 position-fixed overflow-hidden"
+                  aria-labelledby="dropdownMenuButton1"
+                >
+                  <input
+                    type="text"
+                    className="form-control border-0 border-bottom rounded-0 shadow-none mb-2 no-outline search-input pe-30px"
+                    placeholder="ابحث عن الصنف بالإسم"
+                    onInput={filterItems}
+                  />
+                  {fetchLoading ? (
+                    <div className="p-4 text-center fs-small fw-medium">
+                      جارى التحميل...
+                    </div>
+                  ) : error ? (
+                    <div className="p-4 text-center fs-small fw-medium">
+                      حدث خطأ ما
+                      <p>Error: {error.msg}</p>
+                    </div>
+                  ) : (
+                    <div className="overflow-y-auto mh-6rem sm-scroll">
+                      {filteredProducts.map(
+                        (product) =>
+                          !ordersIds.includes(product._id) && (
+                            <li className="text-end" key={product._id}>
+                              <a
+                                className={`dropdown-item rounded py-1 pe-30px btn-hov ${
+                                  chosenProductToSell &&
+                                  chosenProductToSell.name === product.name
+                                    ? "selected-item"
+                                    : ""
+                                }`}
+                                href="/"
+                                onClick={(e) =>
+                                  handleDropdownChoice(e, product)
+                                }
+                              >
+                                {product.name}
+                              </a>
+                            </li>
+                          )
+                      )}
+                    </div>
+                  )}
+                </ul>
+              </div>
+              {chosenProductToSell && (
+                <>
+                  <div className="d-flex gap-3 text-muted">
+                    <p className="mb-0">
+                      العدد بالمخزن : {chosenProductToSell.quantity || 0}
+                    </p>
+                    <p className="mb-0">
+                      السعر بالمخزن : {chosenProductToSell.price || 0}
+                    </p>
+                  </div>
+                  {chosenProductToSell.quantity ? (
+                    <>
+                      <ModalInput
+                        type="text"
+                        name="quantity"
+                        label="العدد"
+                        invalidFeedback={invalidCountFeedbackMsg}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        required
+                      />
+                      <ModalInput
+                        type="text"
+                        name="price"
+                        label="سعر الوحدة"
+                        invalidFeedback={invalidPriceFeedbackMsg}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        required
+                      />
+                    </>
+                  ) : (
+                    <p className="text-danger m-0 fs-small">
+                      الصنف '{chosenProductToSell.name}' لا يوجد منه فى المخزن
+                      لذلك لا يمكنك بيعه
+                    </p>
+                  )}
+                </>
               )}
-            </div>
-          </ul>
-        </div>
-        {chosenProductToSell && (
-          <>
-            <div className="d-flex gap-3 text-muted">
-              <p className="mb-0">
-                العدد بالمخزن : {chosenProductToSell.quantity || 0}
-              </p>
-              <p className="mb-0">
-                السعر بالمخزن : {chosenProductToSell.price || 0}
-              </p>
-            </div>
-            {chosenProductToSell.quantity ? (
-              <>
-                <ModalInput
-                  type="text"
-                  name="quantity"
-                  label="العدد"
-                  invalidFeedback={invalidCountFeedbackMsg}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  required
-                />
-                <ModalInput
-                  type="text"
-                  name="price"
-                  label="سعر الوحدة"
-                  invalidFeedback={invalidPriceFeedbackMsg}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  required
-                />
-              </>
-            ) : (
-              <p className="text-danger m-0 fs-small">
-                الصنف '{chosenProductToSell.name}' لا يوجد منه فى المخزن لذلك لا
-                يمكنك بيعه
-              </p>
-            )}
-          </>
-        )}
-      </CustomModal.Body>
-    </CustomModal>
+            </CustomForm>
+          </CustomModal.Body>
+          <CustomModal.Footer
+            confirmBtnTitle="اضافة"
+            formId="chooseProductToSell"
+            disableConfirmBtn={!chosenProductToSell}
+            loadingState={loading}
+          />
+        </CustomModal>
+      </Modal>
+    </>
   );
 }
 

@@ -1,46 +1,22 @@
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { fetchTransactions } from "../features/transactionsSlice";
 import convertDateFormat from "../utils/convertDateFormat";
 import CustomTable from "../components/CustomTable";
 import TableContainer from "../components/TableContainer";
 import SearchInput from "../components/SearchInput";
 import PageHeader from "../components/PageHeader";
+import useFetch from "../hooks/useFetch";
+import useSearch from "../hooks/useSearch";
 
 function Transactions() {
   const {
     data: transactions,
-    loading,
     error,
-  } = useSelector((state) => state.transactions);
-  const dispatch = useDispatch();
-  const [filteredTransactions, setFilteredTransactions] = useState([]);
-
-  const filterItems = (e) => {
-    const value = e.target.value;
-    setFilteredTransactions(
-      transactions.filter(function (transaction) {
-        return transaction.productDetails.name
-          .toLowerCase()
-          .includes(value.toString().toLowerCase());
-      })
-    );
-  };
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        await dispatch(fetchTransactions()).unwrap();
-      } catch (err) {
-        console.error("Failed to fetch transactions:", err);
-      }
-    };
-    fetchData();
-  }, [dispatch]);
-
-  useEffect(() => {
-    setFilteredTransactions(transactions);
-  }, [transactions]);
+    loading,
+  } = useFetch(fetchTransactions, "transactions");
+  const { filteredData: filteredTransactions, filterItems } = useSearch(
+    transactions,
+    [["productDetails", "name"]]
+  );
 
   return (
     <>

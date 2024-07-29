@@ -1,48 +1,25 @@
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { fetchCustomers } from "../features/customersSlice";
 import { actionsSvg, productTransactionsSvg } from "../svgs/actionsSVGs";
 import { deleteCustomer } from "../features/customersSlice";
 import AddandEditCustomer from "../components/modals/AddandEditCustomer";
-import DangerPopup from "../components/modals/DangerPopup";
 import CustomTable from "../components/CustomTable";
 import TableContainer from "../components/TableContainer";
 import SearchInput from "../components/SearchInput";
 import PageHeader from "../components/PageHeader";
+import RemoveItem from "../components/modals/RemoveItem";
+import useFetch from "../hooks/useFetch";
+import useSearch from "../hooks/useSearch";
 
 function Customers() {
   const {
     data: customers,
-    loading,
     error,
-  } = useSelector((state) => state.customers);
-  const dispatch = useDispatch();
-  const [filteredCustomers, setFilteredCustomers] = useState([]);
-
-  const filterItems = (e) => {
-    const value = e.target.value;
-    setFilteredCustomers(
-      customers.filter((customer) => {
-        const codeAndName = `${customer.name} ${customer.code}`.toLowerCase();
-        return codeAndName.includes(value.toString().toLowerCase());
-      })
-    );
-  };
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        await dispatch(fetchCustomers()).unwrap();
-      } catch (err) {
-        console.error("Failed to fetch customers:", err);
-      }
-    };
-    fetchData();
-  }, [dispatch]);
-
-  useEffect(() => {
-    setFilteredCustomers(customers);
-  }, [customers]);
+    loading,
+  } = useFetch(fetchCustomers, "customers");
+  const { filteredData: filteredCustomers, filterItems } = useSearch(
+    customers,
+    ["name", "code"]
+  );
 
   return (
     <>
@@ -63,7 +40,7 @@ function Customers() {
         ) : error ? (
           <div className="p-4 text-center fs-small fw-medium">
             حدث خطأ ما
-            <p>Error: {error}</p>
+            <p>Error: {error.msg}</p>
           </div>
         ) : filteredCustomers.length > 0 ? (
           <CustomTable>
@@ -79,7 +56,7 @@ function Customers() {
             <tbody>
               {filteredCustomers.map((customer, index, arr) => (
                 <CustomTable.Row
-                  key={customer.id}
+                  key={customer._id}
                   last={index === arr.length - 1}
                 >
                   <CustomTable.Data body={customer.name} />
@@ -102,18 +79,17 @@ function Customers() {
                           <hr className="my-1" />
                           <li>
                             <AddandEditCustomer
-                              forEdit={true}
+                              forEdit
                               initialFormData={customer}
                             />
                           </li>
                           <li>
-                            <DangerPopup
-                              buttonTitle="حذف"
+                            <RemoveItem
                               title="حذف العميل"
-                              itemToRemove={customer}
-                              handler={deleteCustomer}
                               description="هل انت متاكد؟ سيتم حذف العميل نهائياً"
-                              submitBtnTitle="حذف العميل"
+                              confirmBtnTitle="حذف العميل"
+                              handler={deleteCustomer}
+                              itemIdToRemove={customer._id}
                             />
                           </li>
                           <li>

@@ -1,44 +1,25 @@
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { deleteProduct, fetchProducts } from "../features/productsSlice";
 import { actionsSvg, productTransactionsSvg } from "../svgs/actionsSVGs";
 import AddandEditProduct from "../components/modals/AddandEditProduct";
-import DangerPopup from "../components/modals/DangerPopup";
 import { Link } from "react-router-dom";
 import CustomTable from "../components/CustomTable";
 import TableContainer from "../components/TableContainer";
 import SearchInput from "../components/SearchInput";
 import PageHeader from "../components/PageHeader";
+import RemoveItem from "../components/modals/RemoveItem";
+import useFetch from "../hooks/useFetch";
+import useSearch from "../hooks/useSearch";
 
 function Products() {
   const {
     data: products,
-    loading,
     error,
-  } = useSelector((state) => state.products);
-  const dispatch = useDispatch();
-  const [filteredProducts, setFilteredProducts] = useState([]);
-
-  const filterItems = (e) => {
-    const value = e.target.value;
-    setFilteredProducts(
-      products.filter(function (product) {
-        const codeAndName = `${product.name} ${product.code}`.toLowerCase();
-        return codeAndName.includes(value.toString().toLowerCase());
-      })
-    );
-  };
-
-  useEffect(() => {
-    const fetchData = async () => {
-      await dispatch(fetchProducts());
-    };
-    fetchData();
-  }, [dispatch]);
-
-  useEffect(() => {
-    setFilteredProducts(products);
-  }, [products]);
+    loading,
+  } = useFetch(fetchProducts, "products");
+  const { filteredData: filteredProducts, filterItems } = useSearch(products, [
+    "name",
+    "code",
+  ]);
 
   return (
     <>
@@ -113,13 +94,12 @@ function Products() {
                             />
                           </li>
                           <li>
-                            <DangerPopup
-                              buttonTitle="حذف"
+                            <RemoveItem
                               title="حذف الصنف"
-                              itemToRemove={product}
-                              handler={deleteProduct}
                               description="هل انت متاكد؟ سيتم حذف الصنف نهائياً"
-                              submitBtnTitle="حذف الصنف"
+                              confirmBtnTitle="حذف الصنف"
+                              handler={deleteProduct}
+                              itemIdToRemove={product._id}
                             />
                           </li>
                           <li>

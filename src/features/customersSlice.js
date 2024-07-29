@@ -1,56 +1,54 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import apiCall from "../utils/apiCall";
+import { toastFire } from "../utils/toastFire";
 
-// Thunk for fetching customers
 export const fetchCustomers = createAsyncThunk(
   "customersSlice/fetchCustomers",
-  async (_, { rejectWithValue }) => {
-    const data = await apiCall(
-      `${process.env.REACT_APP_API_BASE_URL}/customers`,
-      undefined,
+  async (_, { rejectWithValue, getState }) => {
+    const { token } = getState().auth;
+    return await apiCall(
+      `/customers`,
+      {
+        headers: {
+          Authorization: token,
+        },
+      },
       rejectWithValue
     );
-    return data;
   }
 );
 
-// Thunk for adding a customer
 export const addCustomer = createAsyncThunk(
   "customersSlice/addCustomer",
   async (customer, { getState, rejectWithValue }) => {
-    const { data: customers } = getState().customers;
-    const lastCustomer = customers.reduce(
-      (prev, curr) => {
-        return prev.code > curr.code ? prev : curr;
-      },
-      { code: 0 }
-    );
-    const lastCode = lastCustomer ? lastCustomer.code : 0;
-    const newCustomer = { ...customer, code: lastCode + 1 };
+    const { token } = getState().auth;
 
-    const data = await apiCall(
-      `${process.env.REACT_APP_API_BASE_URL}/customers`,
+    return await apiCall(
+      `/customers`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: token,
         },
-        body: JSON.stringify(newCustomer),
+        body: JSON.stringify(customer),
       },
       rejectWithValue
     );
-    return data;
   }
 );
 
-// Thunk for deleting a customer
 export const deleteCustomer = createAsyncThunk(
   "customersSlice/deleteCustomer",
-  async (customerId, { rejectWithValue }) => {
+  async (customerId, { getState, rejectWithValue }) => {
+    const { token } = getState().auth;
     await apiCall(
-      `${process.env.REACT_APP_API_BASE_URL}/customers/${customerId}`,
+      `/customers/${customerId}`,
       {
         method: "DELETE",
+        headers: {
+          Authorization: token,
+        },
       },
       rejectWithValue
     );
@@ -58,93 +56,50 @@ export const deleteCustomer = createAsyncThunk(
   }
 );
 
-// Thunk for editing a customer
 export const editCustomer = createAsyncThunk(
   "customersSlice/editCustomer",
-  async (customer, { rejectWithValue }) => {
-    const data = await apiCall(
-      `${process.env.REACT_APP_API_BASE_URL}/customers/${customer.id}`,
+  async (customer, { getState, rejectWithValue }) => {
+    const { token } = getState().auth;
+    return await apiCall(
+      `/customers/${customer._id}`,
       {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          Authorization: token,
         },
         body: JSON.stringify(customer),
       },
       rejectWithValue
     );
-    return data;
   }
 );
 
 const customersSlice = createSlice({
   name: "customersSlice",
-  initialState: {
-    data: [],
-    loading: false,
-    error: null,
-  },
+  initialState: [],
   reducers: {},
   extraReducers: (builder) => {
     builder
-      // Fetch Customers
-      .addCase(fetchCustomers.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
       .addCase(fetchCustomers.fulfilled, (state, action) => {
-        state.loading = false;
-        state.data = action.payload;
-      })
-      .addCase(fetchCustomers.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
-      // Add Customer
-      .addCase(addCustomer.pending, (state) => {
-        state.loading = true;
-        state.error = null;
+        return action.payload;
       })
       .addCase(addCustomer.fulfilled, (state, action) => {
-        state.loading = false;
-        state.data.push(action.payload);
-      })
-      .addCase(addCustomer.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
-      // Delete Customer
-      .addCase(deleteCustomer.pending, (state) => {
-        state.loading = true;
-        state.error = null;
+        toastFire("success", `تم اضافة ${action.payload.name} بنجاح`);
+        state.push(action.payload);
       })
       .addCase(deleteCustomer.fulfilled, (state, action) => {
-        state.loading = false;
-        state.data = state.data.filter(
-          (customer) => customer.id !== action.payload
-        );
-      })
-      .addCase(deleteCustomer.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
-      // Edit Customer
-      .addCase(editCustomer.pending, (state) => {
-        state.loading = true;
-        state.error = null;
+        toastFire("success", `تم حذف العميل بنجاح`);
+        return state.filter((customer) => customer._id !== action.payload);
       })
       .addCase(editCustomer.fulfilled, (state, action) => {
-        state.loading = false;
-        const index = state.data.findIndex(
-          (customer) => customer.id === action.payload.id
+        toastFire("success", `تم تعديل ${action.payload.name} بنجاح`);
+        const index = state.findIndex(
+          (customer) => customer._id === action.payload._id
         );
         if (index !== -1) {
-          state.data[index] = action.payload;
+          state[index] = action.payload;
         }
-      })
-      .addCase(editCustomer.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
       });
   },
 });

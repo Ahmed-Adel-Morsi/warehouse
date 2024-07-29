@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import apiCall from "../utils/apiCall";
+import { toastFire } from "../utils/toastFire";
 
 export const loginUser = createAsyncThunk(
   "auth/loginUser",
@@ -40,51 +41,33 @@ const authSlice = createSlice({
   initialState: {
     user: null,
     token: localStorage.getItem("token"),
-    isLoading: false,
-    error: null,
   },
   reducers: {
     logout: (state) => {
       localStorage.removeItem("token");
       state.user = null;
       state.token = null;
-      state.error = null;
-      state.isLoading = false;
     },
   },
   extraReducers: (builder) => {
     builder
-      // Login actions
-      .addCase(loginUser.pending, (state) => {
-        state.isLoading = true;
-        state.error = null;
-      })
       .addCase(loginUser.fulfilled, (state, action) => {
         const { user, token } = action.payload;
-        state.isLoading = false;
         state.user = user;
         state.token = token;
         localStorage.setItem("token", token);
-      })
-      .addCase(loginUser.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.payload;
-      })
-      // Registration actions
-      .addCase(registerUser.pending, (state) => {
-        state.isLoading = true;
-        state.error = null;
+        toastFire(
+          "success",
+          `<div class="fw-bold fs-small">مرحباً بعودتك! تم تسجيل الدخول بنجاح.</div>
+          <div class="fs-small">يمكنك الآن استخدام البرنامج.</div>`
+        );
       })
       .addCase(registerUser.fulfilled, (state, action) => {
         const { user, token } = action.payload;
-        state.isLoading = false;
         state.user = user;
         state.token = token;
         localStorage.setItem("token", token);
-      })
-      .addCase(registerUser.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.payload;
+        toastFire("success", "تم إنشاء الحساب بنجاح");
       });
   },
 });
