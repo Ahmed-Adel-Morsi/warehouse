@@ -19,14 +19,14 @@ function ModalInput({
           className={`form-control fs-small fw-medium h-input${
             invalidFeedback ? " is-invalid" : ""
           }`}
-          {...(type && { type })}
-          {...(name && { id: name })}
-          {...(name && { name })}
-          {...(value && { value })}
-          {...(required && { required })}
-          {...(disabled && { disabled })}
-          {...(onChange && { onChange })}
-          {...(onBlur && { onBlur })}
+          type={type}
+          id={name}
+          name={name}
+          value={value}
+          required={required}
+          disabled={disabled}
+          onChange={onChange}
+          onBlur={onBlur}
         />
         <div className="invalid-feedback fs-075rem">{invalidFeedback}</div>
       </div>
