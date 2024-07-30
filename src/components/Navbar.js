@@ -2,16 +2,13 @@ import { Link } from "react-router-dom";
 import ThemeDropdown from "./ThemeDropdown";
 import Sidebar from "./Sidebar";
 import { hamburgerSvg } from "../svgs/navbarSVGs";
-import { useState } from "react";
 import { Offcanvas } from "react-bootstrap";
+import useModal from "../hooks/useModal";
 
 function Navbar() {
-  const [show, setShow] = useState(false);
-
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
+  const { handleClose, handleShow, show } = useModal();
   return (
-    <nav className="d-block d-lg-none navbar navbar-expand-lg bg-body-white py-2 px-3 border-bottom d-print-none">
+    <nav className="d-lg-none navbar py-2 px-3 border-bottom d-print-none">
       <div className="container-fluid p-0">
         <button
           className="navbar-toggler border-0 p-2 btn-hov"
@@ -24,7 +21,7 @@ function Navbar() {
         <Link to="/" className="navbar-brand fs-4 fw-boldest m-0">
           Warehouse
         </Link>
-        <ThemeDropdown forNavbar={true} />
+        <ThemeDropdown forNavbar />
         <Offcanvas
           show={show}
           onHide={handleClose}
@@ -42,7 +39,7 @@ function Navbar() {
             ></button>
           </Offcanvas.Header>
           <Offcanvas.Body className="p-0">
-            <Sidebar forOffcanvas={true} closeHandler={handleClose} />
+            <Sidebar forOffcanvas closeHandler={handleClose} />
           </Offcanvas.Body>
         </Offcanvas>
       </div>

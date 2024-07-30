@@ -39,7 +39,7 @@ function Transactions() {
         ) : filteredTransactions.length > 0 ? (
           <CustomTable>
             <thead>
-              <CustomTable.Row header={true}>
+              <CustomTable.Row header>
                 <CustomTable.Data body="اسم الصنف" />
                 <CustomTable.Data body="حركة الصنف" />
                 <CustomTable.Data body="الكود" />
@@ -47,7 +47,7 @@ function Transactions() {
                 <CustomTable.Data body="العدد" />
                 <CustomTable.Data body="السعر" />
                 <CustomTable.Data body="العميل" />
-                <CustomTable.Data body="التاريخ" last={true} />
+                <CustomTable.Data body="التاريخ" last />
               </CustomTable.Row>
             </thead>
             <tbody>
@@ -79,7 +79,7 @@ function Transactions() {
                   <CustomTable.Data body={transaction.customerDetails.name} />
                   <CustomTable.Data
                     body={convertDateFormat(transaction.createdAt)}
-                    last={true}
+                    last
                   />
                 </CustomTable.Row>
               ))}

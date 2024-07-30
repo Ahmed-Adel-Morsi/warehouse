@@ -35,7 +35,7 @@ function AdditionPermission() {
   );
   const dispatch = useDispatch();
 
-  const removeProductHandler = async (currentProduct) => {
+  const removeProductHandler = (currentProduct) => {
     setLoading(true);
     const savedProducts = JSON.parse(
       localStorage.getItem("additionPermissionOrders")
@@ -193,7 +193,7 @@ function AdditionPermission() {
         ) : additionPermissionOrders.length > 0 ? (
           <CustomTable>
             <thead>
-              <CustomTable.Row header={true}>
+              <CustomTable.Row header>
                 <CustomTable.Data body="اسم الصنف" />
                 <CustomTable.Data body="الكود" />
                 <CustomTable.Data body="الماركة" />
@@ -202,7 +202,7 @@ function AdditionPermission() {
                 <CustomTable.Data body="العدد" />
                 <CustomTable.Data body="السعر" />
                 <CustomTable.Data body="الاجمالى" />
-                <CustomTable.Data body="إجراءات" last={true} />
+                <CustomTable.Data body="إجراءات" last />
               </CustomTable.Row>
             </thead>
             <tbody>
@@ -233,7 +233,7 @@ function AdditionPermission() {
                         }}
                       />
                     }
-                    last={true}
+                    last
                   />
                 </CustomTable.Row>
               ))}

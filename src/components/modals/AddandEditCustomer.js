@@ -12,7 +12,7 @@ import { addCustomer, editCustomer } from "../../features/customersSlice";
 import useModal from "../../hooks/useModal";
 
 function AddandEditCustomer({
-  forEdit = false,
+  forEdit,
   initialFormData = {
     name: "",
     phoneNumber: "",

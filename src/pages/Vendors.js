@@ -43,12 +43,12 @@ function Vendors() {
         ) : filteredVendors.length > 0 ? (
           <CustomTable>
             <thead>
-              <CustomTable.Row header={true}>
+              <CustomTable.Row header>
                 <CustomTable.Data body="اسم المورد" />
                 <CustomTable.Data body="كود المورد" />
                 <CustomTable.Data body="رقم الهاتف" />
                 <CustomTable.Data body="عنوان المورد" />
-                <CustomTable.Data body="إجراءات" last={true} />
+                <CustomTable.Data body="إجراءات" last />
               </CustomTable.Row>
             </thead>
             <tbody>
@@ -99,7 +99,7 @@ function Vendors() {
                         </ul>
                       </div>
                     }
-                    last={true}
+                    last
                   />
                 </CustomTable.Row>
               ))}

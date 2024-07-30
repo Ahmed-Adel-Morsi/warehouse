@@ -129,9 +129,7 @@ function Sidebar({ forOffcanvas, closeHandler }) {
           </div>
 
           <div className="list-group">
-            {!forOffcanvas && (
-              <ThemeDropdown forNavbar={false}>تبديل الثيم</ThemeDropdown>
-            )}
+            {!forOffcanvas && <ThemeDropdown>تبديل الثيم</ThemeDropdown>}
             {token && (
               <DangerPopup
                 btnStyle="list-group-item my-1 list-group-item-action d-flex align-items-center gap-2 p-2 fs-small fw-medium rounded border-0 btn-hov text-theme-color"

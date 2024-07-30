@@ -32,7 +32,7 @@ function SoldPermission() {
   });
   const dispatch = useDispatch();
 
-  const removeProductHandler = async (currentProduct) => {
+  const removeProductHandler = (currentProduct) => {
     setLoading(true);
     const savedProducts = JSON.parse(
       localStorage.getItem("soldPermissionOrders")
@@ -59,30 +59,24 @@ function SoldPermission() {
 
   const submitHandler = async () => {
     setLoading(true);
-    try {
-      for (const order of soldPermissionOrders) {
-        await dispatch(
-          addTransaction({
-            transactionType: "sell",
-            ...order,
-            customerDetails: chosenCustomer,
-          })
-        );
-        await dispatch(
-          editProduct({
-            ...order.productDetails,
-            quantity: order.productDetails.quantity - order.quantity,
-          })
-        );
-      }
-      resetHandler();
-      setLoading(false);
-      return true;
-    } catch (error) {
-      console.error("Error:", error);
-      setLoading(false);
-      return false;
+    for (const order of soldPermissionOrders) {
+      await dispatch(
+        addTransaction({
+          transactionType: "sell",
+          ...order,
+          customerDetails: chosenCustomer,
+        })
+      );
+      await dispatch(
+        editProduct({
+          ...order.productDetails,
+          quantity: order.productDetails.quantity - order.quantity,
+        })
+      );
     }
+    resetHandler();
+    toastFire("success", "تم حفظ البيانات بنجاح");
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -192,7 +186,7 @@ function SoldPermission() {
         ) : soldPermissionOrders.length > 0 ? (
           <CustomTable>
             <thead>
-              <CustomTable.Row header={true}>
+              <CustomTable.Row header>
                 <CustomTable.Data body="اسم الصنف" />
                 <CustomTable.Data body="الكود" />
                 <CustomTable.Data body="الماركة" />
@@ -201,7 +195,7 @@ function SoldPermission() {
                 <CustomTable.Data body="العدد" />
                 <CustomTable.Data body="السعر" />
                 <CustomTable.Data body="الاجمالى" />
-                <CustomTable.Data body="إجراءات" last={true} />
+                <CustomTable.Data body="إجراءات" last />
               </CustomTable.Row>
             </thead>
             <tbody>
@@ -232,7 +226,7 @@ function SoldPermission() {
                         }}
                       />
                     }
-                    last={true}
+                    last
                   />
                 </CustomTable.Row>
               ))}

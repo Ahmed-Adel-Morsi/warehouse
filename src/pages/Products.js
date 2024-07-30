@@ -45,7 +45,7 @@ function Products() {
         ) : filteredProducts.length > 0 ? (
           <CustomTable>
             <thead>
-              <CustomTable.Row header={true}>
+              <CustomTable.Row header>
                 <CustomTable.Data body="اسم الصنف" />
                 <CustomTable.Data body="الكود" />
                 <CustomTable.Data body="الماركة" />
@@ -55,7 +55,7 @@ function Products() {
                 <CustomTable.Data body="بلد المنشـأ" />
                 <CustomTable.Data body="العدد" />
                 <CustomTable.Data body="السعر" />
-                <CustomTable.Data body="إجراءات" last={true} />
+                <CustomTable.Data body="إجراءات" last />
               </CustomTable.Row>
             </thead>
             <tbody>
@@ -89,7 +89,7 @@ function Products() {
                           <hr className="my-1" />
                           <li>
                             <AddandEditProduct
-                              forEdit={true}
+                              forEdit
                               initialFormData={product}
                             />
                           </li>
@@ -114,7 +114,7 @@ function Products() {
                         </ul>
                       </div>
                     }
-                    last={true}
+                    last
                   />
                 </CustomTable.Row>
               ))}

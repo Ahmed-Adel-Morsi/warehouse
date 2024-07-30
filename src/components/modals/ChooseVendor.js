@@ -23,6 +23,17 @@ function ChooseVendor({ setChosenVendor }) {
     "name",
   ]);
 
+  const handleDropdownChoice = (e, vendor) => {
+    e.preventDefault();
+    document.getElementById("dropdownMenuButton1").firstChild.textContent =
+      vendor.name;
+    setCurrentChoice(vendor);
+    document.querySelectorAll(".dropdown-item").forEach((e) => {
+      e.classList.remove("selected-item");
+    });
+    e.target.classList.add("selected-item");
+  };
+
   const handleVendorChoice = () => {
     setLoading(true);
     if (Object.keys(currentChoice).length !== 0) {
@@ -92,19 +103,7 @@ function ChooseVendor({ setChosenVendor }) {
                         <a
                           className="dropdown-item rounded py-1 pe-30px btn-hov"
                           href="/"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            document.getElementById(
-                              "dropdownMenuButton1"
-                            ).firstChild.textContent = vendor.name;
-                            setCurrentChoice(vendor);
-                            document
-                              .querySelectorAll(".dropdown-item")
-                              .forEach((e) => {
-                                e.classList.remove("selected-item");
-                              });
-                            e.target.classList.add("selected-item");
-                          }}
+                          onClick={(e) => handleDropdownChoice(e, vendor)}
                         >
                           {vendor.name}
                         </a>

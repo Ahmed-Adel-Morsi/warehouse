@@ -41,11 +41,11 @@ function AdditionInvoices() {
         ) : filteredTransactions.length > 0 ? (
           <CustomTable>
             <thead>
-              <CustomTable.Row header={true}>
+              <CustomTable.Row header>
                 <CustomTable.Data body="اسم المورد" />
                 <CustomTable.Data body="التاريخ" />
                 <CustomTable.Data body="رقم الفاتورة" />
-                <CustomTable.Data body="إجراءات" last={true} />
+                <CustomTable.Data body="إجراءات" last />
               </CustomTable.Row>
             </thead>
             <tbody>
@@ -69,7 +69,7 @@ function AdditionInvoices() {
                         {showInvoicesSvg}
                       </Link>
                     }
-                    last={true}
+                    last
                   />
                 </CustomTable.Row>
               ))}

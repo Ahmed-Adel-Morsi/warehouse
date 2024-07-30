@@ -69,7 +69,7 @@ function InvoiceDetails({ type }) {
           <TableContainer>
             <CustomTable>
               <thead>
-                <CustomTable.Row header={true}>
+                <CustomTable.Row header>
                   <CustomTable.Data body="اسم الصنف" />
                   <CustomTable.Data body="الكود" />
                   <CustomTable.Data body="الماركة" />
@@ -78,11 +78,11 @@ function InvoiceDetails({ type }) {
                   {type === "buy" && <CustomTable.Data body="المكان" />}
                   <CustomTable.Data body="العدد" />
                   <CustomTable.Data body="السعر" />
-                  <CustomTable.Data body="الاجمالي" last={true} />
+                  <CustomTable.Data body="الاجمالي" last />
                 </CustomTable.Row>
               </thead>
               <tbody>
-                <CustomTable.Row last={true}>
+                <CustomTable.Row last>
                   <CustomTable.Data body={transaction.productDetails.name} />
                   <CustomTable.Data body={transaction.productDetails.code} />
                   <CustomTable.Data body={transaction.productDetails.brand} />
@@ -95,7 +95,7 @@ function InvoiceDetails({ type }) {
                   )}
                   <CustomTable.Data body={transaction.quantity} />
                   <CustomTable.Data body={transaction.price} />
-                  <CustomTable.Data body={transaction.totalPrice} last={true} />
+                  <CustomTable.Data body={transaction.totalPrice} last />
                 </CustomTable.Row>
               </tbody>
             </CustomTable>

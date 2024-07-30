@@ -45,12 +45,12 @@ function Customers() {
         ) : filteredCustomers.length > 0 ? (
           <CustomTable>
             <thead>
-              <CustomTable.Row header={true}>
+              <CustomTable.Row header>
                 <CustomTable.Data body="اسم العميل" />
                 <CustomTable.Data body="كود العميل" />
                 <CustomTable.Data body="رقم الهاتف" />
                 <CustomTable.Data body="عنوان العميل" />
-                <CustomTable.Data body="إجراءات" last={true} />
+                <CustomTable.Data body="إجراءات" last />
               </CustomTable.Row>
             </thead>
             <tbody>
@@ -101,7 +101,7 @@ function Customers() {
                         </ul>
                       </div>
                     }
-                    last={true}
+                    last
                   />
                 </CustomTable.Row>
               ))}

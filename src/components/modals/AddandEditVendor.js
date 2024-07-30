@@ -12,7 +12,7 @@ import { addVendor, editVendor } from "../../features/vendorsSlice";
 import useModal from "../../hooks/useModal";
 
 function AddandEditVendor({
-  forEdit = false,
+  forEdit,
   initialFormData = {
     name: "",
     phoneNumber: "",

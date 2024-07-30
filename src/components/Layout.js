@@ -7,8 +7,8 @@ function Layout() {
   return (
     <>
       <Navbar />
-      <div className="d-flex vh-100">
-        <Sidebar forOffcanvas={false} />
+      <div className="d-flex">
+        <Sidebar />
         <PageContent>
           <Outlet />
         </PageContent>

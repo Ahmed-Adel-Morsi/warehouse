@@ -12,7 +12,7 @@ import CustomForm from "../CustomForm";
 import useModal from "../../hooks/useModal";
 
 function AddandEditProduct({
-  forEdit = false,
+  forEdit,
   initialFormData = {
     name: "",
     code: "",

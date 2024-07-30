@@ -21,8 +21,19 @@ function ChooseCustomer({ setChosenCustomer }) {
   } = useFetch(fetchCustomers, "customers");
   const { filteredData: filteredCustomers, filterItems } = useSearch(
     customers,
-    ["name", "code"]
+    ["name"]
   );
+
+  const handleDropdownChoice = (e, customer) => {
+    e.preventDefault();
+    document.getElementById("dropdownMenuButton1").firstChild.textContent =
+      customer.name;
+    setCurrentChoice(customer);
+    document.querySelectorAll(".dropdown-item").forEach((e) => {
+      e.classList.remove("selected-item");
+    });
+    e.target.classList.add("selected-item");
+  };
 
   const handleCustomerChoice = () => {
     setLoading(true);
@@ -93,19 +104,7 @@ function ChooseCustomer({ setChosenCustomer }) {
                         <a
                           className="dropdown-item rounded py-1 pe-30px btn-hov"
                           href="/"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            document.getElementById(
-                              "dropdownMenuButton1"
-                            ).firstChild.textContent = customer.name;
-                            setCurrentChoice(customer);
-                            document
-                              .querySelectorAll(".dropdown-item")
-                              .forEach((e) => {
-                                e.classList.remove("selected-item");
-                              });
-                            e.target.classList.add("selected-item");
-                          }}
+                          onClick={(e) => handleDropdownChoice(e, customer)}
                         >
                           {customer.name}
                         </a>
