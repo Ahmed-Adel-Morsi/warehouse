@@ -9,6 +9,7 @@ import PageHeader from "../components/PageHeader";
 import RemoveItem from "../components/modals/RemoveItem";
 import useFetch from "../hooks/useFetch";
 import useSearch from "../hooks/useSearch";
+import { Link } from "react-router-dom";
 
 function Customers() {
   const {
@@ -93,10 +94,13 @@ function Customers() {
                             />
                           </li>
                           <li>
-                            <button className="dropdown-item rounded d-flex align-items-center gap-1 px-2 fs-small fw-medium">
+                            <Link
+                              to={`${customer._id}`}
+                              className="dropdown-item rounded d-flex align-items-center gap-1 px-2 fs-small fw-medium"
+                            >
                               {productTransactionsSvg}
                               حركة العميل
-                            </button>
+                            </Link>
                           </li>
                         </ul>
                       </div>

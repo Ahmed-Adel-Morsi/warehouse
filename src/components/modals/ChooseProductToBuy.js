@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CustomModal from "../CustomModal";
 import CustomForm from "../CustomForm";
 import { selectTogglerSvg } from "../../svgs/pageContentSVGs";
@@ -19,11 +19,18 @@ function ChooseProductToBuy({
   ordersIds,
 }) {
   const [currentChoice, setCurrentChoice] = useState({});
-  const [invalidCountFeedbackMsg, setInvalidCountFeedbackMsg] = useState("");
-  const [invalidPriceFeedbackMsg, setInvalidPriceFeedbackMsg] = useState("");
   const [formData, setFormData] = useState({});
+  const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const { show, handleClose, handleShow } = useModal();
+  const {
+    data: products,
+    error,
+    loading: fetchLoading,
+  } = useFetch(fetchProducts, "products");
+  const { filteredData: filteredProducts, filterItems } = useSearch(products, [
+    "name",
+  ]);
 
   const handleDropdownChoice = (e, product) => {
     e.preventDefault();
@@ -37,85 +44,64 @@ function ChooseProductToBuy({
     setChosenProductToBuy(product);
   };
 
+  const validateField = (name, value) => {
+    let error = "";
+    if (name === "quantity" || name === "price") {
+      if (!value) {
+        error = name === "quantity" ? "يجب إدخال العدد" : "يجب إدخال السعر";
+      } else if (isNaN(value)) {
+        error = "يجب إدخال ارقام فقط";
+      }
+    }
+    return error;
+  };
+
   const handleChange = (e) => {
-    handleBlur(e);
+    const { name, value } = e.target;
+    const error = validateField(name, value);
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: value,
+    });
+    setErrors({
+      ...errors,
+      [name]: error,
     });
   };
 
-  const handleBlur = (e) => {
-    if (isFieldValid(e)) {
-      e.target.removeAttribute("required");
-      e.target.classList.remove("is-invalid");
-      e.target.setCustomValidity("");
-    } else {
-      e.target.required = true;
-      e.target.classList.add("is-invalid");
-      e.target.setCustomValidity("Invalid field.");
-    }
-  };
-
   const handleSubmit = (e) => {
-    setLoading(true);
-    if (e.currentTarget.checkValidity()) {
-      setAdditionPermissionOrders((prevProducts) => [
-        ...prevProducts,
-        {
-          ...formData,
-          totalPrice: parseInt(formData.quantity) * parseFloat(formData.price),
-          productDetails: chosenProductToBuy,
-        },
-      ]);
-      handleClose();
-      toastFire("success", `تم اختيار الصنف ${currentChoice.name} بنجاح`);
-      setChosenProductToBuy(null);
+    e.preventDefault();
+    const quantityError = validateField("quantity", formData.quantity);
+    const priceError = validateField("price", formData.price);
+
+    if (quantityError || priceError) {
+      setErrors({
+        quantity: quantityError,
+        price: priceError,
+      });
+      return;
     }
+
+    setLoading(true);
+    setAdditionPermissionOrders((prevProducts) => [
+      ...prevProducts,
+      {
+        ...formData,
+        totalPrice: parseInt(formData.quantity) * parseFloat(formData.price),
+        productDetails: currentChoice,
+      },
+    ]);
+    handleClose();
+    toastFire("success", `تم اختيار الصنف ${currentChoice.name} بنجاح`);
+    setChosenProductToBuy(null);
     setLoading(false);
   };
 
-  const isFieldValid = (e) => {
-    let value = e.target.value;
-
-    switch (e.target.name) {
-      case "quantity":
-        if (value !== "") {
-          if (!isNaN(parseInt(value))) {
-            return true;
-          } else {
-            setInvalidCountFeedbackMsg("يجب إدخال ارقام فقط");
-          }
-        } else {
-          setInvalidCountFeedbackMsg("يجب إدخال العدد");
-        }
-        return false;
-
-      case "price":
-        if (value !== "") {
-          if (!isNaN(parseFloat(value))) {
-            return true;
-          } else {
-            setInvalidPriceFeedbackMsg("يجب إدخال ارقام فقط");
-          }
-        } else {
-          setInvalidPriceFeedbackMsg("يجب إدخال السعر");
-        }
-        return false;
-
-      default:
-        return true;
+  useEffect(() => {
+    if (chosenProductToBuy) {
+      setCurrentChoice(chosenProductToBuy);
     }
-  };
-
-  const {
-    data: products,
-    error,
-    loading: fetchLoading,
-  } = useFetch(fetchProducts, "products");
-  const { filteredData: filteredProducts, filterItems } = useSearch(products, [
-    "name",
-  ]);
+  }, [chosenProductToBuy]);
 
   return (
     <>
@@ -211,18 +197,18 @@ function ChooseProductToBuy({
                       type="text"
                       name="quantity"
                       label="العدد"
-                      invalidFeedback={invalidCountFeedbackMsg}
+                      isInvalid={errors.quantity}
+                      invalidFeedback={errors.quantity}
                       onChange={handleChange}
-                      onBlur={handleBlur}
                       required
                     />
                     <ModalInput
                       type="text"
                       name="price"
                       label="سعر الوحدة"
-                      invalidFeedback={invalidPriceFeedbackMsg}
+                      isInvalid={errors.price}
+                      invalidFeedback={errors.price}
                       onChange={handleChange}
-                      onBlur={handleBlur}
                       required
                     />
                   </>

@@ -12,4 +12,5 @@ export const ROUTES = {
   ADDITION_INVOICES: "/addition-invoices",
   INVOICE_DETAILS: ":invoiceNumber",
   PRODUCT_INVOICES: ":productId",
+  CUSTOMER_INVOICES: ":customerId",
 };

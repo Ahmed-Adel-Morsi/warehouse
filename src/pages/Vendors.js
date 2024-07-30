@@ -1,5 +1,3 @@
-// import { useEffect, useState } from "react";
-// import { useDispatch, useSelector } from "react-redux";
 import { fetchVendors } from "../features/vendorsSlice";
 import { actionsSvg, productTransactionsSvg } from "../svgs/actionsSVGs";
 import { deleteVendor } from "../features/vendorsSlice";
@@ -11,6 +9,7 @@ import PageHeader from "../components/PageHeader";
 import RemoveItem from "../components/modals/RemoveItem";
 import useFetch from "../hooks/useFetch";
 import useSearch from "../hooks/useSearch";
+import { Link } from "react-router-dom";
 
 function Vendors() {
   const { data: vendors, error, loading } = useFetch(fetchVendors, "vendors");
@@ -91,10 +90,13 @@ function Vendors() {
                             />
                           </li>
                           <li>
-                            <button className="dropdown-item rounded d-flex align-items-center gap-1 px-2 fs-small fw-medium">
+                            <Link
+                              to={`${vendor._id}`}
+                              className="dropdown-item rounded d-flex align-items-center gap-1 px-2 fs-small fw-medium"
+                            >
                               {productTransactionsSvg}
                               حركة المورد
-                            </button>
+                            </Link>
                           </li>
                         </ul>
                       </div>

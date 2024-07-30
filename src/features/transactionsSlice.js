@@ -53,11 +53,27 @@ export const getTransactionsOfType = createAsyncThunk(
 );
 
 export const getTransactionsByProductId = createAsyncThunk(
-  "transactionsSlice/getTransactionById",
+  "transactionsSlice/getTransactionsByProductId",
   async (productId, { rejectWithValue, getState }) => {
     const { token } = getState().auth;
     return await apiCall(
       `/transactions?product_id=${productId}`,
+      {
+        headers: {
+          Authorization: token,
+        },
+      },
+      rejectWithValue
+    );
+  }
+);
+
+export const getTransactionsByCustomerId = createAsyncThunk(
+  "transactionsSlice/getTransactionsByCustomerId",
+  async (customerId, { rejectWithValue, getState }) => {
+    const { token } = getState().auth;
+    return await apiCall(
+      `/transactions?customer_id=${customerId}`,
       {
         headers: {
           Authorization: token,
@@ -100,6 +116,9 @@ const transactionsSlice = createSlice({
         return action.payload;
       })
       .addCase(getTransactionsByProductId.fulfilled, (state, action) => {
+        return action.payload;
+      })
+      .addCase(getTransactionsByCustomerId.fulfilled, (state, action) => {
         return action.payload;
       })
       .addCase(getTransactionByInvoiceNumber.fulfilled, (state, action) => {

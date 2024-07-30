@@ -29,8 +29,21 @@ function App() {
               <Route path="" element={<Products />} />
               <Route path={ROUTES.PRODUCT_INVOICES} element={<ItemDetails />} />
             </Route>
-            <Route path={ROUTES.CUSTOMERS} element={<Customers />} />
-            <Route path={ROUTES.VENDORS} element={<Vendors />} />
+
+            <Route path={ROUTES.CUSTOMERS} element={<Outlet />}>
+              <Route path="" element={<Customers />} />
+              <Route
+                path={ROUTES.CUSTOMER_INVOICES}
+                element={<ItemDetails type="customer" />}
+              />
+            </Route>
+            <Route path={ROUTES.VENDORS} element={<Outlet />}>
+              <Route path="" element={<Vendors />} />
+              <Route
+                path={ROUTES.CUSTOMER_INVOICES}
+                element={<ItemDetails type="vendor" />}
+              />
+            </Route>
             <Route path={ROUTES.TRANSACTIONS} element={<Transactions />} />
             <Route path={ROUTES.SOLD_PERMISSION} element={<SoldPermission />} />
             <Route
