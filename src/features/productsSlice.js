@@ -92,7 +92,6 @@ const productsSlice = createSlice({
         return state.filter((product) => product._id !== action.payload);
       })
       .addCase(editProduct.fulfilled, (state, action) => {
-        toastFire("success", `تم تعديل ${action.payload.name} بنجاح`);
         const index = state.findIndex(
           (product) => product._id === action.payload._id
         );

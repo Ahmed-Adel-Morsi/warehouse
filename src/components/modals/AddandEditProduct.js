@@ -10,6 +10,7 @@ import MainButton from "../MainButton";
 import { Modal } from "react-bootstrap";
 import CustomForm from "../CustomForm";
 import useModal from "../../hooks/useModal";
+import { toastFire } from "../../utils/toastFire";
 
 function AddandEditProduct({
   forEdit,
@@ -35,7 +36,10 @@ function AddandEditProduct({
     loading,
     handleChange,
     handleSubmit,
-  } = useForm(initialFormData, forEdit ? editProduct : addProduct, handleClose);
+  } = useForm(initialFormData, forEdit ? editProduct : addProduct, () => {
+    handleClose();
+    if (forEdit) toastFire("success", `تم تعديل ${formData.name} بنجاح`);
+  });
 
   useEffect(() => {
     if (forEdit && initialFormData) {
@@ -105,7 +109,7 @@ function AddandEditProduct({
                 type="text"
                 name="quantity"
                 label="العدد"
-                value={formData.quantity}
+                value={formData.quantity || ""}
                 onChange={handleChange}
                 invalidFeedback={fieldErrors.quantity}
                 disabled={forEdit}
@@ -114,7 +118,7 @@ function AddandEditProduct({
                 type="text"
                 name="price"
                 label="السعر"
-                value={formData.price}
+                value={formData.price || ""}
                 onChange={handleChange}
                 invalidFeedback={fieldErrors.price}
               />
@@ -154,7 +158,7 @@ function AddandEditProduct({
                 type="text"
                 name="size"
                 label="الحجم"
-                value={formData.size}
+                value={formData.size || ""}
                 onChange={handleChange}
                 invalidFeedback={fieldErrors.size}
               />
