@@ -88,8 +88,7 @@ function AddandEditProduct({
                 label="اسم الصنف"
                 value={formData.name}
                 onChange={handleChange}
-                isInvalid={fieldErrors.name}
-                invalidFeedback={fieldErrors.name ? fieldErrors.name : ""}
+                invalidFeedback={fieldErrors.name}
                 required
               />
               <ModalInput
@@ -98,8 +97,7 @@ function AddandEditProduct({
                 label="الكود"
                 value={formData.code}
                 onChange={handleChange}
-                isInvalid={fieldErrors.code}
-                invalidFeedback={fieldErrors.code ? fieldErrors.code : ""}
+                invalidFeedback={fieldErrors.code}
                 required
                 disabled={forEdit}
               />
@@ -109,10 +107,7 @@ function AddandEditProduct({
                 label="العدد"
                 value={formData.quantity}
                 onChange={handleChange}
-                isInvalid={fieldErrors.quantity}
-                invalidFeedback={
-                  fieldErrors.quantity ? fieldErrors.quantity : ""
-                }
+                invalidFeedback={fieldErrors.quantity}
                 disabled={forEdit}
               />
               <ModalInput
@@ -121,8 +116,7 @@ function AddandEditProduct({
                 label="السعر"
                 value={formData.price}
                 onChange={handleChange}
-                isInvalid={fieldErrors.price}
-                invalidFeedback={fieldErrors.price ? fieldErrors.price : ""}
+                invalidFeedback={fieldErrors.price}
               />
               <ModalInput
                 type="text"
@@ -130,8 +124,7 @@ function AddandEditProduct({
                 label="الماركة"
                 value={formData.brand}
                 onChange={handleChange}
-                isInvalid={fieldErrors.brand}
-                invalidFeedback={fieldErrors.brand ? fieldErrors.brand : ""}
+                invalidFeedback={fieldErrors.brand}
               />
               <ModalInput
                 type="text"
@@ -139,10 +132,7 @@ function AddandEditProduct({
                 label="بلد المنشـأ"
                 value={formData.countryOfOrigin}
                 onChange={handleChange}
-                isInvalid={fieldErrors.countryOfOrigin}
-                invalidFeedback={
-                  fieldErrors.countryOfOrigin ? fieldErrors.countryOfOrigin : ""
-                }
+                invalidFeedback={fieldErrors.countryOfOrigin}
               />
               <ModalInput
                 type="text"
@@ -150,10 +140,7 @@ function AddandEditProduct({
                 label="المكان"
                 value={formData.location}
                 onChange={handleChange}
-                isInvalid={fieldErrors.location}
-                invalidFeedback={
-                  fieldErrors.location ? fieldErrors.location : ""
-                }
+                invalidFeedback={fieldErrors.location}
               />
               <ModalInput
                 type="text"
@@ -161,8 +148,7 @@ function AddandEditProduct({
                 label="اللون"
                 value={formData.color}
                 onChange={handleChange}
-                isInvalid={fieldErrors.color}
-                invalidFeedback={fieldErrors.color ? fieldErrors.color : ""}
+                invalidFeedback={fieldErrors.color}
               />
               <ModalInput
                 type="text"
@@ -170,8 +156,7 @@ function AddandEditProduct({
                 label="الحجم"
                 value={formData.size}
                 onChange={handleChange}
-                isInvalid={fieldErrors.size}
-                invalidFeedback={fieldErrors.size ? fieldErrors.size : ""}
+                invalidFeedback={fieldErrors.size}
               />
             </CustomForm>
           </CustomModal.Body>

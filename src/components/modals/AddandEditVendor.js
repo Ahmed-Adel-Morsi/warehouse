@@ -84,8 +84,7 @@ function AddandEditVendor({
                 label="اسم المورد"
                 value={formData.name}
                 onChange={handleChange}
-                isInvalid={fieldErrors.name}
-                invalidFeedback={fieldErrors.name ? fieldErrors.name : ""}
+                invalidFeedback={fieldErrors.name}
                 required
                 disabled={forEdit}
               />
@@ -95,10 +94,7 @@ function AddandEditVendor({
                 label="رقم الهاتف"
                 value={formData.phoneNumber}
                 onChange={handleChange}
-                isInvalid={fieldErrors.phoneNumber}
-                invalidFeedback={
-                  fieldErrors.phoneNumber ? fieldErrors.phoneNumber : ""
-                }
+                invalidFeedback={fieldErrors.phoneNumber}
               />
               <ModalInput
                 type="text"
@@ -106,8 +102,7 @@ function AddandEditVendor({
                 label="عنوان المورد"
                 value={formData.address}
                 onChange={handleChange}
-                isInvalid={fieldErrors.address}
-                invalidFeedback={fieldErrors.address ? fieldErrors.address : ""}
+                invalidFeedback={fieldErrors.address}
               />
             </CustomForm>
           </CustomModal.Body>

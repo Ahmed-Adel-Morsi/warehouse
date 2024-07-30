@@ -205,7 +205,6 @@ function ChooseProductToSell({
                         type="text"
                         name="quantity"
                         label="العدد"
-                        isInvalid={errors.quantity}
                         invalidFeedback={errors.quantity}
                         onChange={handleChange}
                         required
@@ -214,7 +213,6 @@ function ChooseProductToSell({
                         type="text"
                         name="price"
                         label="سعر الوحدة"
-                        isInvalid={errors.price}
                         invalidFeedback={errors.price}
                         onChange={handleChange}
                         required

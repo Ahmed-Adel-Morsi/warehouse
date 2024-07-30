@@ -88,8 +88,7 @@ function AddandEditCustomer({
                 label="اسم العميل"
                 value={formData.name}
                 onChange={handleChange}
-                isInvalid={fieldErrors.name}
-                invalidFeedback={fieldErrors.name ? fieldErrors.name : ""}
+                invalidFeedback={fieldErrors.name}
                 required
                 disabled={forEdit}
               />
@@ -99,10 +98,7 @@ function AddandEditCustomer({
                 label="رقم الهاتف"
                 value={formData.phoneNumber}
                 onChange={handleChange}
-                isInvalid={fieldErrors.phoneNumber}
-                invalidFeedback={
-                  fieldErrors.phoneNumber ? fieldErrors.phoneNumber : ""
-                }
+                invalidFeedback={fieldErrors.phoneNumber}
               />
               <ModalInput
                 type="text"
@@ -110,8 +106,7 @@ function AddandEditCustomer({
                 label="عنوان العميل"
                 value={formData.address}
                 onChange={handleChange}
-                isInvalid={fieldErrors.address}
-                invalidFeedback={fieldErrors.address ? fieldErrors.address : ""}
+                invalidFeedback={fieldErrors.address}
               />
             </CustomForm>
           </CustomModal.Body>

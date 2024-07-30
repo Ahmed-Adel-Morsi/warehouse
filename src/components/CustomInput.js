@@ -7,7 +7,6 @@ function ModalInput({
   disabled,
   onChange,
   onBlur,
-  isInvalid,
   invalidFeedback,
 }) {
   return (
@@ -17,15 +16,17 @@ function ModalInput({
       </label>
       <div className="flex-grow-1">
         <input
-          type={type}
-          id={name}
-          name={name}
-          value={value}
-          className={`form-control fs-small fw-medium h-input${isInvalid ? " is-invalid" : ""}`}
-          required={required}
-          disabled={disabled}
-          onChange={onChange}
-          onBlur={onBlur}
+          className={`form-control fs-small fw-medium h-input${
+            invalidFeedback ? " is-invalid" : ""
+          }`}
+          {...(type && { type })}
+          {...(name && { id: name })}
+          {...(name && { name })}
+          {...(value && { value })}
+          {...(required && { required })}
+          {...(disabled && { disabled })}
+          {...(onChange && { onChange })}
+          {...(onBlur && { onBlur })}
         />
         <div className="invalid-feedback fs-075rem">{invalidFeedback}</div>
       </div>
