@@ -10,7 +10,6 @@ import MainButton from "../components/MainButton";
 import CustomTable from "../components/CustomTable";
 import TableContainer from "../components/TableContainer";
 import useFetch from "../hooks/useFetch";
-import { useEffect } from "react";
 
 function ItemDetails({ type }) {
   const { productId, customerId } = useParams();
@@ -28,10 +27,6 @@ function ItemDetails({ type }) {
     window.print();
   };
 
-  useEffect(() => {
-    console.log(transactions);
-  }, [transactions]);
-
   return (
     <>
       <PageHeader>
@@ -47,25 +42,29 @@ function ItemDetails({ type }) {
             : ` - ${transactions[0].productDetails.name}`
           : ""}
       </PageHeader>
-      {loading ? (
-        <div className="p-4 text-center fs-small fw-medium">
-          جارى التحميل...
+
+      {transactions.length > 0 && (
+        <div className="d-flex flex-column flex-lg-row justify-content-end d-print-none">
+          <MainButton
+            btnIcon={printerSvg}
+            clickHandler={handlePrint}
+            btnTitle="طباعة"
+          />
         </div>
-      ) : error ? (
-        <div className="p-4 text-center fs-small fw-medium">
-          حدث خطأ ما
-          <p>Error: {error}</p>
-        </div>
-      ) : transactions.length > 0 ? (
-        <>
-          <div className="d-flex flex-column flex-lg-row justify-content-end d-print-none">
-            <MainButton
-              btnIcon={printerSvg}
-              clickHandler={handlePrint}
-              btnTitle="طباعة"
-            />
+      )}
+
+      <TableContainer>
+        {loading ? (
+          <div className="p-4 text-center fs-small fw-medium">
+            جارى التحميل...
           </div>
-          <TableContainer>
+        ) : error ? (
+          <div className="p-4 text-center fs-small fw-medium">
+            حدث خطأ ما
+            <p>Error: {error}</p>
+          </div>
+        ) : transactions.length > 0 ? (
+          <>
             <CustomTable>
               <thead>
                 <CustomTable.Row header>
@@ -114,15 +113,13 @@ function ItemDetails({ type }) {
                 ))}
               </tbody>
             </CustomTable>
-          </TableContainer>
-        </>
-      ) : (
-        <TableContainer>
+          </>
+        ) : (
           <div className="p-4 text-center fs-small fw-medium">
             لا توجد بيانات
           </div>
-        </TableContainer>
-      )}
+        )}
+      </TableContainer>
     </>
   );
 }

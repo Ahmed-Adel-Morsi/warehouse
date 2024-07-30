@@ -34,39 +34,43 @@ function InvoiceDetails({ type }) {
   return (
     <>
       <PageHeader>فاتورة {type === "sell" ? "بيع" : "إضافة"}</PageHeader>
-      {loading ? (
-        <div className="p-4 text-center fs-small fw-medium">
-          جارى التحميل...
-        </div>
-      ) : error ? (
-        <div className="p-4 text-center fs-small fw-medium">
-          حدث خطأ ما
-          <p>Error: {error}</p>
-        </div>
-      ) : transaction ? (
-        <>
-          <div className="d-flex flex-column flex-lg-row justify-content-between align-items-center gap-3">
-            <div className="d-flex flex-column flex-lg-row justify-content-between gap-2 w-75 invoice-details">
-              <p className="fw-semibold mb-0 align-self-center">
-                اسم {type === "sell" ? "العميل" : "المورد"} :{" "}
-                {transaction.customerDetails.name}
-              </p>
-              <p className="fw-semibold mb-0 align-self-center">
-                تحريرا في : {convertDateFormat(transaction.createdAt)}
-              </p>
-              <p className="fw-semibold mb-0 align-self-center">
-                رقم الفاتورة : {transaction.invoiceNumber}
-              </p>
-            </div>
-            <div className="d-block d-print-none">
-              <MainButton
-                btnIcon={printerSvg}
-                clickHandler={handlePrint}
-                btnTitle="طباعة"
-              />
-            </div>
+
+      {transaction && (
+        <div className="d-flex flex-column flex-lg-row justify-content-between align-items-center gap-3">
+          <div className="d-flex flex-column flex-lg-row justify-content-between gap-2 w-75 invoice-details">
+            <p className="fw-semibold mb-0 align-self-center">
+              اسم {type === "sell" ? "العميل" : "المورد"} :{" "}
+              {transaction.customerDetails.name}
+            </p>
+            <p className="fw-semibold mb-0 align-self-center">
+              تحريرا في : {convertDateFormat(transaction.createdAt)}
+            </p>
+            <p className="fw-semibold mb-0 align-self-center">
+              رقم الفاتورة : {transaction.invoiceNumber}
+            </p>
           </div>
-          <TableContainer>
+          <div className="d-block d-print-none">
+            <MainButton
+              btnIcon={printerSvg}
+              clickHandler={handlePrint}
+              btnTitle="طباعة"
+            />
+          </div>
+        </div>
+      )}
+
+      <TableContainer>
+        {loading ? (
+          <div className="p-4 text-center fs-small fw-medium">
+            جارى التحميل...
+          </div>
+        ) : error ? (
+          <div className="p-4 text-center fs-small fw-medium">
+            حدث خطأ ما
+            <p>Error: {error}</p>
+          </div>
+        ) : transaction ? (
+          <>
             <CustomTable>
               <thead>
                 <CustomTable.Row header>
@@ -99,12 +103,14 @@ function InvoiceDetails({ type }) {
                 </CustomTable.Row>
               </tbody>
             </CustomTable>
-          </TableContainer>
-          <p className="mt-4 d-none d-print-block fw-bold fs-6">التوقيع:</p>
-        </>
-      ) : (
-        <div className="p-4 text-center fs-small fw-medium">لا يوجد بيانات</div>
-      )}
+            <p className="mt-4 d-none d-print-block fw-bold fs-6">التوقيع:</p>
+          </>
+        ) : (
+          <div className="p-4 text-center fs-small fw-medium">
+            لا يوجد بيانات
+          </div>
+        )}
+      </TableContainer>
     </>
   );
 }
