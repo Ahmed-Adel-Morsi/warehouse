@@ -6,7 +6,7 @@ function CustomTable({ children }) {
   );
 }
 
-CustomTable.Row = function ({ children, header = false, last = false }) {
+CustomTable.Row = function ({ children, header, last }) {
   return (
     <tr
       className={`text-center btn-hov${header ? " table-head" : ""}${
@@ -18,7 +18,7 @@ CustomTable.Row = function ({ children, header = false, last = false }) {
   );
 };
 
-CustomTable.Data = function ({ body, last = false, classes = false }) {
+CustomTable.Data = function ({ body, last, classes }) {
   return (
     <td
       className={`align-middle p-3${!last ? " border-start" : ""}${
