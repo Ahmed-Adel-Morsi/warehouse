@@ -1,5 +1,3 @@
-import { handleErrors } from "./errorhandler";
-
 const apiCall = async (route, options, rejectWithValue) => {
   try {
     const response = await fetch(
@@ -8,15 +6,13 @@ const apiCall = async (route, options, rejectWithValue) => {
     );
     const data = await response.json();
 
-    if (!response.ok) {
-      return rejectWithValue(
-        handleErrors(data) || "Network response was not ok"
-      );
+    if (!data.success) {
+      return rejectWithValue(data || { message: "حدث خطأ ما" });
     }
 
-    return data;
+    return data.data;
   } catch (error) {
-    return rejectWithValue(handleErrors(error) || "An unknown error occurred");
+    return rejectWithValue(error || { message: "حدث خطأ ما" });
   }
 };
 

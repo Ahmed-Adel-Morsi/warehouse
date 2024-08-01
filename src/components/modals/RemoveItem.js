@@ -26,7 +26,7 @@ function RemoveItem({
         handleClose();
       })
       .catch((error) => {
-        toastFire("error", "حدث خطأ ما");
+        toastFire("error", error.message);
       })
       .finally(() => {
         setLoading(false);

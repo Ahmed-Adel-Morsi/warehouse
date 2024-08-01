@@ -86,9 +86,11 @@ function ChooseProductToBuy({
     setAdditionPermissionOrders((prevProducts) => [
       ...prevProducts,
       {
+        ...currentChoice,
+        orignalPrice: currentChoice.price,
+        originalQuantity: currentChoice.quantity,
         ...formData,
         totalPrice: parseInt(formData.quantity) * parseFloat(formData.price),
-        productDetails: currentChoice,
       },
     ]);
     handleClose();
@@ -152,8 +154,8 @@ function ChooseProductToBuy({
                     </div>
                   ) : error ? (
                     <div className="p-4 text-center fs-small fw-medium">
-                      حدث خطأ ما
-                      <p>Error: {error.msg}</p>
+                      حدث خطأ ما:
+                      <p>{error.message}</p>
                     </div>
                   ) : (
                     <div className="overflow-y-auto mh-6rem sm-scroll">

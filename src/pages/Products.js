@@ -39,8 +39,8 @@ function Products() {
           </div>
         ) : error ? (
           <div className="p-4 text-center fs-small fw-medium">
-            حدث خطأ ما
-            <p>Error: {error}</p>
+            حدث خطأ ما:
+            <p>{error.message}</p>
           </div>
         ) : filteredProducts.length > 0 ? (
           <CustomTable>

@@ -27,14 +27,14 @@ const useForm = (initialState, submitAction, handleSuccess, handleFail) => {
         }
       })
       .catch((error) => {
-        if (error.type === "array") {
+        if (error.data) {
           const allFieldErrors = error.data.reduce((acc, err) => {
             acc[err.path] = err.msg;
             return acc;
           }, {});
           setFieldErrors(allFieldErrors);
         } else {
-          toastFire("error", error.msg);
+          toastFire("error", error.message);
         }
         if (handleFail) {
           handleFail();

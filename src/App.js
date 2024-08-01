@@ -15,6 +15,7 @@ import Login from "./pages/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Layout from "./components/Layout";
 import NotFound from "./pages/NotFound";
+import ProductsMovements from "./pages/ProductsMovements";
 import "./App.css";
 
 function App() {
@@ -27,7 +28,10 @@ function App() {
           <Route element={<ProtectedRoute />}>
             <Route path={ROUTES.PRODUCTS} element={<Outlet />}>
               <Route path="" element={<Products />} />
-              <Route path={ROUTES.PRODUCT_INVOICES} element={<ItemDetails />} />
+              <Route
+                path={ROUTES.PRODUCT_INVOICES}
+                element={<ProductsMovements />}
+              />
             </Route>
 
             <Route path={ROUTES.CUSTOMERS} element={<Outlet />}>
