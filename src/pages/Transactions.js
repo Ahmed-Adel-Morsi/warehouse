@@ -5,10 +5,11 @@ import TableContainer from "../components/TableContainer";
 import SearchInput from "../components/SearchInput";
 import PageHeader from "../components/PageHeader";
 import useFetch from "../hooks/useFetch";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 function Transactions() {
-  const [searchQuery, setSearchQuery] = useState("");
+  const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
   const {
     data: transactions,
     error,
@@ -16,8 +17,36 @@ function Transactions() {
   } = useFetch(fetchTransactions, "transactions");
 
   const filterProducts = (e) => {
-    setSearchQuery(e.target.value);
+    setFilteredProducts(
+      products.filter((product) =>
+        product.name.toLowerCase().includes(e.target.value.toLowerCase())
+      )
+    );
   };
+
+  useEffect(() => {
+    if (transactions.length > 0) {
+      const newProducts = [];
+      transactions.forEach((transaction) => {
+        transaction.products.forEach((product) => {
+          newProducts.push({
+            ...product,
+            key: `${transaction._id}${product._id}`,
+            transactionType: transaction.transactionType,
+            customerName: transaction.customerDetails.name,
+            transactionDate: transaction.createdAt,
+          });
+        });
+      });
+      setProducts(newProducts);
+    } else {
+      setProducts([]);
+    }
+  }, [transactions]);
+
+  useEffect(() => {
+    setFilteredProducts(products);
+  }, [products]);
 
   return (
     <>
@@ -37,7 +66,7 @@ function Transactions() {
             حدث خطأ ما:
             <p>{error.message}</p>
           </div>
-        ) : transactions.length > 0 ? (
+        ) : filteredProducts.length > 0 ? (
           <CustomTable>
             <thead>
               <CustomTable.Row header>
@@ -52,47 +81,33 @@ function Transactions() {
               </CustomTable.Row>
             </thead>
             <tbody>
-              {transactions.map((transaction, index, arr) =>
-                transaction.products.map(
-                  (product, i, a) =>
-                    product.name
-                      .toLowerCase()
-                      .includes(searchQuery.toLowerCase()) && (
-                      <CustomTable.Row
-                        key={product._id}
-                        last={index === arr.length - 1 && i === a.length - 1}
+              {filteredProducts.map((product, i, a) => (
+                <CustomTable.Row key={product.key} last={i === a.length - 1}>
+                  <CustomTable.Data body={product.name} />
+                  <CustomTable.Data
+                    body={
+                      <span
+                        className={`badge p-badge fw-semibold fs-075rem ${
+                          product.transactionType === "sell"
+                            ? "text-bg-dark"
+                            : "bg-hov-color"
+                        }`}
                       >
-                        <CustomTable.Data body={product.name} />
-                        <CustomTable.Data
-                          body={
-                            <span
-                              className={`badge p-badge fw-semibold fs-075rem ${
-                                transaction.transactionType === "sell"
-                                  ? "text-bg-dark"
-                                  : "bg-hov-color"
-                              }`}
-                            >
-                              {transaction.transactionType === "sell"
-                                ? "إضافة"
-                                : "بيع"}
-                            </span>
-                          }
-                        />
-                        <CustomTable.Data body={product.code} />
-                        <CustomTable.Data body={product.brand} />
-                        <CustomTable.Data body={product.quantity} />
-                        <CustomTable.Data body={product.price} />
-                        <CustomTable.Data
-                          body={transaction.customerDetails.name}
-                        />
-                        <CustomTable.Data
-                          body={convertDateFormat(transaction.createdAt)}
-                          last
-                        />
-                      </CustomTable.Row>
-                    )
-                )
-              )}
+                        {product.transactionType === "sell" ? "إضافة" : "بيع"}
+                      </span>
+                    }
+                  />
+                  <CustomTable.Data body={product.code} />
+                  <CustomTable.Data body={product.brand} />
+                  <CustomTable.Data body={product.quantity} />
+                  <CustomTable.Data body={product.price} />
+                  <CustomTable.Data body={product.customerName} />
+                  <CustomTable.Data
+                    body={convertDateFormat(product.transactionDate)}
+                    last
+                  />
+                </CustomTable.Row>
+              ))}
             </tbody>
           </CustomTable>
         ) : (
