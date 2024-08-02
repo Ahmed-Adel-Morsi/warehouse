@@ -8,6 +8,7 @@ import CustomTable from "../components/CustomTable";
 import TableContainer from "../components/TableContainer";
 import useFetch from "../hooks/useFetch";
 import { useEffect, useMemo, useState } from "react";
+import handlePrint from "../utils/handlePrint";
 
 function InvoiceDetails({ type }) {
   const { invoiceNumber } = useParams();
@@ -22,10 +23,6 @@ function InvoiceDetails({ type }) {
     loading,
   } = useFetch(getTransactionByInvoiceNumber, "transactions", params);
   const [transaction, setTransaction] = useState(null);
-
-  const handlePrint = () => {
-    window.print();
-  };
 
   useEffect(() => {
     setTransaction(transactions.length > 0 ? transactions[0] : null);
@@ -49,7 +46,7 @@ function InvoiceDetails({ type }) {
               رقم الفاتورة : {transaction.invoiceNumber}
             </p>
           </div>
-          <div className="d-block d-print-none">
+          <div className="d-print-none">
             <MainButton
               btnIcon={printerSvg}
               clickHandler={handlePrint}
@@ -66,51 +63,52 @@ function InvoiceDetails({ type }) {
           </div>
         ) : error ? (
           <div className="p-4 text-center fs-small fw-medium">
-            حدث خطأ ما
-            <p>Error: {error}</p>
+            حدث خطأ ما:
+            <p>{error.message}</p>
           </div>
         ) : transaction ? (
-          <>
-            <CustomTable>
-              <thead>
-                <CustomTable.Row header>
-                  <CustomTable.Data body="اسم الصنف" />
-                  <CustomTable.Data body="الكود" />
-                  <CustomTable.Data body="الماركة" />
-                  <CustomTable.Data body="الحجم" />
-                  <CustomTable.Data body="اللون" />
-                  {type === "buy" && <CustomTable.Data body="المكان" />}
-                  <CustomTable.Data body="العدد" />
-                  <CustomTable.Data body="السعر" />
-                  <CustomTable.Data body="الاجمالي" last />
-                </CustomTable.Row>
-              </thead>
-              <tbody>
-                <CustomTable.Row last>
-                  <CustomTable.Data body={transaction.productDetails.name} />
-                  <CustomTable.Data body={transaction.productDetails.code} />
-                  <CustomTable.Data body={transaction.productDetails.brand} />
-                  <CustomTable.Data body={transaction.productDetails.size} />
-                  <CustomTable.Data body={transaction.productDetails.color} />
+          <CustomTable>
+            <thead>
+              <CustomTable.Row header>
+                <CustomTable.Data body="اسم الصنف" />
+                <CustomTable.Data body="الكود" />
+                <CustomTable.Data body="الماركة" />
+                <CustomTable.Data body="الحجم" />
+                <CustomTable.Data body="اللون" />
+                {type === "buy" && <CustomTable.Data body="المكان" />}
+                <CustomTable.Data body="العدد" />
+                <CustomTable.Data body="السعر" />
+                <CustomTable.Data body="الاجمالي" last />
+              </CustomTable.Row>
+            </thead>
+            <tbody>
+              {transaction.products.map((product, index, arr) => (
+                <CustomTable.Row
+                  key={product._id}
+                  last={index === arr.length - 1}
+                >
+                  <CustomTable.Data body={product.name} />
+                  <CustomTable.Data body={product.code} />
+                  <CustomTable.Data body={product.brand} />
+                  <CustomTable.Data body={product.size} />
+                  <CustomTable.Data body={product.color} />
                   {type === "buy" && (
-                    <CustomTable.Data
-                      body={transaction.productDetails.location}
-                    />
+                    <CustomTable.Data body={product.location} />
                   )}
-                  <CustomTable.Data body={transaction.quantity} />
-                  <CustomTable.Data body={transaction.price} />
-                  <CustomTable.Data body={transaction.totalPrice} last />
+                  <CustomTable.Data body={product.quantity} />
+                  <CustomTable.Data body={product.price} />
+                  <CustomTable.Data body={product.totalPrice} last />
                 </CustomTable.Row>
-              </tbody>
-            </CustomTable>
-            <p className="mt-4 d-none d-print-block fw-bold fs-6">التوقيع:</p>
-          </>
+              ))}
+            </tbody>
+          </CustomTable>
         ) : (
           <div className="p-4 text-center fs-small fw-medium">
             لا يوجد بيانات
           </div>
         )}
       </TableContainer>
+      <p className="mt-4 d-none d-print-block fw-bold fs-6">التوقيع:</p>
     </>
   );
 }
