@@ -5,12 +5,14 @@ import { loginUser } from "../features/authSlice";
 import { useNavigate } from "react-router-dom";
 import { Spinner } from "react-bootstrap";
 import useForm from "../hooks/useForm";
+import { loginSchema } from "../schemas/userSchema";
+import CustomInput from "../components/CustomInput";
 
 function Login() {
   const navigate = useNavigate();
   const { token } = useSelector((state) => state.auth);
   const { formData, fieldErrors, loading, handleChange, handleSubmit } =
-    useForm({ userName: "", password: "" }, loginUser);
+    useForm({ userName: "", password: "" }, loginSchema, loginUser);
 
   useEffect(() => {
     if (token) {
@@ -38,41 +40,25 @@ function Login() {
             <label className="mb-2 fs-small" htmlFor="userName">
               اسم المستخدم
             </label>
-            <input
-              className="form-control"
-              id="userName"
+            <CustomInput
               type="text"
               name="userName"
               value={formData.userName}
               onChange={handleChange}
-              autoComplete="username"
-              required
+              invalidFeedback={fieldErrors.userName}
             />
-            {fieldErrors.userName && (
-              <div className="invalid-feedback d-block">
-                {fieldErrors.userName}
-              </div>
-            )}
           </div>
           <div>
-            <label className="mb-2 fs-small" htmlFor="pass">
+            <label className="mb-2 fs-small" htmlFor="password">
               كلمة المرور
             </label>
-            <input
-              className="form-control"
-              id="pass"
+            <CustomInput
               type="password"
               name="password"
               value={formData.password}
               onChange={handleChange}
-              autoComplete="current-password"
-              required
+              invalidFeedback={fieldErrors.password}
             />
-            {fieldErrors.password && (
-              <div className="invalid-feedback d-block">
-                {fieldErrors.password}
-              </div>
-            )}
           </div>
           <MainButton
             type="submit"

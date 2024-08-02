@@ -1,7 +1,7 @@
 import DropdownSmallButton from "../DropdownSmallButton";
 import CustomModal from "../CustomModal";
 import useForm from "../../hooks/useForm";
-import ModalInput from "../CustomInput";
+import CustomInput from "../CustomInput";
 import CustomForm from "../CustomForm";
 import MainButton from "../MainButton";
 import { Modal } from "react-bootstrap";
@@ -10,6 +10,7 @@ import { editSvg } from "../../svgs/actionsSVGs";
 import { addCustomerSvg } from "../../svgs/pageContentSVGs";
 import { addCustomer, editCustomer } from "../../features/customersSlice";
 import useModal from "../../hooks/useModal";
+import customerSchema from "../../schemas/customerSchema";
 
 function AddandEditCustomer({
   forEdit,
@@ -31,6 +32,7 @@ function AddandEditCustomer({
     handleSubmit,
   } = useForm(
     initialFormData,
+    customerSchema,
     forEdit ? editCustomer : addCustomer,
     handleClose
   );
@@ -82,7 +84,7 @@ function AddandEditCustomer({
               id={forEdit ? "editCustomer" : "addCustomer"}
               onSubmit={handleSubmit}
             >
-              <ModalInput
+              <CustomInput
                 type="text"
                 name="name"
                 label="اسم العميل"
@@ -92,7 +94,7 @@ function AddandEditCustomer({
                 required
                 disabled={forEdit}
               />
-              <ModalInput
+              <CustomInput
                 type="text"
                 name="phoneNumber"
                 label="رقم الهاتف"
@@ -100,7 +102,7 @@ function AddandEditCustomer({
                 onChange={handleChange}
                 invalidFeedback={fieldErrors.phoneNumber}
               />
-              <ModalInput
+              <CustomInput
                 type="text"
                 name="address"
                 label="عنوان العميل"

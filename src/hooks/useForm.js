@@ -2,7 +2,13 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { toastFire } from "../utils/toastFire";
 
-const useForm = (initialState, submitAction, handleSuccess, handleFail) => {
+const useForm = (
+  initialState,
+  validationSchema,
+  submitAction,
+  handleSuccess,
+  handleFail
+) => {
   const [formData, setFormData] = useState(initialState);
   const [fieldErrors, setFieldErrors] = useState({});
   const [loading, setLoading] = useState(false);
@@ -14,35 +20,48 @@ const useForm = (initialState, submitAction, handleSuccess, handleFail) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const validateForm = async () => {
+    try {
+      await validationSchema.validate(formData, { abortEarly: false });
+      setFieldErrors({});
+      return true;
+    } catch (error) {
+      const validationErrors = {};
+      error.inner.forEach((err) => {
+        validationErrors[err.path] = err.message;
+      });
+      setFieldErrors(validationErrors);
+      return false;
+    }
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    dispatch(submitAction(formData))
-      .unwrap()
-      .then(() => {
-        setFormData(initialState);
-        setFieldErrors({});
-        if (handleSuccess) {
-          handleSuccess();
-        }
-      })
-      .catch((error) => {
-        if (error.data) {
-          const allFieldErrors = error.data.reduce((acc, err) => {
-            acc[err.path] = err.msg;
-            return acc;
-          }, {});
-          setFieldErrors(allFieldErrors);
-        } else {
+
+    const isValid = await validateForm();
+
+    if (isValid) {
+      dispatch(submitAction(formData))
+        .unwrap()
+        .then(() => {
+          setFormData(initialState);
+          if (handleSuccess) {
+            handleSuccess();
+          }
+        })
+        .catch((error) => {
           toastFire("error", error.message);
-        }
-        if (handleFail) {
-          handleFail();
-        }
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+          if (handleFail) {
+            handleFail();
+          }
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    } else {
+      setLoading(false);
+    }
   };
 
   return {

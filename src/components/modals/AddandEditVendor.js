@@ -1,7 +1,7 @@
 import DropdownSmallButton from "../DropdownSmallButton";
 import CustomModal from "../CustomModal";
 import useForm from "../../hooks/useForm";
-import ModalInput from "../CustomInput";
+import CustomInput from "../CustomInput";
 import CustomForm from "../CustomForm";
 import MainButton from "../MainButton";
 import { Modal } from "react-bootstrap";
@@ -10,6 +10,7 @@ import { editSvg } from "../../svgs/actionsSVGs";
 import { addCustomerSvg } from "../../svgs/pageContentSVGs";
 import { addVendor, editVendor } from "../../features/vendorsSlice";
 import useModal from "../../hooks/useModal";
+import customerSchema from "../../schemas/customerSchema";
 
 function AddandEditVendor({
   forEdit,
@@ -29,7 +30,12 @@ function AddandEditVendor({
     loading,
     handleChange,
     handleSubmit,
-  } = useForm(initialFormData, forEdit ? editVendor : addVendor, handleClose);
+  } = useForm(
+    initialFormData,
+    customerSchema,
+    forEdit ? editVendor : addVendor,
+    handleClose
+  );
 
   useEffect(() => {
     if (forEdit && initialFormData) {
@@ -78,7 +84,7 @@ function AddandEditVendor({
               id={forEdit ? "editVendor" : "addVendor"}
               onSubmit={handleSubmit}
             >
-              <ModalInput
+              <CustomInput
                 type="text"
                 name="name"
                 label="اسم المورد"
@@ -88,7 +94,7 @@ function AddandEditVendor({
                 required
                 disabled={forEdit}
               />
-              <ModalInput
+              <CustomInput
                 type="text"
                 name="phoneNumber"
                 label="رقم الهاتف"
@@ -96,7 +102,7 @@ function AddandEditVendor({
                 onChange={handleChange}
                 invalidFeedback={fieldErrors.phoneNumber}
               />
-              <ModalInput
+              <CustomInput
                 type="text"
                 name="address"
                 label="عنوان المورد"

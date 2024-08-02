@@ -4,7 +4,7 @@ import CustomForm from "../CustomForm";
 import { selectTogglerSvg } from "../../svgs/pageContentSVGs";
 import { fetchProducts } from "../../features/productsSlice";
 import { productsSvg } from "../../svgs/sidebarSVGs";
-import ModalInput from "../CustomInput";
+import CustomInput from "../CustomInput";
 import useFetch from "../../hooks/useFetch";
 import { Modal } from "react-bootstrap";
 import MainButton from "../MainButton";
@@ -195,7 +195,7 @@ function ChooseProductToBuy({
                     </p>
                   </div>
                   <>
-                    <ModalInput
+                    <CustomInput
                       type="text"
                       name="quantity"
                       label="العدد"
@@ -203,7 +203,7 @@ function ChooseProductToBuy({
                       onChange={handleChange}
                       required
                     />
-                    <ModalInput
+                    <CustomInput
                       type="text"
                       name="price"
                       label="سعر الوحدة"

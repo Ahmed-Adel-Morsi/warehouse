@@ -2,7 +2,7 @@ import { addProductSvg } from "../../svgs/pageContentSVGs";
 import CustomModal from "../CustomModal";
 import { addProduct, editProduct } from "../../features/productsSlice";
 import { useEffect } from "react";
-import ModalInput from "../CustomInput";
+import CustomInput from "../CustomInput";
 import { editSvg } from "../../svgs/actionsSVGs";
 import useForm from "../../hooks/useForm";
 import DropdownSmallButton from "../DropdownSmallButton";
@@ -11,6 +11,7 @@ import { Modal } from "react-bootstrap";
 import CustomForm from "../CustomForm";
 import useModal from "../../hooks/useModal";
 import { toastFire } from "../../utils/toastFire";
+import productSchema from "../../schemas/productSchema";
 
 function AddandEditProduct({
   forEdit,
@@ -36,10 +37,15 @@ function AddandEditProduct({
     loading,
     handleChange,
     handleSubmit,
-  } = useForm(initialFormData, forEdit ? editProduct : addProduct, () => {
-    handleClose();
-    if (forEdit) toastFire("success", `تم تعديل ${formData.name} بنجاح`);
-  });
+  } = useForm(
+    initialFormData,
+    productSchema,
+    forEdit ? editProduct : addProduct,
+    () => {
+      handleClose();
+      if (forEdit) toastFire("success", `تم تعديل ${formData.name} بنجاح`);
+    }
+  );
 
   useEffect(() => {
     if (forEdit && initialFormData) {
@@ -86,7 +92,7 @@ function AddandEditProduct({
               id={forEdit ? "editProduct" : "addProduct"}
               onSubmit={handleSubmit}
             >
-              <ModalInput
+              <CustomInput
                 type="text"
                 name="name"
                 label="اسم الصنف"
@@ -95,7 +101,7 @@ function AddandEditProduct({
                 invalidFeedback={fieldErrors.name}
                 required
               />
-              <ModalInput
+              <CustomInput
                 type="text"
                 name="code"
                 label="الكود"
@@ -105,7 +111,7 @@ function AddandEditProduct({
                 required
                 disabled={forEdit}
               />
-              <ModalInput
+              <CustomInput
                 type="text"
                 name="quantity"
                 label="العدد"
@@ -114,7 +120,7 @@ function AddandEditProduct({
                 invalidFeedback={fieldErrors.quantity}
                 disabled={forEdit}
               />
-              <ModalInput
+              <CustomInput
                 type="text"
                 name="price"
                 label="السعر"
@@ -122,7 +128,7 @@ function AddandEditProduct({
                 onChange={handleChange}
                 invalidFeedback={fieldErrors.price}
               />
-              <ModalInput
+              <CustomInput
                 type="text"
                 name="brand"
                 label="الماركة"
@@ -130,7 +136,7 @@ function AddandEditProduct({
                 onChange={handleChange}
                 invalidFeedback={fieldErrors.brand}
               />
-              <ModalInput
+              <CustomInput
                 type="text"
                 name="countryOfOrigin"
                 label="بلد المنشـأ"
@@ -138,7 +144,7 @@ function AddandEditProduct({
                 onChange={handleChange}
                 invalidFeedback={fieldErrors.countryOfOrigin}
               />
-              <ModalInput
+              <CustomInput
                 type="text"
                 name="location"
                 label="المكان"
@@ -146,7 +152,7 @@ function AddandEditProduct({
                 onChange={handleChange}
                 invalidFeedback={fieldErrors.location}
               />
-              <ModalInput
+              <CustomInput
                 type="text"
                 name="color"
                 label="اللون"
@@ -154,7 +160,7 @@ function AddandEditProduct({
                 onChange={handleChange}
                 invalidFeedback={fieldErrors.color}
               />
-              <ModalInput
+              <CustomInput
                 type="text"
                 name="size"
                 label="الحجم"

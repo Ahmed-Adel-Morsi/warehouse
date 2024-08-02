@@ -1,4 +1,4 @@
-function ModalInput({
+function CustomInput({
   type,
   name,
   label,
@@ -10,13 +10,15 @@ function ModalInput({
   invalidFeedback,
 }) {
   return (
-    <div className="d-flex gap-3 w-100 ms-2">
-      <label htmlFor={name} className="w-25 fs-small fw-medium">
-        {label}
-      </label>
-      <div className="flex-grow-1">
+    <div className="w-100">
+      <div className="d-flex gap-3 align-items-center ms-2">
+        {label && (
+          <label htmlFor={name} className="w-25 fs-small fw-medium">
+            {label}
+          </label>
+        )}
         <input
-          className={`form-control fs-small fw-medium h-input${
+          className={`form-control flex-grow-1 fs-small fw-medium h-input${
             invalidFeedback ? " is-invalid" : ""
           }`}
           type={type}
@@ -28,10 +30,17 @@ function ModalInput({
           onChange={onChange}
           onBlur={onBlur}
         />
-        <div className="invalid-feedback fs-075rem">{invalidFeedback}</div>
       </div>
+      {invalidFeedback && (
+        <div
+          className={"invalid-feedback fs-075rem d-block"}
+          {...(label && { style: { paddingRight: "25%" } })}
+        >
+          {invalidFeedback}
+        </div>
+      )}
     </div>
   );
 }
 
-export default ModalInput;
+export default CustomInput;
