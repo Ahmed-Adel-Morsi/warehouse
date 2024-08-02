@@ -15,7 +15,7 @@ function Transactions() {
   } = useFetch(fetchTransactions, "transactions");
   const { filteredData: filteredTransactions, filterItems } = useSearch(
     transactions,
-    [["productDetails", "name"]]
+    ["invoiceNumber"]
   );
 
   return (
@@ -33,8 +33,8 @@ function Transactions() {
           </div>
         ) : error ? (
           <div className="p-4 text-center fs-small fw-medium">
-            حدث خطأ ما
-            <p>Error: {error}</p>
+            حدث خطأ ما:
+            <p>{error.message}</p>
           </div>
         ) : filteredTransactions.length > 0 ? (
           <CustomTable>
@@ -51,38 +51,40 @@ function Transactions() {
               </CustomTable.Row>
             </thead>
             <tbody>
-              {filteredTransactions.map((transaction, index, arr) => (
-                <CustomTable.Row
-                  key={transaction._id}
-                  last={index === arr.length - 1}
-                >
-                  <CustomTable.Data body={transaction.productDetails.name} />
-                  <CustomTable.Data
-                    body={
-                      <span
-                        className={`badge p-badge fw-semibold fs-075rem ${
-                          transaction.transactionType === "sell"
-                            ? "text-bg-dark"
-                            : "bg-hov-color"
-                        }`}
-                      >
-                        {transaction.transactionType === "sell"
-                          ? "إضافة"
-                          : "بيع"}
-                      </span>
-                    }
-                  />
-                  <CustomTable.Data body={transaction.productDetails.code} />
-                  <CustomTable.Data body={transaction.productDetails.brand} />
-                  <CustomTable.Data body={transaction.quantity} />
-                  <CustomTable.Data body={transaction.price} />
-                  <CustomTable.Data body={transaction.customerDetails.name} />
-                  <CustomTable.Data
-                    body={convertDateFormat(transaction.createdAt)}
-                    last
-                  />
-                </CustomTable.Row>
-              ))}
+              {filteredTransactions.map((transaction, index, arr) =>
+                transaction.products.map((product, i, a) => (
+                  <CustomTable.Row
+                    key={product._id}
+                    last={index === arr.length - 1 && i === a.length - 1}
+                  >
+                    <CustomTable.Data body={product.name} />
+                    <CustomTable.Data
+                      body={
+                        <span
+                          className={`badge p-badge fw-semibold fs-075rem ${
+                            transaction.transactionType === "sell"
+                              ? "text-bg-dark"
+                              : "bg-hov-color"
+                          }`}
+                        >
+                          {transaction.transactionType === "sell"
+                            ? "إضافة"
+                            : "بيع"}
+                        </span>
+                      }
+                    />
+                    <CustomTable.Data body={product.code} />
+                    <CustomTable.Data body={product.brand} />
+                    <CustomTable.Data body={product.quantity} />
+                    <CustomTable.Data body={product.price} />
+                    <CustomTable.Data body={transaction.customerDetails.name} />
+                    <CustomTable.Data
+                      body={convertDateFormat(transaction.createdAt)}
+                      last
+                    />
+                  </CustomTable.Row>
+                ))
+              )}
             </tbody>
           </CustomTable>
         ) : (
