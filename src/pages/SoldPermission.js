@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import AddandEditCustomer from "../components/modals/AddandEditCustomer";
 import ChooseCustomer from "../components/modals/ChooseCustomer";
 import CustomModal from "../components/CustomModal";
-import { resetSvg, saveSvg } from "../svgs/pageContentSVGs";
+import { printerSvg, resetSvg, saveSvg } from "../svgs/pageContentSVGs";
 import ChooseProductToSell from "../components/modals/ChooseProductToSell";
 import DangerPopup from "../components/modals/DangerPopup";
 import { useDispatch } from "react-redux";
@@ -16,6 +16,8 @@ import { removeSvg } from "../svgs/actionsSVGs";
 import MainButton from "../components/MainButton";
 import { Modal } from "react-bootstrap";
 import useModal from "../hooks/useModal";
+import handlePrint from "../utils/handlePrint";
+import convertDateFormat from "../utils/convertDateFormat";
 
 function SoldPermission() {
   const [loading, setLoading] = useState(false);
@@ -30,6 +32,18 @@ function SoldPermission() {
     const savedProducts = localStorage.getItem("soldPermissionOrders");
     return savedProducts ? JSON.parse(savedProducts) : [];
   });
+  const [submitted, setSubmitted] = useState(() => {
+    const soldPermissionSaved = localStorage.getItem("soldPermissionSaved");
+    return soldPermissionSaved ? JSON.parse(soldPermissionSaved) : false;
+  });
+  const [soldPermissionInvoiceInfo, setSoldPermissionInvoiceInfo] = useState(
+    () => {
+      const savedInvoiceInfo = localStorage.getItem(
+        "soldPermissionInvoiceInfo"
+      );
+      return savedInvoiceInfo ? JSON.parse(savedInvoiceInfo) : null;
+    }
+  );
   const dispatch = useDispatch();
 
   const removeProductHandler = (currentProduct) => {
@@ -38,9 +52,7 @@ function SoldPermission() {
       localStorage.getItem("soldPermissionOrders")
     );
     setSoldPermissionOrders(
-      savedProducts.filter(
-        (product) => product.productDetails._id !== currentProduct._id
-      )
+      savedProducts.filter((product) => product._id !== currentProduct._id)
     );
     setOrdersIds(ordersIds.filter((id) => id !== currentProduct._id));
     toastFire("success", `تم حذف ${currentProduct.name} بنجاح`);
@@ -49,6 +61,8 @@ function SoldPermission() {
 
   const resetHandler = () => {
     setLoading(true);
+    setSubmitted(false);
+    setSoldPermissionInvoiceInfo(null);
     setChosenCustomer(null);
     setChosenProductToSell(null);
     setSoldPermissionOrders([]);
@@ -59,22 +73,29 @@ function SoldPermission() {
 
   const submitHandler = async () => {
     setLoading(true);
+    await dispatch(
+      addTransaction({
+        transactionType: "sell",
+        products: soldPermissionOrders,
+        customerDetails: chosenCustomer,
+      })
+    )
+      .unwrap()
+      .then((res) => {
+        setSoldPermissionInvoiceInfo({
+          invoiceNumber: res.invoiceNumber,
+          createdAt: convertDateFormat(res.createdAt),
+        });
+      });
     for (const order of soldPermissionOrders) {
       await dispatch(
-        addTransaction({
-          transactionType: "sell",
-          ...order,
-          customerDetails: chosenCustomer,
-        })
-      );
-      await dispatch(
         editProduct({
-          ...order.productDetails,
-          quantity: order.productDetails.quantity - order.quantity,
+          ...order,
+          quantity: parseInt(order.originalQuantity) - parseInt(order.quantity),
         })
       );
     }
-    resetHandler();
+    setSubmitted(true);
     toastFire("success", "تم حفظ البيانات بنجاح");
     setLoading(false);
   };
@@ -103,8 +124,23 @@ function SoldPermission() {
   }, [soldPermissionOrders]);
 
   useEffect(() => {
+    if (soldPermissionInvoiceInfo !== null) {
+      localStorage.setItem(
+        "soldPermissionInvoiceInfo",
+        JSON.stringify(soldPermissionInvoiceInfo)
+      );
+    } else {
+      localStorage.removeItem("soldPermissionInvoiceInfo");
+    }
+  }, [soldPermissionInvoiceInfo]);
+
+  useEffect(() => {
+    localStorage.setItem("soldPermissionSaved", JSON.stringify(submitted));
+  }, [submitted]);
+
+  useEffect(() => {
     soldPermissionOrders.forEach((e) => {
-      setOrdersIds((prev) => [...prev, e.productDetails._id]);
+      setOrdersIds((prev) => [...prev, e._id]);
     });
   }, [soldPermissionOrders]);
 
@@ -112,12 +148,20 @@ function SoldPermission() {
     <>
       <PageHeader>إذن بيع</PageHeader>
       <div className="mb-3 d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 fw-semibold">
-        <div className="text-center text-md-end">
+        <div className="d-none d-print-block fw-bold fs-6 align-self-start">
+          <p>
+            {chosenCustomer
+              ? `اسم العميل : ${chosenCustomer.name}`
+              : "الرجاء اختيار العميل"}
+          </p>
+          <p>تحرير في : {soldPermissionInvoiceInfo !== null ? soldPermissionInvoiceInfo.createdAt : ""}</p>
+        </div>
+        <div className="text-center text-md-end d-print-none">
           {chosenCustomer
             ? `اسم العميل : ${chosenCustomer.name}`
             : "الرجاء اختيار العميل"}
         </div>
-        <div className="d-flex gap-3 w-sm-100 flex-column flex-sm-row flex-grow-1 justify-content-end">
+        <div className="d-flex d-print-none gap-3 w-sm-100 flex-column flex-sm-row flex-grow-1 justify-content-end">
           {!chosenCustomer && (
             <>
               <ChooseCustomer
@@ -129,12 +173,15 @@ function SoldPermission() {
           )}
           {chosenCustomer && (
             <>
-              <ChooseProductToSell
-                setChosenProductToSell={setChosenProductToSell}
-                setSoldPermissionOrders={setSoldPermissionOrders}
-                chosenProductToSell={chosenProductToSell}
-                ordersIds={ordersIds}
-              />
+              {!submitted && (
+                <ChooseProductToSell
+                  setChosenProductToSell={setChosenProductToSell}
+                  setSoldPermissionOrders={setSoldPermissionOrders}
+                  chosenProductToSell={chosenProductToSell}
+                  ordersIds={ordersIds}
+                />
+              )}
+
               <DangerPopup
                 btnTitle="إعادة تهيئة"
                 btnIcon={resetSvg}
@@ -145,7 +192,15 @@ function SoldPermission() {
                 loadingState={loading}
                 handler={resetHandler}
               />
-              {soldPermissionOrders.length > 0 && (
+
+              {submitted && (
+                <MainButton
+                  btnIcon={printerSvg}
+                  clickHandler={handlePrint}
+                  btnTitle="طباعة"
+                />
+              )}
+              {soldPermissionOrders.length > 0 && !submitted && (
                 <>
                   <MainButton
                     btnTitle="حفظ"
@@ -184,60 +239,69 @@ function SoldPermission() {
             جارى التحميل...
           </div>
         ) : soldPermissionOrders.length > 0 ? (
-          <CustomTable>
-            <thead>
-              <CustomTable.Row header>
-                <CustomTable.Data body="اسم الصنف" />
-                <CustomTable.Data body="الكود" />
-                <CustomTable.Data body="الماركة" />
-                <CustomTable.Data body="الحجم" />
-                <CustomTable.Data body="اللون" />
-                <CustomTable.Data body="العدد" />
-                <CustomTable.Data body="السعر" />
-                <CustomTable.Data body="الاجمالى" />
-                <CustomTable.Data body="إجراءات" last />
-              </CustomTable.Row>
-            </thead>
-            <tbody>
-              {soldPermissionOrders.map((order, index, arr) => (
-                <CustomTable.Row
-                  key={order.productDetails._id}
-                  last={index === arr.length - 1}
-                >
-                  <CustomTable.Data body={order.productDetails.name} />
-                  <CustomTable.Data body={order.productDetails.code} />
-                  <CustomTable.Data body={order.productDetails.brand} />
-                  <CustomTable.Data body={order.productDetails.size} />
-                  <CustomTable.Data body={order.productDetails.color} />
-                  <CustomTable.Data body={order.quantity} />
-                  <CustomTable.Data body={order.price} />
-                  <CustomTable.Data body={order.totalPrice} />
-                  <CustomTable.Data
-                    body={
-                      <DangerPopup
-                        btnStyle="btn btn-hov"
-                        btnIcon={removeSvg}
-                        title="حذف الصنف"
-                        description="هل انت متاكد؟ سيتم حذف الصنف"
-                        confirmBtnTitle="حذف"
-                        loadingState={loading}
-                        handler={() => {
-                          removeProductHandler(order.productDetails);
-                        }}
-                      />
-                    }
-                    last
-                  />
+          <>
+            <CustomTable>
+              <thead>
+                <CustomTable.Row header>
+                  <CustomTable.Data body="اسم الصنف" />
+                  <CustomTable.Data body="الكود" />
+                  <CustomTable.Data body="الماركة" />
+                  <CustomTable.Data body="الحجم" />
+                  <CustomTable.Data body="اللون" />
+                  <CustomTable.Data body="العدد" />
+                  <CustomTable.Data body="السعر" />
+                  <CustomTable.Data body="الاجمالى" last={submitted} />
+                  {!submitted && <CustomTable.Data body="إجراءات" last />}
                 </CustomTable.Row>
-              ))}
-            </tbody>
-          </CustomTable>
+              </thead>
+              <tbody>
+                {soldPermissionOrders.map((order, index, arr) => (
+                  <CustomTable.Row
+                    key={order._id}
+                    last={index === arr.length - 1}
+                  >
+                    <CustomTable.Data body={order.name} />
+                    <CustomTable.Data body={order.code} />
+                    <CustomTable.Data body={order.brand} />
+                    <CustomTable.Data body={order.size} />
+                    <CustomTable.Data body={order.color} />
+                    <CustomTable.Data body={order.quantity} />
+                    <CustomTable.Data body={order.price} />
+                    <CustomTable.Data
+                      body={order.totalPrice}
+                      last={submitted}
+                    />
+                    {!submitted && (
+                      <CustomTable.Data
+                        body={
+                          <DangerPopup
+                            btnStyle="btn btn-hov"
+                            btnIcon={removeSvg}
+                            title="حذف الصنف"
+                            description="هل انت متاكد؟ سيتم حذف الصنف"
+                            confirmBtnTitle="حذف"
+                            loadingState={loading}
+                            handler={() => {
+                              removeProductHandler(order);
+                            }}
+                          />
+                        }
+                        last
+                      />
+                    )}
+                  </CustomTable.Row>
+                ))}
+              </tbody>
+            </CustomTable>
+          </>
         ) : (
           <div className="p-4 text-center fs-small fw-medium">
             لا يوجد بيانات
           </div>
         )}
       </TableContainer>
+      <p className="mt-4 d-none d-print-block fw-bold fs-6">رقم الاذن: {soldPermissionInvoiceInfo !== null ? soldPermissionInvoiceInfo.invoiceNumber : ""}</p>
+      <p className="mt-3 d-none d-print-block fw-bold fs-6">التوقيع:</p>
     </>
   );
 }
