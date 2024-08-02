@@ -5,18 +5,19 @@ import TableContainer from "../components/TableContainer";
 import SearchInput from "../components/SearchInput";
 import PageHeader from "../components/PageHeader";
 import useFetch from "../hooks/useFetch";
-import useSearch from "../hooks/useSearch";
+import { useState } from "react";
 
 function Transactions() {
+  const [searchQuery, setSearchQuery] = useState("");
   const {
     data: transactions,
     error,
     loading,
   } = useFetch(fetchTransactions, "transactions");
-  const { filteredData: filteredTransactions, filterItems } = useSearch(
-    transactions,
-    ["invoiceNumber"]
-  );
+
+  const filterProducts = (e) => {
+    setSearchQuery(e.target.value);
+  };
 
   return (
     <>
@@ -24,7 +25,7 @@ function Transactions() {
       <SearchInput
         name="transactionsFilter"
         placeholder="يمكنك البحث عن الصنف بالإسم"
-        onChange={filterItems}
+        onChange={filterProducts}
       />
       <TableContainer>
         {loading ? (
@@ -36,7 +37,7 @@ function Transactions() {
             حدث خطأ ما:
             <p>{error.message}</p>
           </div>
-        ) : filteredTransactions.length > 0 ? (
+        ) : transactions.length > 0 ? (
           <CustomTable>
             <thead>
               <CustomTable.Row header>
@@ -51,39 +52,46 @@ function Transactions() {
               </CustomTable.Row>
             </thead>
             <tbody>
-              {filteredTransactions.map((transaction, index, arr) =>
-                transaction.products.map((product, i, a) => (
-                  <CustomTable.Row
-                    key={product._id}
-                    last={index === arr.length - 1 && i === a.length - 1}
-                  >
-                    <CustomTable.Data body={product.name} />
-                    <CustomTable.Data
-                      body={
-                        <span
-                          className={`badge p-badge fw-semibold fs-075rem ${
-                            transaction.transactionType === "sell"
-                              ? "text-bg-dark"
-                              : "bg-hov-color"
-                          }`}
-                        >
-                          {transaction.transactionType === "sell"
-                            ? "إضافة"
-                            : "بيع"}
-                        </span>
-                      }
-                    />
-                    <CustomTable.Data body={product.code} />
-                    <CustomTable.Data body={product.brand} />
-                    <CustomTable.Data body={product.quantity} />
-                    <CustomTable.Data body={product.price} />
-                    <CustomTable.Data body={transaction.customerDetails.name} />
-                    <CustomTable.Data
-                      body={convertDateFormat(transaction.createdAt)}
-                      last
-                    />
-                  </CustomTable.Row>
-                ))
+              {transactions.map((transaction, index, arr) =>
+                transaction.products.map(
+                  (product, i, a) =>
+                    product.name
+                      .toLowerCase()
+                      .includes(searchQuery.toLowerCase()) && (
+                      <CustomTable.Row
+                        key={product._id}
+                        last={index === arr.length - 1 && i === a.length - 1}
+                      >
+                        <CustomTable.Data body={product.name} />
+                        <CustomTable.Data
+                          body={
+                            <span
+                              className={`badge p-badge fw-semibold fs-075rem ${
+                                transaction.transactionType === "sell"
+                                  ? "text-bg-dark"
+                                  : "bg-hov-color"
+                              }`}
+                            >
+                              {transaction.transactionType === "sell"
+                                ? "إضافة"
+                                : "بيع"}
+                            </span>
+                          }
+                        />
+                        <CustomTable.Data body={product.code} />
+                        <CustomTable.Data body={product.brand} />
+                        <CustomTable.Data body={product.quantity} />
+                        <CustomTable.Data body={product.price} />
+                        <CustomTable.Data
+                          body={transaction.customerDetails.name}
+                        />
+                        <CustomTable.Data
+                          body={convertDateFormat(transaction.createdAt)}
+                          last
+                        />
+                      </CustomTable.Row>
+                    )
+                )
               )}
             </tbody>
           </CustomTable>
