@@ -52,33 +52,40 @@ function SoldPermission() {
   };
 
   const submitHandler = async () => {
-    setLoading(true);
-    await dispatch(
-      addTransaction({
-        transactionType: "sell",
-        products: soldPermissionOrders,
-        customerDetails: chosenCustomer,
-      })
-    )
-      .unwrap()
-      .then((res) => {
-        dispatch(
-          setSoldPermissionInvoiceInfo({
-            invoiceNumber: res.invoiceNumber,
-            createdAt: convertDateFormat(res.createdAt),
-          })
-        );
-      });
-    for (const order of soldPermissionOrders) {
-      await dispatch(
-        editProduct({
-          ...order,
-          quantity: parseInt(order.originalQuantity) - parseInt(order.quantity),
+    try {
+      setLoading(true);
+
+      const transactionResponse = await dispatch(
+        addTransaction({
+          transactionType: "sell",
+          products: soldPermissionOrders,
+          customerDetails: chosenCustomer,
+        })
+      ).unwrap();
+
+      dispatch(
+        setSoldPermissionInvoiceInfo({
+          invoiceNumber: transactionResponse.invoiceNumber,
+          createdAt: convertDateFormat(transactionResponse.createdAt),
         })
       );
+
+      for (const order of soldPermissionOrders) {
+        await dispatch(
+          editProduct({
+            ...order,
+            quantity:
+              parseInt(order.originalQuantity) - parseInt(order.quantity),
+          })
+        );
+      }
+
+      toastFire("success", "تم حفظ البيانات بنجاح");
+    } catch (error) {
+      toastFire("error", "حدث خطأ أثناء حفظ البيانات");
+    } finally {
+      setLoading(false);
     }
-    toastFire("success", "تم حفظ البيانات بنجاح");
-    setLoading(false);
   };
 
   return (

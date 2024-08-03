@@ -6,23 +6,18 @@ import SearchInput from "../components/SearchInput";
 import PageHeader from "../components/PageHeader";
 import useFetch from "../hooks/useFetch";
 import { useEffect, useState } from "react";
+import useSearch from "../hooks/useSearch";
 
 function Transactions() {
   const [products, setProducts] = useState([]);
-  const [filteredProducts, setFilteredProducts] = useState([]);
+  const { filteredData: filteredProducts, filterItems } = useSearch(products, [
+    "name",
+  ]);
   const {
     data: transactions,
     error,
     loading,
   } = useFetch(fetchTransactions, "transactions");
-
-  const filterProducts = (e) => {
-    setFilteredProducts(
-      products.filter((product) =>
-        product.name.toLowerCase().includes(e.target.value.toLowerCase())
-      )
-    );
-  };
 
   useEffect(() => {
     if (transactions.length > 0) {
@@ -44,17 +39,13 @@ function Transactions() {
     }
   }, [transactions]);
 
-  useEffect(() => {
-    setFilteredProducts(products);
-  }, [products]);
-
   return (
     <>
       <PageHeader>حركة الاصناف</PageHeader>
       <SearchInput
         name="transactionsFilter"
         placeholder="يمكنك البحث عن الصنف بالإسم"
-        onChange={filterProducts}
+        onChange={filterItems}
       />
       <TableContainer>
         {loading ? (

@@ -28,11 +28,8 @@ import {
 function AdditionPermission() {
   const [loading, setLoading] = useState(false);
   const { show, handleClose, handleShow } = useModal();
-  const {
-    chosenVendor,
-    addPermissionOrders,
-    addPermissionInvoiceInfo,
-  } = useSelector((state) => state.addPermission);
+  const { chosenVendor, addPermissionOrders, addPermissionInvoiceInfo } =
+    useSelector((state) => state.addPermission);
   const dispatch = useDispatch();
 
   const removeProductHandler = (currentProduct) => {
@@ -56,34 +53,41 @@ function AdditionPermission() {
   };
 
   const submitHandler = async () => {
-    setLoading(true);
-    await dispatch(
-      addTransaction({
-        transactionType: "buy",
-        products: addPermissionOrders,
-        customerDetails: chosenVendor,
-      })
-    )
-      .unwrap()
-      .then((res) => {
-        dispatch(
-          setAddPermissionInvoiceInfo({
-            invoiceNumber: res.invoiceNumber,
-            createdAt: convertDateFormat(res.createdAt),
-          })
-        );
-      });
-    for (const order of addPermissionOrders) {
-      await dispatch(
-        editProduct({
-          ...order,
-          quantity:
-            (parseInt(order.originalQuantity) || 0) + parseInt(order.quantity),
+    try {
+      setLoading(true);
+
+      const transactionResponse = await dispatch(
+        addTransaction({
+          transactionType: "buy",
+          products: addPermissionOrders,
+          customerDetails: chosenVendor,
+        })
+      ).unwrap();
+
+      dispatch(
+        setAddPermissionInvoiceInfo({
+          invoiceNumber: transactionResponse.invoiceNumber,
+          createdAt: convertDateFormat(transactionResponse.createdAt),
         })
       );
+
+      for (const order of addPermissionOrders) {
+        await dispatch(
+          editProduct({
+            ...order,
+            quantity:
+              (parseInt(order.originalQuantity) || 0) +
+              parseInt(order.quantity),
+          })
+        );
+      }
+
+      toastFire("success", "تم حفظ البيانات بنجاح");
+    } catch (error) {
+      toastFire("error", "حدث خطأ أثناء حفظ البيانات");
+    } finally {
+      setLoading(false);
     }
-    toastFire("success", "تم حفظ البيانات بنجاح");
-    setLoading(false);
   };
 
   return (
@@ -192,7 +196,10 @@ function AdditionPermission() {
                 <CustomTable.Data body="اللون" />
                 <CustomTable.Data body="العدد" />
                 <CustomTable.Data body="السعر" />
-                <CustomTable.Data body="الاجمالى" last={addPermissionInvoiceInfo} />
+                <CustomTable.Data
+                  body="الاجمالى"
+                  last={addPermissionInvoiceInfo}
+                />
                 {!addPermissionInvoiceInfo && (
                   <CustomTable.Data body="إجراءات" last />
                 )}
