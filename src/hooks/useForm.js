@@ -7,7 +7,8 @@ const useForm = (
   validationSchema,
   submitAction,
   handleSuccess,
-  handleFail
+  handleFail,
+  notPromise
 ) => {
   const [formData, setFormData] = useState(initialState);
   const [fieldErrors, setFieldErrors] = useState({});
@@ -42,6 +43,15 @@ const useForm = (
     const isValid = await validateForm();
 
     if (isValid) {
+      if (notPromise) {
+        dispatch(submitAction(formData));
+        setFormData(initialState);
+        if (handleSuccess) {
+          handleSuccess();
+        }
+        setLoading(false);
+        return;
+      }
       dispatch(submitAction(formData))
         .unwrap()
         .then(() => {

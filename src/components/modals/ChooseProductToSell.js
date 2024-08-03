@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import CustomModal from "../CustomModal";
 import { selectTogglerSvg } from "../../svgs/pageContentSVGs";
 import { fetchProducts } from "../../features/productsSlice";
@@ -11,29 +10,45 @@ import { toastFire } from "../../utils/toastFire";
 import useFetch from "../../hooks/useFetch";
 import useModal from "../../hooks/useModal";
 import useSearch from "../../hooks/useSearch";
+import useForm from "../../hooks/useForm";
 import { useDispatch, useSelector } from "react-redux";
+import transactionSchema from "../../schemas/transactionSchema";
 import {
   setSoldPermissionOrders,
   setChosenProductToSell,
+  setCurrentChoice,
 } from "../../features/soldPermissionSlice";
 
 function ChooseProductToSell() {
-  const [currentChoice, setCurrentChoice] = useState({});
-  const [formData, setFormData] = useState({});
-  const [errors, setErrors] = useState({});
-  const [loading, setLoading] = useState(false);
   const { show, handleClose, handleShow } = useModal();
   const {
     data: products,
     error,
     loading: fetchLoading,
   } = useFetch(fetchProducts, "products");
+
   const { filteredData: filteredProducts, filterItems } = useSearch(products, [
     "name",
   ]);
-  const { soldPermissionOrders, soldPermissionOrderIds, chosenProductToSell } =
+
+  const { soldPermissionOrderIds, chosenProductToSell, currentChoice } =
     useSelector((state) => state.soldPermission);
+
+  const soldPermissionSchema = transactionSchema(chosenProductToSell);
   const dispatch = useDispatch();
+
+  const { formData, fieldErrors, loading, handleChange, handleSubmit } =
+    useForm(
+      { quantity: "", price: "" },
+      soldPermissionSchema,
+      setSoldPermissionOrders,
+      () => {
+        handleClose();
+        toastFire("success", `تم اختيار الصنف ${currentChoice.name} بنجاح`);
+      },
+      undefined,
+      true
+    );
 
   const handleDropdownChoice = (e, product) => {
     e.preventDefault();
@@ -43,76 +58,9 @@ function ChooseProductToSell() {
     e.target.classList.add("selected-item");
     document.getElementById("dropdownMenuButton1").firstChild.textContent =
       product.name;
-    setCurrentChoice(product);
+    dispatch(setCurrentChoice(product));
     dispatch(setChosenProductToSell(product));
   };
-
-  const validateField = (name, value) => {
-    let error = "";
-    if (name === "quantity" || name === "price") {
-      if (!value) {
-        error = name === "quantity" ? "يجب إدخال العدد" : "يجب إدخال السعر";
-      } else if (isNaN(value)) {
-        error = "يجب إدخال ارقام فقط";
-      } else if (
-        name === "quantity" &&
-        parseInt(value) > chosenProductToSell.quantity
-      ) {
-        error = `لا يمكن أن يكون العدد أكبر من ${chosenProductToSell.quantity}`;
-      }
-    }
-    return error;
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    const error = validateField(name, value);
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-    setErrors({
-      ...errors,
-      [name]: error,
-    });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const quantityError = validateField("quantity", formData.quantity);
-    const priceError = validateField("price", formData.price);
-
-    if (quantityError || priceError) {
-      setErrors({
-        quantity: quantityError,
-        price: priceError,
-      });
-      return;
-    }
-
-    setLoading(true);
-    dispatch(
-      setSoldPermissionOrders([
-        ...soldPermissionOrders,
-        {
-          ...currentChoice,
-          orignalPrice: currentChoice.price,
-          originalQuantity: currentChoice.quantity,
-          ...formData,
-          totalPrice: parseInt(formData.quantity) * parseFloat(formData.price),
-        },
-      ])
-    );
-    handleClose();
-    toastFire("success", `تم اختيار الصنف ${currentChoice.name} بنجاح`);
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    if (chosenProductToSell) {
-      setCurrentChoice(chosenProductToSell);
-    }
-  }, [chosenProductToSell]);
 
   return (
     <>
@@ -211,7 +159,8 @@ function ChooseProductToSell() {
                         type="text"
                         name="quantity"
                         label="العدد"
-                        invalidFeedback={errors.quantity}
+                        value={formData.quantity}
+                        invalidFeedback={fieldErrors.quantity}
                         onChange={handleChange}
                         required
                       />
@@ -219,7 +168,8 @@ function ChooseProductToSell() {
                         type="text"
                         name="price"
                         label="سعر الوحدة"
-                        invalidFeedback={errors.price}
+                        value={formData.price}
+                        invalidFeedback={fieldErrors.price}
                         onChange={handleChange}
                         required
                       />

@@ -11,6 +11,7 @@ const soldPermissionSlice = createSlice({
       (order) => order._id
     ),
     chosenProductToSell: null,
+    currentChoice: {},
   },
   reducers: {
     setChosenCustomer: (state, action) => {
@@ -19,14 +20,24 @@ const soldPermissionSlice = createSlice({
     },
 
     setSoldPermissionOrders: (state, action) => {
-      setValue(
-        "soldPermissionOrders",
-        action.payload,
-        action.payload.length > 0
-      );
-      state.soldPermissionOrderIds = action.payload.map((order) => order._id);
+      const value = Array.isArray(action.payload)
+        ? action.payload
+        : [
+            ...state.soldPermissionOrders,
+            {
+              ...state.currentChoice,
+              orignalPrice: state.currentChoice.price,
+              originalQuantity: state.currentChoice.quantity,
+              ...action.payload,
+              totalPrice:
+                parseInt(action.payload.quantity) *
+                parseFloat(action.payload.price),
+            },
+          ];
+      setValue("soldPermissionOrders", value, value.length > 0);
+      state.soldPermissionOrderIds = value.map((order) => order._id);
       state.chosenProductToSell = null;
-      state.soldPermissionOrders = action.payload;
+      state.soldPermissionOrders = value;
     },
 
     setSoldPermissionInvoiceInfo: (state, action) => {
@@ -39,7 +50,12 @@ const soldPermissionSlice = createSlice({
     },
 
     setChosenProductToSell: (state, action) => {
+      state.currentChoice = action.payload;
       state.chosenProductToSell = action.payload;
+    },
+
+    setCurrentChoice: (state, action) => {
+      state.currentChoice = action.payload;
     },
 
     resetSoldPermission: (state) => {
@@ -51,6 +67,7 @@ const soldPermissionSlice = createSlice({
       state.soldPermissionInvoiceInfo = null;
       state.soldPermissionOrderIds = [];
       state.chosenProductToSell = null;
+      state.currentChoice = {};
     },
   },
 });
@@ -60,6 +77,7 @@ export const {
   setSoldPermissionOrders,
   setSoldPermissionInvoiceInfo,
   setChosenProductToSell,
+  setCurrentChoice,
   resetSoldPermission,
 } = soldPermissionSlice.actions;
 

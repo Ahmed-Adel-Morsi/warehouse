@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import CustomModal from "../CustomModal";
 import CustomForm from "../CustomForm";
 import { selectTogglerSvg } from "../../svgs/pageContentSVGs";
@@ -11,29 +10,45 @@ import MainButton from "../MainButton";
 import { toastFire } from "../../utils/toastFire";
 import useModal from "../../hooks/useModal";
 import useSearch from "../../hooks/useSearch";
+import useForm from "../../hooks/useForm";
 import { useDispatch, useSelector } from "react-redux";
+import transactionSchema from "../../schemas/transactionSchema";
 import {
   setAddPermissionOrders,
   setChosenProductToBuy,
+  setCurrentChoice,
 } from "../../features/addPermissionSlice";
 
 function ChooseProductToBuy() {
-  const [currentChoice, setCurrentChoice] = useState({});
-  const [formData, setFormData] = useState({});
-  const [errors, setErrors] = useState({});
-  const [loading, setLoading] = useState(false);
   const { show, handleClose, handleShow } = useModal();
   const {
     data: products,
     error,
     loading: fetchLoading,
   } = useFetch(fetchProducts, "products");
+
   const { filteredData: filteredProducts, filterItems } = useSearch(products, [
     "name",
   ]);
-  const { addPermissionOrders, addPermissionOrderIds, chosenProductToBuy } =
+
+  const { addPermissionOrderIds, chosenProductToBuy, currentChoice } =
     useSelector((state) => state.addPermission);
+
+  const addPermissionSchema = transactionSchema();
   const dispatch = useDispatch();
+
+  const { formData, fieldErrors, loading, handleChange, handleSubmit } =
+    useForm(
+      { quantity: "", price: "" },
+      addPermissionSchema,
+      setAddPermissionOrders,
+      () => {
+        handleClose();
+        toastFire("success", `تم اختيار الصنف ${currentChoice.name} بنجاح`);
+      },
+      undefined,
+      true
+    );
 
   const handleDropdownChoice = (e, product) => {
     e.preventDefault();
@@ -43,71 +58,9 @@ function ChooseProductToBuy() {
     e.target.classList.add("selected-item");
     document.getElementById("dropdownMenuButton1").firstChild.textContent =
       product.name;
-    setCurrentChoice(product);
+    dispatch(setCurrentChoice(product));
     dispatch(setChosenProductToBuy(product));
   };
-
-  const validateField = (name, value) => {
-    let error = "";
-    if (name === "quantity" || name === "price") {
-      if (!value) {
-        error = name === "quantity" ? "يجب إدخال العدد" : "يجب إدخال السعر";
-      } else if (isNaN(value)) {
-        error = "يجب إدخال ارقام فقط";
-      }
-    }
-    return error;
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    const error = validateField(name, value);
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-    setErrors({
-      ...errors,
-      [name]: error,
-    });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const quantityError = validateField("quantity", formData.quantity);
-    const priceError = validateField("price", formData.price);
-
-    if (quantityError || priceError) {
-      setErrors({
-        quantity: quantityError,
-        price: priceError,
-      });
-      return;
-    }
-
-    setLoading(true);
-    dispatch(
-      setAddPermissionOrders([
-        ...addPermissionOrders,
-        {
-          ...currentChoice,
-          orignalPrice: currentChoice.price,
-          originalQuantity: currentChoice.quantity,
-          ...formData,
-          totalPrice: parseInt(formData.quantity) * parseFloat(formData.price),
-        },
-      ])
-    );
-    handleClose();
-    toastFire("success", `تم اختيار الصنف ${currentChoice.name} بنجاح`);
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    if (chosenProductToBuy) {
-      setCurrentChoice(chosenProductToBuy);
-    }
-  }, [chosenProductToBuy]);
 
   return (
     <>
@@ -203,7 +156,8 @@ function ChooseProductToBuy() {
                       type="text"
                       name="quantity"
                       label="العدد"
-                      invalidFeedback={errors.quantity}
+                      value={formData.quantity}
+                      invalidFeedback={fieldErrors.quantity}
                       onChange={handleChange}
                       required
                     />
@@ -211,7 +165,8 @@ function ChooseProductToBuy() {
                       type="text"
                       name="price"
                       label="سعر الوحدة"
-                      invalidFeedback={errors.price}
+                      value={formData.price}
+                      invalidFeedback={fieldErrors.price}
                       onChange={handleChange}
                       required
                     />

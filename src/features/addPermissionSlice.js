@@ -11,6 +11,7 @@ const addPermissionSlice = createSlice({
       (order) => order._id
     ),
     chosenProductToBuy: null,
+    currentChoice: {},
   },
   reducers: {
     setChosenVendor: (state, action) => {
@@ -19,14 +20,24 @@ const addPermissionSlice = createSlice({
     },
 
     setAddPermissionOrders: (state, action) => {
-      setValue(
-        "addPermissionOrders",
-        action.payload,
-        action.payload.length > 0
-      );
-      state.addPermissionOrderIds = action.payload.map((order) => order._id);
+      const value = Array.isArray(action.payload)
+        ? action.payload
+        : [
+            ...state.addPermissionOrders,
+            {
+              ...state.currentChoice,
+              orignalPrice: state.currentChoice.price,
+              originalQuantity: state.currentChoice.quantity,
+              ...action.payload,
+              totalPrice:
+                parseInt(action.payload.quantity) *
+                parseFloat(action.payload.price),
+            },
+          ];
+      setValue("addPermissionOrders", value, value.length > 0);
+      state.addPermissionOrderIds = value.map((order) => order._id);
       state.chosenProductToBuy = null;
-      state.addPermissionOrders = action.payload;
+      state.addPermissionOrders = value;
     },
 
     setAddPermissionInvoiceInfo: (state, action) => {
@@ -39,7 +50,12 @@ const addPermissionSlice = createSlice({
     },
 
     setChosenProductToBuy: (state, action) => {
+      state.currentChoice = action.payload;
       state.chosenProductToBuy = action.payload;
+    },
+
+    setCurrentChoice: (state, action) => {
+      state.currentChoice = action.payload;
     },
 
     resetAddPermission: (state) => {
@@ -51,6 +67,7 @@ const addPermissionSlice = createSlice({
       state.addPermissionInvoiceInfo = null;
       state.addPermissionOrderIds = [];
       state.chosenProductToBuy = null;
+      state.currentChoice = {};
     },
   },
 });
@@ -60,6 +77,7 @@ export const {
   setAddPermissionOrders,
   setAddPermissionInvoiceInfo,
   setChosenProductToBuy,
+  setCurrentChoice,
   resetAddPermission,
 } = addPermissionSlice.actions;
 
