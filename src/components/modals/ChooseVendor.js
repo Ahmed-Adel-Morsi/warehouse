@@ -9,8 +9,10 @@ import MainButton from "../MainButton";
 import { Modal } from "react-bootstrap";
 import useModal from "../../hooks/useModal";
 import useSearch from "../../hooks/useSearch";
+import { useDispatch } from "react-redux";
+import { setChosenVendor } from "../../features/addPermissionSlice";
 
-function ChooseVendor({ setChosenVendor }) {
+function ChooseVendor() {
   const [currentChoice, setCurrentChoice] = useState({});
   const [loading, setLoading] = useState(false);
   const { show, handleClose, handleShow } = useModal();
@@ -22,6 +24,7 @@ function ChooseVendor({ setChosenVendor }) {
   const { filteredData: filteredVendors, filterItems } = useSearch(vendors, [
     "name",
   ]);
+  const dispatch = useDispatch();
 
   const handleDropdownChoice = (e, vendor) => {
     e.preventDefault();
@@ -37,7 +40,7 @@ function ChooseVendor({ setChosenVendor }) {
   const handleVendorChoice = () => {
     setLoading(true);
     if (Object.keys(currentChoice).length !== 0) {
-      setChosenVendor(currentChoice);
+      dispatch(setChosenVendor(currentChoice));
       toastFire("success", `تم اختيار المورد ${currentChoice.name} بنجاح`);
     } else {
       toastFire("warning", "يرجى اختيار المورد من فضلك");

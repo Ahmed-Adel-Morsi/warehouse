@@ -17,8 +17,12 @@ import Layout from "./components/Layout";
 import NotFound from "./pages/NotFound";
 import ProductsMovements from "./pages/ProductsMovements";
 import "./App.css";
+import { useSelector } from "react-redux";
 
 function App() {
+  const theme = useSelector((state) => state.theme);
+  document.body.setAttribute("data-bs-theme", theme);
+
   return (
     <div className="App">
       <Routes>

@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
 
 function MainButton({ btnIcon, btnTitle, clickHandler, type }) {
-  const { theme } = useSelector((state) => state.theme);
+  const theme = useSelector((state) => state.theme);
 
   return (
     <button

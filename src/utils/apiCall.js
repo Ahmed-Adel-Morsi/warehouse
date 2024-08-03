@@ -12,7 +12,7 @@ const apiCall = async (route, options, rejectWithValue) => {
 
     return data.data;
   } catch (error) {
-    return rejectWithValue(error || { message: "حدث خطأ ما" });
+    return rejectWithValue(error.message || "حدث خطأ ما");
   }
 };
 

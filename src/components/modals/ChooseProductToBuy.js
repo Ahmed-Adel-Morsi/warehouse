@@ -11,13 +11,13 @@ import MainButton from "../MainButton";
 import { toastFire } from "../../utils/toastFire";
 import useModal from "../../hooks/useModal";
 import useSearch from "../../hooks/useSearch";
-
-function ChooseProductToBuy({
+import { useDispatch, useSelector } from "react-redux";
+import {
+  setAddPermissionOrders,
   setChosenProductToBuy,
-  chosenProductToBuy,
-  setAdditionPermissionOrders,
-  ordersIds,
-}) {
+} from "../../features/addPermissionSlice";
+
+function ChooseProductToBuy() {
   const [currentChoice, setCurrentChoice] = useState({});
   const [formData, setFormData] = useState({});
   const [errors, setErrors] = useState({});
@@ -31,6 +31,9 @@ function ChooseProductToBuy({
   const { filteredData: filteredProducts, filterItems } = useSearch(products, [
     "name",
   ]);
+  const { addPermissionOrders, addPermissionOrderIds, chosenProductToBuy } =
+    useSelector((state) => state.addPermission);
+  const dispatch = useDispatch();
 
   const handleDropdownChoice = (e, product) => {
     e.preventDefault();
@@ -41,7 +44,7 @@ function ChooseProductToBuy({
     document.getElementById("dropdownMenuButton1").firstChild.textContent =
       product.name;
     setCurrentChoice(product);
-    setChosenProductToBuy(product);
+    dispatch(setChosenProductToBuy(product));
   };
 
   const validateField = (name, value) => {
@@ -83,19 +86,20 @@ function ChooseProductToBuy({
     }
 
     setLoading(true);
-    setAdditionPermissionOrders((prevProducts) => [
-      ...prevProducts,
-      {
-        ...currentChoice,
-        orignalPrice: currentChoice.price,
-        originalQuantity: currentChoice.quantity,
-        ...formData,
-        totalPrice: parseInt(formData.quantity) * parseFloat(formData.price),
-      },
-    ]);
+    dispatch(
+      setAddPermissionOrders([
+        ...addPermissionOrders,
+        {
+          ...currentChoice,
+          orignalPrice: currentChoice.price,
+          originalQuantity: currentChoice.quantity,
+          ...formData,
+          totalPrice: parseInt(formData.quantity) * parseFloat(formData.price),
+        },
+      ])
+    );
     handleClose();
     toastFire("success", `تم اختيار الصنف ${currentChoice.name} بنجاح`);
-    setChosenProductToBuy(null);
     setLoading(false);
   };
 
@@ -161,7 +165,7 @@ function ChooseProductToBuy({
                     <div className="overflow-y-auto mh-6rem sm-scroll">
                       {filteredProducts.map(
                         (product) =>
-                          !ordersIds.includes(product._id) && (
+                          !addPermissionOrderIds.includes(product._id) && (
                             <li className="text-end" key={product._id}>
                               <a
                                 className={`dropdown-item rounded py-1 pe-30px btn-hov ${

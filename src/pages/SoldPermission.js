@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import AddandEditCustomer from "../components/modals/AddandEditCustomer";
 import ChooseCustomer from "../components/modals/ChooseCustomer";
 import CustomModal from "../components/CustomModal";
 import { printerSvg, resetSvg, saveSvg } from "../svgs/pageContentSVGs";
 import ChooseProductToSell from "../components/modals/ChooseProductToSell";
 import DangerPopup from "../components/modals/DangerPopup";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addTransaction } from "../features/transactionsSlice";
 import { editProduct } from "../features/productsSlice";
 import CustomTable from "../components/CustomTable";
@@ -18,55 +18,35 @@ import { Modal } from "react-bootstrap";
 import useModal from "../hooks/useModal";
 import handlePrint from "../utils/handlePrint";
 import convertDateFormat from "../utils/convertDateFormat";
+import {
+  resetSoldPermission,
+  setSoldPermissionInvoiceInfo,
+  setSoldPermissionOrders,
+} from "../features/soldPermissionSlice";
 
 function SoldPermission() {
   const [loading, setLoading] = useState(false);
-  const [chosenProductToSell, setChosenProductToSell] = useState(null);
   const { show, handleClose, handleShow } = useModal();
-  const [ordersIds, setOrdersIds] = useState([]);
-  const [chosenCustomer, setChosenCustomer] = useState(() => {
-    const savedCustomer = localStorage.getItem("chosenCustomer");
-    return savedCustomer ? JSON.parse(savedCustomer) : null;
-  });
-  const [soldPermissionOrders, setSoldPermissionOrders] = useState(() => {
-    const savedProducts = localStorage.getItem("soldPermissionOrders");
-    return savedProducts ? JSON.parse(savedProducts) : [];
-  });
-  const [submitted, setSubmitted] = useState(() => {
-    const soldPermissionSaved = localStorage.getItem("soldPermissionSaved");
-    return soldPermissionSaved ? JSON.parse(soldPermissionSaved) : false;
-  });
-  const [soldPermissionInvoiceInfo, setSoldPermissionInvoiceInfo] = useState(
-    () => {
-      const savedInvoiceInfo = localStorage.getItem(
-        "soldPermissionInvoiceInfo"
-      );
-      return savedInvoiceInfo ? JSON.parse(savedInvoiceInfo) : null;
-    }
-  );
+  const { chosenCustomer, soldPermissionOrders, soldPermissionInvoiceInfo } =
+    useSelector((state) => state.soldPermission);
   const dispatch = useDispatch();
 
   const removeProductHandler = (currentProduct) => {
     setLoading(true);
-    const savedProducts = JSON.parse(
-      localStorage.getItem("soldPermissionOrders")
+    dispatch(
+      setSoldPermissionOrders(
+        soldPermissionOrders.filter(
+          (product) => product._id !== currentProduct._id
+        )
+      )
     );
-    setSoldPermissionOrders(
-      savedProducts.filter((product) => product._id !== currentProduct._id)
-    );
-    setOrdersIds(ordersIds.filter((id) => id !== currentProduct._id));
     toastFire("success", `تم حذف ${currentProduct.name} بنجاح`);
     setLoading(false);
   };
 
   const resetHandler = () => {
     setLoading(true);
-    setSubmitted(false);
-    setSoldPermissionInvoiceInfo(null);
-    setChosenCustomer(null);
-    setChosenProductToSell(null);
-    setSoldPermissionOrders([]);
-    setOrdersIds([]);
+    dispatch(resetSoldPermission());
     toastFire("success", "تمت إعادة تهيئة البيانات بنجاح");
     setLoading(false);
   };
@@ -82,10 +62,12 @@ function SoldPermission() {
     )
       .unwrap()
       .then((res) => {
-        setSoldPermissionInvoiceInfo({
-          invoiceNumber: res.invoiceNumber,
-          createdAt: convertDateFormat(res.createdAt),
-        });
+        dispatch(
+          setSoldPermissionInvoiceInfo({
+            invoiceNumber: res.invoiceNumber,
+            createdAt: convertDateFormat(res.createdAt),
+          })
+        );
       });
     for (const order of soldPermissionOrders) {
       await dispatch(
@@ -95,54 +77,9 @@ function SoldPermission() {
         })
       );
     }
-    setSubmitted(true);
     toastFire("success", "تم حفظ البيانات بنجاح");
     setLoading(false);
   };
-
-  useEffect(() => {
-    setLoading(true);
-    if (chosenCustomer !== null) {
-      localStorage.setItem("chosenCustomer", JSON.stringify(chosenCustomer));
-    } else {
-      localStorage.removeItem("chosenCustomer");
-    }
-    setLoading(false);
-  }, [chosenCustomer]);
-
-  useEffect(() => {
-    setLoading(true);
-    if (soldPermissionOrders.length > 0) {
-      localStorage.setItem(
-        "soldPermissionOrders",
-        JSON.stringify(soldPermissionOrders)
-      );
-    } else {
-      localStorage.removeItem("soldPermissionOrders");
-    }
-    setLoading(false);
-  }, [soldPermissionOrders]);
-
-  useEffect(() => {
-    if (soldPermissionInvoiceInfo !== null) {
-      localStorage.setItem(
-        "soldPermissionInvoiceInfo",
-        JSON.stringify(soldPermissionInvoiceInfo)
-      );
-    } else {
-      localStorage.removeItem("soldPermissionInvoiceInfo");
-    }
-  }, [soldPermissionInvoiceInfo]);
-
-  useEffect(() => {
-    localStorage.setItem("soldPermissionSaved", JSON.stringify(submitted));
-  }, [submitted]);
-
-  useEffect(() => {
-    soldPermissionOrders.forEach((e) => {
-      setOrdersIds((prev) => [...prev, e._id]);
-    });
-  }, [soldPermissionOrders]);
 
   return (
     <>
@@ -154,7 +91,12 @@ function SoldPermission() {
               ? `اسم العميل : ${chosenCustomer.name}`
               : "الرجاء اختيار العميل"}
           </p>
-          <p>تحرير في : {soldPermissionInvoiceInfo !== null ? soldPermissionInvoiceInfo.createdAt : ""}</p>
+          <p>
+            تحرير في :{" "}
+            {soldPermissionInvoiceInfo !== null
+              ? soldPermissionInvoiceInfo.createdAt
+              : ""}
+          </p>
         </div>
         <div className="text-center text-md-end d-print-none">
           {chosenCustomer
@@ -164,23 +106,13 @@ function SoldPermission() {
         <div className="d-flex d-print-none gap-3 w-sm-100 flex-column flex-sm-row flex-grow-1 justify-content-end">
           {!chosenCustomer && (
             <>
-              <ChooseCustomer
-                setChosenCustomer={setChosenCustomer}
-                chosenCustomer={chosenCustomer}
-              />
+              <ChooseCustomer />
               <AddandEditCustomer btnTitle="إضافة عميل جديد" />
             </>
           )}
           {chosenCustomer && (
             <>
-              {!submitted && (
-                <ChooseProductToSell
-                  setChosenProductToSell={setChosenProductToSell}
-                  setSoldPermissionOrders={setSoldPermissionOrders}
-                  chosenProductToSell={chosenProductToSell}
-                  ordersIds={ordersIds}
-                />
-              )}
+              {!soldPermissionInvoiceInfo && <ChooseProductToSell />}
 
               <DangerPopup
                 btnTitle="إعادة تهيئة"
@@ -193,42 +125,43 @@ function SoldPermission() {
                 handler={resetHandler}
               />
 
-              {submitted && (
+              {soldPermissionInvoiceInfo && (
                 <MainButton
                   btnIcon={printerSvg}
                   clickHandler={handlePrint}
                   btnTitle="طباعة"
                 />
               )}
-              {soldPermissionOrders.length > 0 && !submitted && (
-                <>
-                  <MainButton
-                    btnTitle="حفظ"
-                    btnIcon={saveSvg}
-                    clickHandler={handleShow}
-                  />
+              {soldPermissionOrders.length > 0 &&
+                !soldPermissionInvoiceInfo && (
+                  <>
+                    <MainButton
+                      btnTitle="حفظ"
+                      btnIcon={saveSvg}
+                      clickHandler={handleShow}
+                    />
 
-                  <Modal
-                    show={show}
-                    onHide={handleClose}
-                    backdrop="static"
-                    keyboard={false}
-                    centered
-                  >
-                    <CustomModal handleClose={handleClose}>
-                      <CustomModal.Header
-                        title="حفظ البيانات"
-                        description="يرجي تأكيد حفظ البيانات"
-                      />
-                      <CustomModal.Footer
-                        confirmBtnTitle="حفظ"
-                        clickHandler={submitHandler}
-                        loadingState={loading}
-                      />
-                    </CustomModal>
-                  </Modal>
-                </>
-              )}
+                    <Modal
+                      show={show}
+                      onHide={handleClose}
+                      backdrop="static"
+                      keyboard={false}
+                      centered
+                    >
+                      <CustomModal handleClose={handleClose}>
+                        <CustomModal.Header
+                          title="حفظ البيانات"
+                          description="يرجي تأكيد حفظ البيانات"
+                        />
+                        <CustomModal.Footer
+                          confirmBtnTitle="حفظ"
+                          clickHandler={submitHandler}
+                          loadingState={loading}
+                        />
+                      </CustomModal>
+                    </Modal>
+                  </>
+                )}
             </>
           )}
         </div>
@@ -250,8 +183,13 @@ function SoldPermission() {
                   <CustomTable.Data body="اللون" />
                   <CustomTable.Data body="العدد" />
                   <CustomTable.Data body="السعر" />
-                  <CustomTable.Data body="الاجمالى" last={submitted} />
-                  {!submitted && <CustomTable.Data body="إجراءات" last />}
+                  <CustomTable.Data
+                    body="الاجمالى"
+                    last={soldPermissionInvoiceInfo}
+                  />
+                  {!soldPermissionInvoiceInfo && (
+                    <CustomTable.Data body="إجراءات" last />
+                  )}
                 </CustomTable.Row>
               </thead>
               <tbody>
@@ -269,9 +207,9 @@ function SoldPermission() {
                     <CustomTable.Data body={order.price} />
                     <CustomTable.Data
                       body={order.totalPrice}
-                      last={submitted}
+                      last={soldPermissionInvoiceInfo}
                     />
-                    {!submitted && (
+                    {!soldPermissionInvoiceInfo && (
                       <CustomTable.Data
                         body={
                           <DangerPopup
@@ -300,7 +238,12 @@ function SoldPermission() {
           </div>
         )}
       </TableContainer>
-      <p className="mt-4 d-none d-print-block fw-bold fs-6">رقم الاذن: {soldPermissionInvoiceInfo !== null ? soldPermissionInvoiceInfo.invoiceNumber : ""}</p>
+      <p className="mt-4 d-none d-print-block fw-bold fs-6">
+        رقم الاذن:{" "}
+        {soldPermissionInvoiceInfo !== null
+          ? soldPermissionInvoiceInfo.invoiceNumber
+          : ""}
+      </p>
       <p className="mt-3 d-none d-print-block fw-bold fs-6">التوقيع:</p>
     </>
   );

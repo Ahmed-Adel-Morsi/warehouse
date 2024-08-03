@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import apiCall from "../utils/apiCall";
 import { toastFire } from "../utils/toastFire";
+import { getValue, setValue } from "../utils/localStorageHandler";
 
 export const loginUser = createAsyncThunk(
   "auth/loginUser",
@@ -40,11 +41,11 @@ const authSlice = createSlice({
   name: "auth",
   initialState: {
     user: null,
-    token: localStorage.getItem("token"),
+    token: getValue("token"),
   },
   reducers: {
     logout: (state) => {
-      localStorage.removeItem("token");
+      setValue("token", null);
       state.user = null;
       state.token = null;
     },
@@ -55,7 +56,7 @@ const authSlice = createSlice({
         const { user, token } = action.payload;
         state.user = user;
         state.token = token;
-        localStorage.setItem("token", token);
+        setValue("token", token, true);
         toastFire(
           "success",
           `<div class="fw-bold fs-small">مرحباً بعودتك! تم تسجيل الدخول بنجاح.</div>
@@ -66,7 +67,7 @@ const authSlice = createSlice({
         const { user, token } = action.payload;
         state.user = user;
         state.token = token;
-        localStorage.setItem("token", token);
+        setValue("token", token, true);
         toastFire("success", "تم إنشاء الحساب بنجاح");
       });
   },

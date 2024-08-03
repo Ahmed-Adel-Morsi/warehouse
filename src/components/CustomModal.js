@@ -54,7 +54,7 @@ function CustomModalFooter({
   confirmBtnTitle,
   clickHandler,
 }) {
-  const { theme } = useSelector((state) => state.theme);
+  const theme = useSelector((state) => state.theme);
   const handleClose = useContext(CloseContext);
 
   return (

@@ -5,6 +5,8 @@ import themeReducer from "../features/themeSlice";
 import customersReducer from "../features/customersSlice";
 import vendorsReducer from "../features/vendorsSlice";
 import transactionsReducer from "../features/transactionsSlice";
+import addPermissionReducer from "../features/addPermissionSlice";
+import soldPermissionReducer from "../features/soldPermissionSlice";
 
 const store = configureStore({
   reducer: {
@@ -14,6 +16,8 @@ const store = configureStore({
     vendors: vendorsReducer,
     transactions: transactionsReducer,
     theme: themeReducer,
+    addPermission: addPermissionReducer,
+    soldPermission: soldPermissionReducer,
   },
 });
 

@@ -9,8 +9,10 @@ import { toastFire } from "../../utils/toastFire";
 import useFetch from "../../hooks/useFetch";
 import useModal from "../../hooks/useModal";
 import useSearch from "../../hooks/useSearch";
+import { useDispatch } from "react-redux";
+import { setChosenCustomer } from "../../features/soldPermissionSlice";
 
-function ChooseCustomer({ setChosenCustomer }) {
+function ChooseCustomer() {
   const [currentChoice, setCurrentChoice] = useState({});
   const [loading, setLoading] = useState(false);
   const { show, handleClose, handleShow } = useModal();
@@ -23,6 +25,7 @@ function ChooseCustomer({ setChosenCustomer }) {
     customers,
     ["name"]
   );
+  const dispatch = useDispatch();
 
   const handleDropdownChoice = (e, customer) => {
     e.preventDefault();
@@ -38,7 +41,7 @@ function ChooseCustomer({ setChosenCustomer }) {
   const handleCustomerChoice = () => {
     setLoading(true);
     if (Object.keys(currentChoice).length !== 0) {
-      setChosenCustomer(currentChoice);
+      dispatch(setChosenCustomer(currentChoice));
       toastFire("success", `تم اختيار العميل ${currentChoice.name} بنجاح`);
     } else {
       toastFire("warning", "يرجى اختيار العميل من فضلك");

@@ -11,13 +11,13 @@ import { toastFire } from "../../utils/toastFire";
 import useFetch from "../../hooks/useFetch";
 import useModal from "../../hooks/useModal";
 import useSearch from "../../hooks/useSearch";
-
-function ChooseProductToSell({
-  setChosenProductToSell,
-  chosenProductToSell,
+import { useDispatch, useSelector } from "react-redux";
+import {
   setSoldPermissionOrders,
-  ordersIds,
-}) {
+  setChosenProductToSell,
+} from "../../features/soldPermissionSlice";
+
+function ChooseProductToSell() {
   const [currentChoice, setCurrentChoice] = useState({});
   const [formData, setFormData] = useState({});
   const [errors, setErrors] = useState({});
@@ -31,6 +31,9 @@ function ChooseProductToSell({
   const { filteredData: filteredProducts, filterItems } = useSearch(products, [
     "name",
   ]);
+  const { soldPermissionOrders, soldPermissionOrderIds, chosenProductToSell } =
+    useSelector((state) => state.soldPermission);
+  const dispatch = useDispatch();
 
   const handleDropdownChoice = (e, product) => {
     e.preventDefault();
@@ -41,7 +44,7 @@ function ChooseProductToSell({
     document.getElementById("dropdownMenuButton1").firstChild.textContent =
       product.name;
     setCurrentChoice(product);
-    setChosenProductToSell(product);
+    dispatch(setChosenProductToSell(product));
   };
 
   const validateField = (name, value) => {
@@ -88,19 +91,20 @@ function ChooseProductToSell({
     }
 
     setLoading(true);
-    setSoldPermissionOrders((prevProducts) => [
-      ...prevProducts,
-      {
-        ...currentChoice,
-        orignalPrice: currentChoice.price,
-        originalQuantity: currentChoice.quantity,
-        ...formData,
-        totalPrice: parseInt(formData.quantity) * parseFloat(formData.price),
-      },
-    ]);
+    dispatch(
+      setSoldPermissionOrders([
+        ...soldPermissionOrders,
+        {
+          ...currentChoice,
+          orignalPrice: currentChoice.price,
+          originalQuantity: currentChoice.quantity,
+          ...formData,
+          totalPrice: parseInt(formData.quantity) * parseFloat(formData.price),
+        },
+      ])
+    );
     handleClose();
     toastFire("success", `تم اختيار الصنف ${currentChoice.name} بنجاح`);
-    setChosenProductToSell(null);
     setLoading(false);
   };
 
@@ -168,7 +172,7 @@ function ChooseProductToSell({
                     <div className="overflow-y-auto mh-6rem sm-scroll">
                       {filteredProducts.map(
                         (product) =>
-                          !ordersIds.includes(product._id) && (
+                          !soldPermissionOrderIds.includes(product._id) && (
                             <li className="text-end" key={product._id}>
                               <a
                                 className={`dropdown-item rounded py-1 pe-30px btn-hov ${
