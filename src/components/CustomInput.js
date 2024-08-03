@@ -29,6 +29,7 @@ function CustomInput({
           disabled={disabled}
           onChange={onChange}
           onBlur={onBlur}
+          autoComplete="off"
         />
       </div>
       {invalidFeedback && (
