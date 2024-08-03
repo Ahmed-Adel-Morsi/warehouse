@@ -7,7 +7,7 @@ function Layout() {
   return (
     <>
       <Navbar />
-      <div className="d-flex">
+      <div className="d-flex vh-100">
         <Sidebar />
         <PageContent>
           <Outlet />
