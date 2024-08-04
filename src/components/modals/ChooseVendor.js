@@ -11,6 +11,7 @@ import useModal from "../../hooks/useModal";
 import useSearch from "../../hooks/useSearch";
 import { useDispatch } from "react-redux";
 import { setChosenVendor } from "../../features/addPermissionSlice";
+import handleDropdownChoice from "../../utils/handleDropdownChoice";
 
 function ChooseVendor() {
   const [currentChoice, setCurrentChoice] = useState({});
@@ -25,17 +26,6 @@ function ChooseVendor() {
     "name",
   ]);
   const dispatch = useDispatch();
-
-  const handleDropdownChoice = (e, vendor) => {
-    e.preventDefault();
-    document.getElementById("dropdownMenuButton1").firstChild.textContent =
-      vendor.name;
-    setCurrentChoice(vendor);
-    document.querySelectorAll(".dropdown-item").forEach((e) => {
-      e.classList.remove("selected-item");
-    });
-    e.target.classList.add("selected-item");
-  };
 
   const handleVendorChoice = () => {
     setLoading(true);
@@ -86,9 +76,11 @@ function ChooseVendor() {
               >
                 <input
                   type="text"
+                  name="search"
                   className="form-control border-0 border-bottom rounded-0 shadow-none mb-2 no-outline search-input pe-30px"
                   placeholder="ابحث عن المورد بالإسم"
                   onInput={filterItems}
+                  autoComplete="off"
                 />
                 {fetchLoading ? (
                   <div className="p-4 text-center fs-small fw-medium">
@@ -106,7 +98,11 @@ function ChooseVendor() {
                         <a
                           className="dropdown-item rounded py-1 pe-30px btn-hov"
                           href="/"
-                          onClick={(e) => handleDropdownChoice(e, vendor)}
+                          onClick={(e) =>
+                            handleDropdownChoice(e, vendor, () => {
+                              setCurrentChoice(vendor);
+                            })
+                          }
                         >
                           {vendor.name}
                         </a>

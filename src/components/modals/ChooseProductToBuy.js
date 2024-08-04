@@ -17,6 +17,7 @@ import {
   setAddPermissionOrders,
   setChosenProductToBuy,
 } from "../../features/addPermissionSlice";
+import handleDropdownChoice from "../../utils/handleDropdownChoice";
 
 function ChooseProductToBuy() {
   const { show, handleClose, handleShow } = useModal();
@@ -52,17 +53,6 @@ function ChooseProductToBuy() {
       undefined,
       true
     );
-
-  const handleDropdownChoice = (e, product) => {
-    e.preventDefault();
-    document.querySelectorAll(".dropdown .dropdown-item").forEach((e) => {
-      e.classList.remove("selected-item");
-    });
-    e.target.classList.add("selected-item");
-    document.getElementById("dropdownMenuButton1").firstChild.textContent =
-      product.name;
-    dispatch(setChosenProductToBuy(product));
-  };
 
   return (
     <>
@@ -103,9 +93,11 @@ function ChooseProductToBuy() {
                 >
                   <input
                     type="text"
+                    name="search"
                     className="form-control border-0 border-bottom rounded-0 shadow-none mb-2 no-outline search-input pe-30px"
                     placeholder="ابحث عن الصنف بالإسم"
                     onInput={filterItems}
+                    autoComplete="off"
                   />
                   {fetchLoading ? (
                     <div className="p-4 text-center fs-small fw-medium">
@@ -131,7 +123,9 @@ function ChooseProductToBuy() {
                                 }`}
                                 href="/"
                                 onClick={(e) =>
-                                  handleDropdownChoice(e, product)
+                                  handleDropdownChoice(e, product, () => {
+                                    dispatch(setChosenProductToBuy(product));
+                                  })
                                 }
                               >
                                 {product.name}
