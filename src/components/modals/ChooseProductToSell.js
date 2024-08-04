@@ -16,7 +16,6 @@ import transactionSchema from "../../schemas/transactionSchema";
 import {
   setSoldPermissionOrders,
   setChosenProductToSell,
-  setCurrentChoice,
 } from "../../features/soldPermissionSlice";
 
 function ChooseProductToSell() {
@@ -31,8 +30,9 @@ function ChooseProductToSell() {
     "name",
   ]);
 
-  const { soldPermissionOrderIds, chosenProductToSell, currentChoice } =
-    useSelector((state) => state.soldPermission);
+  const { soldPermissionOrderIds, chosenProductToSell } = useSelector(
+    (state) => state.soldPermission
+  );
 
   const soldPermissionSchema = transactionSchema(chosenProductToSell);
   const dispatch = useDispatch();
@@ -44,7 +44,10 @@ function ChooseProductToSell() {
       setSoldPermissionOrders,
       () => {
         handleClose();
-        toastFire("success", `تم اختيار الصنف ${currentChoice.name} بنجاح`);
+        toastFire(
+          "success",
+          `تم اختيار الصنف ${chosenProductToSell.name} بنجاح`
+        );
       },
       undefined,
       true
@@ -58,7 +61,6 @@ function ChooseProductToSell() {
     e.target.classList.add("selected-item");
     document.getElementById("dropdownMenuButton1").firstChild.textContent =
       product.name;
-    dispatch(setCurrentChoice(product));
     dispatch(setChosenProductToSell(product));
   };
 

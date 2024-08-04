@@ -11,7 +11,6 @@ const addPermissionSlice = createSlice({
       (order) => order._id
     ),
     chosenProductToBuy: null,
-    currentChoice: {},
   },
   reducers: {
     setChosenVendor: (state, action) => {
@@ -25,9 +24,9 @@ const addPermissionSlice = createSlice({
         : [
             ...state.addPermissionOrders,
             {
-              ...state.currentChoice,
-              orignalPrice: state.currentChoice.price,
-              originalQuantity: state.currentChoice.quantity,
+              ...state.chosenProductToBuy,
+              orignalPrice: state.chosenProductToBuy.price,
+              originalQuantity: state.chosenProductToBuy.quantity,
               ...action.payload,
               totalPrice:
                 parseInt(action.payload.quantity) *
@@ -50,12 +49,7 @@ const addPermissionSlice = createSlice({
     },
 
     setChosenProductToBuy: (state, action) => {
-      state.currentChoice = action.payload;
       state.chosenProductToBuy = action.payload;
-    },
-
-    setCurrentChoice: (state, action) => {
-      state.currentChoice = action.payload;
     },
 
     resetAddPermission: (state) => {
@@ -67,7 +61,6 @@ const addPermissionSlice = createSlice({
       state.addPermissionInvoiceInfo = null;
       state.addPermissionOrderIds = [];
       state.chosenProductToBuy = null;
-      state.currentChoice = {};
     },
   },
 });
@@ -77,7 +70,6 @@ export const {
   setAddPermissionOrders,
   setAddPermissionInvoiceInfo,
   setChosenProductToBuy,
-  setCurrentChoice,
   resetAddPermission,
 } = addPermissionSlice.actions;
 

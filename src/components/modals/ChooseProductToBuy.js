@@ -16,7 +16,6 @@ import transactionSchema from "../../schemas/transactionSchema";
 import {
   setAddPermissionOrders,
   setChosenProductToBuy,
-  setCurrentChoice,
 } from "../../features/addPermissionSlice";
 
 function ChooseProductToBuy() {
@@ -31,8 +30,9 @@ function ChooseProductToBuy() {
     "name",
   ]);
 
-  const { addPermissionOrderIds, chosenProductToBuy, currentChoice } =
-    useSelector((state) => state.addPermission);
+  const { addPermissionOrderIds, chosenProductToBuy } = useSelector(
+    (state) => state.addPermission
+  );
 
   const addPermissionSchema = transactionSchema();
   const dispatch = useDispatch();
@@ -44,7 +44,10 @@ function ChooseProductToBuy() {
       setAddPermissionOrders,
       () => {
         handleClose();
-        toastFire("success", `تم اختيار الصنف ${currentChoice.name} بنجاح`);
+        toastFire(
+          "success",
+          `تم اختيار الصنف ${chosenProductToBuy.name} بنجاح`
+        );
       },
       undefined,
       true
@@ -58,7 +61,6 @@ function ChooseProductToBuy() {
     e.target.classList.add("selected-item");
     document.getElementById("dropdownMenuButton1").firstChild.textContent =
       product.name;
-    dispatch(setCurrentChoice(product));
     dispatch(setChosenProductToBuy(product));
   };
 
