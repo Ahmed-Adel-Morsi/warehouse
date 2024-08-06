@@ -8,8 +8,7 @@ import DangerPopup from "../components/modals/DangerPopup";
 import { useDispatch, useSelector } from "react-redux";
 import { addTransaction } from "../features/transactionsSlice";
 import { editProduct } from "../features/productsSlice";
-import CustomTable from "../components/CustomTable";
-import TableContainer from "../components/TableContainer";
+import { Row, Data } from "../components/CustomTable";
 import PageHeader from "../components/PageHeader";
 import { toastFire } from "../utils/toastFire";
 import { removeSvg } from "../svgs/actionsSVGs";
@@ -23,6 +22,7 @@ import {
   setSoldPermissionInvoiceInfo,
   setSoldPermissionOrders,
 } from "../features/soldPermissionSlice";
+import TableSection from "../components/TableSection";
 
 function SoldPermission() {
   const [loading, setLoading] = useState(false);
@@ -173,78 +173,44 @@ function SoldPermission() {
           )}
         </div>
       </div>
-      <TableContainer>
-        {loading ? (
-          <div className="p-4 text-center fs-small fw-medium">
-            جارى التحميل...
-          </div>
-        ) : soldPermissionOrders.length > 0 ? (
-          <>
-            <CustomTable>
-              <thead>
-                <CustomTable.Row header>
-                  <CustomTable.Data body="اسم الصنف" />
-                  <CustomTable.Data body="الكود" />
-                  <CustomTable.Data body="الماركة" />
-                  <CustomTable.Data body="الحجم" />
-                  <CustomTable.Data body="اللون" />
-                  <CustomTable.Data body="العدد" />
-                  <CustomTable.Data body="السعر" />
-                  <CustomTable.Data
-                    body="الاجمالى"
-                    last={soldPermissionInvoiceInfo}
+      <TableSection
+        loading={loading}
+        dataLength={soldPermissionOrders.length}
+        pageName={
+          soldPermissionInvoiceInfo ? "submittedPermission" : "permission"
+        }
+      >
+        {soldPermissionOrders.map((order, index, arr) => (
+          <Row key={order._id} last={index === arr.length - 1}>
+            <Data body={order.name} />
+            <Data body={order.code} />
+            <Data body={order.brand} />
+            <Data body={order.size} />
+            <Data body={order.color} />
+            <Data body={order.quantity} />
+            <Data body={order.price} />
+            <Data body={order.totalPrice} last={soldPermissionInvoiceInfo} />
+            {!soldPermissionInvoiceInfo && (
+              <Data
+                body={
+                  <DangerPopup
+                    btnStyle="btn btn-hov"
+                    btnIcon={removeSvg}
+                    title="حذف الصنف"
+                    description="هل انت متاكد؟ سيتم حذف الصنف"
+                    confirmBtnTitle="حذف"
+                    loadingState={loading}
+                    handler={() => {
+                      removeProductHandler(order);
+                    }}
                   />
-                  {!soldPermissionInvoiceInfo && (
-                    <CustomTable.Data body="إجراءات" last />
-                  )}
-                </CustomTable.Row>
-              </thead>
-              <tbody>
-                {soldPermissionOrders.map((order, index, arr) => (
-                  <CustomTable.Row
-                    key={order._id}
-                    last={index === arr.length - 1}
-                  >
-                    <CustomTable.Data body={order.name} />
-                    <CustomTable.Data body={order.code} />
-                    <CustomTable.Data body={order.brand} />
-                    <CustomTable.Data body={order.size} />
-                    <CustomTable.Data body={order.color} />
-                    <CustomTable.Data body={order.quantity} />
-                    <CustomTable.Data body={order.price} />
-                    <CustomTable.Data
-                      body={order.totalPrice}
-                      last={soldPermissionInvoiceInfo}
-                    />
-                    {!soldPermissionInvoiceInfo && (
-                      <CustomTable.Data
-                        body={
-                          <DangerPopup
-                            btnStyle="btn btn-hov"
-                            btnIcon={removeSvg}
-                            title="حذف الصنف"
-                            description="هل انت متاكد؟ سيتم حذف الصنف"
-                            confirmBtnTitle="حذف"
-                            loadingState={loading}
-                            handler={() => {
-                              removeProductHandler(order);
-                            }}
-                          />
-                        }
-                        last
-                      />
-                    )}
-                  </CustomTable.Row>
-                ))}
-              </tbody>
-            </CustomTable>
-          </>
-        ) : (
-          <div className="p-4 text-center fs-small fw-medium">
-            لا يوجد بيانات
-          </div>
-        )}
-      </TableContainer>
+                }
+                last
+              />
+            )}
+          </Row>
+        ))}
+      </TableSection>
       <p className="mt-4 d-none d-print-block fw-bold fs-6">
         رقم الاذن:{" "}
         {soldPermissionInvoiceInfo !== null

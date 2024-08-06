@@ -4,11 +4,11 @@ import { printerSvg } from "../svgs/pageContentSVGs";
 import convertDateFormat from "../utils/convertDateFormat";
 import PageHeader from "../components/PageHeader";
 import MainButton from "../components/MainButton";
-import CustomTable from "../components/CustomTable";
-import TableContainer from "../components/TableContainer";
+import { Row, Data } from "../components/CustomTable";
 import { useEffect } from "react";
 import handlePrint from "../utils/handlePrint";
 import { useDispatch, useSelector } from "react-redux";
+import TableSection from "../components/TableSection";
 
 function InvoiceDetails({ type }) {
   const { invoiceNumber } = useParams();
@@ -57,58 +57,28 @@ function InvoiceDetails({ type }) {
         </div>
       )}
 
-      <TableContainer>
-        {loading ? (
-          <div className="p-4 text-center fs-small fw-medium">
-            جارى التحميل...
-          </div>
-        ) : error ? (
-          <div className="p-4 text-center fs-small fw-medium">
-            حدث خطأ ما:
-            <p>{error.message}</p>
-          </div>
-        ) : transaction ? (
-          <CustomTable>
-            <thead>
-              <CustomTable.Row header>
-                <CustomTable.Data body="اسم الصنف" />
-                <CustomTable.Data body="الكود" />
-                <CustomTable.Data body="الماركة" />
-                <CustomTable.Data body="الحجم" />
-                <CustomTable.Data body="اللون" />
-                {type === "buy" && <CustomTable.Data body="المكان" />}
-                <CustomTable.Data body="العدد" />
-                <CustomTable.Data body="السعر" />
-                <CustomTable.Data body="الاجمالي" last />
-              </CustomTable.Row>
-            </thead>
-            <tbody>
-              {transaction.products.map((product, index, arr) => (
-                <CustomTable.Row
-                  key={product._id}
-                  last={index === arr.length - 1}
-                >
-                  <CustomTable.Data body={product.name} />
-                  <CustomTable.Data body={product.code} />
-                  <CustomTable.Data body={product.brand} />
-                  <CustomTable.Data body={product.size} />
-                  <CustomTable.Data body={product.color} />
-                  {type === "buy" && (
-                    <CustomTable.Data body={product.location} />
-                  )}
-                  <CustomTable.Data body={product.quantity} />
-                  <CustomTable.Data body={product.price} />
-                  <CustomTable.Data body={product.totalPrice} last />
-                </CustomTable.Row>
-              ))}
-            </tbody>
-          </CustomTable>
-        ) : (
-          <div className="p-4 text-center fs-small fw-medium">
-            لا يوجد بيانات
-          </div>
-        )}
-      </TableContainer>
+      <TableSection
+        loading={loading}
+        error={error}
+        dataLength={transaction ? 1 : 0}
+        pageName={type === "sell" ? "soldInvoiceDetails" : "addInvoiceDetails"}
+      >
+        {transaction &&
+          transaction.products.map((product, index, arr) => (
+            <Row key={product._id} last={index === arr.length - 1}>
+              <Data body={product.name} />
+              <Data body={product.code} />
+              <Data body={product.brand} />
+              <Data body={product.size} />
+              <Data body={product.color} />
+              {type === "buy" && <Data body={product.location} />}
+              <Data body={product.quantity} />
+              <Data body={product.price} />
+              <Data body={product.totalPrice} last />
+            </Row>
+          ))}
+      </TableSection>
+
       <p className="mt-4 d-none d-print-block fw-bold fs-6">التوقيع:</p>
     </>
   );

@@ -4,11 +4,11 @@ import { printerSvg } from "../svgs/pageContentSVGs";
 import convertDateFormat from "../utils/convertDateFormat";
 import PageHeader from "../components/PageHeader";
 import MainButton from "../components/MainButton";
-import CustomTable from "../components/CustomTable";
-import TableContainer from "../components/TableContainer";
+import { Row, Data } from "../components/CustomTable";
 import handlePrint from "../utils/handlePrint";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
+import TableSection from "../components/TableSection";
 
 function CustomerTransactions({ type }) {
   const { customerId } = useParams();
@@ -43,75 +43,40 @@ function CustomerTransactions({ type }) {
         </div>
       )}
 
-      <TableContainer>
-        {loading ? (
-          <div className="p-4 text-center fs-small fw-medium">
-            جارى التحميل...
-          </div>
-        ) : error ? (
-          <div className="p-4 text-center fs-small fw-medium">
-            حدث خطأ ما:
-            <p>{error.message}</p>
-          </div>
-        ) : transactions.length > 0 ? (
-          <>
-            <CustomTable>
-              <thead>
-                <CustomTable.Row header>
-                  <CustomTable.Data body="اسم الصنف" />
-                  <CustomTable.Data body="حركة الصنف" />
-                  <CustomTable.Data body="الكود" />
-                  <CustomTable.Data body="الماركة" />
-                  <CustomTable.Data body="العدد" />
-                  <CustomTable.Data body="السعر" />
-                  <CustomTable.Data body="العميل" />
-                  <CustomTable.Data body="التاريخ" last />
-                </CustomTable.Row>
-              </thead>
-              <tbody>
-                {transactions.map((transaction, index, arr) => (
-                  <CustomTable.Row
-                    key={`${transaction._id}${transaction.productDetails._id}`}
-                    last={index === arr.length - 1}
-                  >
-                    <CustomTable.Data body={transaction.productDetails.name} />
-                    <CustomTable.Data
-                      body={
-                        <span
-                          className={`badge p-badge fw-semibold fs-075rem ${
-                            transaction.transactionType === "sell"
-                              ? "bg-hov-color"
-                              : "text-bg-dark"
-                          }`}
-                        >
-                          {transaction.transactionType === "sell"
-                            ? "بيع"
-                            : "اضافة"}
-                        </span>
-                      }
-                    />
-                    <CustomTable.Data body={transaction.productDetails.code} />
-                    <CustomTable.Data body={transaction.productDetails.brand} />
-                    <CustomTable.Data
-                      body={transaction.productDetails.quantity}
-                    />
-                    <CustomTable.Data body={transaction.productDetails.price} />
-                    <CustomTable.Data body={transaction.customerDetails.name} />
-                    <CustomTable.Data
-                      body={convertDateFormat(transaction.createdAt)}
-                      last
-                    />
-                  </CustomTable.Row>
-                ))}
-              </tbody>
-            </CustomTable>
-          </>
-        ) : (
-          <div className="p-4 text-center fs-small fw-medium">
-            لا توجد بيانات
-          </div>
-        )}
-      </TableContainer>
+      <TableSection
+        loading={loading}
+        error={error}
+        dataLength={transactions.length}
+        pageName="movements"
+      >
+        {transactions.map((transaction, index, arr) => (
+          <Row
+            key={`${transaction._id}${transaction.productDetails._id}`}
+            last={index === arr.length - 1}
+          >
+            <Data body={transaction.productDetails.name} />
+            <Data
+              body={
+                <span
+                  className={`badge p-badge fw-semibold fs-075rem ${
+                    transaction.transactionType === "sell"
+                      ? "bg-hov-color"
+                      : "text-bg-dark"
+                  }`}
+                >
+                  {transaction.transactionType === "sell" ? "بيع" : "اضافة"}
+                </span>
+              }
+            />
+            <Data body={transaction.productDetails.code} />
+            <Data body={transaction.productDetails.brand} />
+            <Data body={transaction.productDetails.quantity} />
+            <Data body={transaction.productDetails.price} />
+            <Data body={transaction.customerDetails.name} />
+            <Data body={convertDateFormat(transaction.createdAt)} last />
+          </Row>
+        ))}
+      </TableSection>
     </>
   );
 }

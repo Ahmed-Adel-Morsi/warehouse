@@ -1,12 +1,12 @@
 import { showInvoicesSvg } from "../svgs/actionsSVGs";
 import { Link } from "react-router-dom";
 import convertDateFormat from "../utils/convertDateFormat";
-import TableContainer from "../components/TableContainer";
-import CustomTable from "../components/CustomTable";
+import { Row, Data } from "../components/CustomTable";
 import SearchInput from "../components/SearchInput";
 import PageHeader from "../components/PageHeader";
 import useSearch from "../hooks/useSearch";
 import { useSelector } from "react-redux";
+import TableSection from "../components/TableSection";
 
 function AdditionInvoices() {
   const {
@@ -27,59 +27,32 @@ function AdditionInvoices() {
         placeholder="يمكنك البحث عن المورد بالإسم ورقم الفاتوره"
         onChange={filterItems}
       />
-      <TableContainer>
-        {loading ? (
-          <div className="p-4 text-center fs-small fw-medium">
-            جارى التحميل...
-          </div>
-        ) : error ? (
-          <div className="p-4 text-center fs-small fw-medium">
-            حدث خطأ ما:
-            <p>{error.message}</p>
-          </div>
-        ) : filteredTransactions.length > 0 ? (
-          <CustomTable>
-            <thead>
-              <CustomTable.Row header>
-                <CustomTable.Data body="اسم المورد" />
-                <CustomTable.Data body="التاريخ" />
-                <CustomTable.Data body="رقم الفاتورة" />
-                <CustomTable.Data body="إجراءات" last />
-              </CustomTable.Row>
-            </thead>
-            <tbody>
-              {filteredTransactions.map((transaction, index, arr) => (
-                <CustomTable.Row
-                  key={transaction._id}
-                  last={index === arr.length - 1}
+      <TableSection
+        loading={loading}
+        error={error}
+        dataLength={filteredTransactions.length}
+        pageName="additionInvoices"
+      >
+        {filteredTransactions.map((transaction, index, arr) => (
+          <Row key={transaction._id} last={index === arr.length - 1}>
+            <Data body={transaction.customerDetails.name} />
+            <Data body={convertDateFormat(transaction.createdAt)} />
+            <Data body={transaction.invoiceNumber} />
+            <Data
+              body={
+                <Link
+                  to={`${transaction.invoiceNumber}`}
+                  title="عرض الفاتورة"
+                  className="btn btn-hov"
                 >
-                  <CustomTable.Data body={transaction.customerDetails.name} />
-                  <CustomTable.Data
-                    body={convertDateFormat(transaction.createdAt)}
-                  />
-                  <CustomTable.Data body={transaction.invoiceNumber} />
-                  <CustomTable.Data
-                    body={
-                      <Link
-                        to={`${transaction.invoiceNumber}`}
-                        title="عرض الفاتورة"
-                        className="btn btn-hov"
-                      >
-                        {showInvoicesSvg}
-                      </Link>
-                    }
-                    last
-                  />
-                </CustomTable.Row>
-              ))}
-            </tbody>
-          </CustomTable>
-        ) : (
-          <div className="p-4 text-center fs-small fw-medium">
-            لا يوجد بيانات
-          </div>
-        )}
-      </TableContainer>
+                  {showInvoicesSvg}
+                </Link>
+              }
+              last
+            />
+          </Row>
+        ))}
+      </TableSection>
     </>
   );
 }
