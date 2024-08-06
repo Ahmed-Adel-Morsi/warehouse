@@ -19,6 +19,7 @@ const store = configureStore({
     addPermission: addPermissionReducer,
     soldPermission: soldPermissionReducer,
   },
+  devTools: false,
 });
 
 export default store;
