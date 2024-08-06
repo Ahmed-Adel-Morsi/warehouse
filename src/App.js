@@ -9,19 +9,33 @@ import SoldPermission from "./pages/SoldPermission";
 import AdditionPermission from "./pages/AdditionPermission";
 import SoldInvoices from "./pages/SoldInvoices";
 import AdditionInvoices from "./pages/AdditionInvoices";
-import ItemDetails from "./pages/ItemDetails";
 import InvoiceDetails from "./pages/InvoiceDetails";
 import Login from "./pages/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Layout from "./components/Layout";
 import NotFound from "./pages/NotFound";
-import ProductsMovements from "./pages/ProductsMovements";
 import "./App.css";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
+import { fetchProducts } from "./features/productsSlice";
+import { fetchCustomers } from "./features/customersSlice";
+import { fetchVendors } from "./features/vendorsSlice";
+import { fetchTransactions } from "./features/transactionsSlice";
+import CustomerTransactions from "./pages/CustomerTransactions";
+import ProductTransactions from "./pages/ProductTransactions";
 
 function App() {
   const theme = useSelector((state) => state.theme);
   document.body.setAttribute("data-bs-theme", theme);
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(fetchProducts());
+    dispatch(fetchCustomers());
+    dispatch(fetchVendors());
+    dispatch(fetchTransactions());
+  }, [dispatch]);
 
   return (
     <div className="App">
@@ -34,7 +48,7 @@ function App() {
               <Route path="" element={<Products />} />
               <Route
                 path={ROUTES.PRODUCT_INVOICES}
-                element={<ProductsMovements />}
+                element={<ProductTransactions />}
               />
             </Route>
 
@@ -42,14 +56,14 @@ function App() {
               <Route path="" element={<Customers />} />
               <Route
                 path={ROUTES.CUSTOMER_INVOICES}
-                element={<ItemDetails type="customer" />}
+                element={<CustomerTransactions type="customer" />}
               />
             </Route>
             <Route path={ROUTES.VENDORS} element={<Outlet />}>
               <Route path="" element={<Vendors />} />
               <Route
                 path={ROUTES.CUSTOMER_INVOICES}
-                element={<ItemDetails type="vendor" />}
+                element={<CustomerTransactions type="vendor" />}
               />
             </Route>
             <Route path={ROUTES.TRANSACTIONS} element={<Transactions />} />
