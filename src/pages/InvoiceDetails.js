@@ -1,32 +1,33 @@
 import { useParams } from "react-router-dom";
-import { getTransactionByInvoiceNumber } from "../features/transactionsSlice";
+import { getInvoiceNumberTransaction } from "../features/transactionsSlice";
 import { printerSvg } from "../svgs/pageContentSVGs";
 import convertDateFormat from "../utils/convertDateFormat";
 import PageHeader from "../components/PageHeader";
 import MainButton from "../components/MainButton";
 import CustomTable from "../components/CustomTable";
 import TableContainer from "../components/TableContainer";
-import useFetch from "../hooks/useFetch";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect } from "react";
 import handlePrint from "../utils/handlePrint";
+import { useDispatch, useSelector } from "react-redux";
 
 function InvoiceDetails({ type }) {
   const { invoiceNumber } = useParams();
-  const params = useMemo(
-    () => ({ type, invoiceNumber }),
-    [type, invoiceNumber]
-  );
-
   const {
-    data: transactions,
-    error,
     loading,
-  } = useFetch(getTransactionByInvoiceNumber, "transactions", params);
-  const [transaction, setTransaction] = useState(null);
+    error,
+    transactions: AllTransactions,
+    invoiceNumberTransaction: transaction,
+  } = useSelector((state) => state.transactions);
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    setTransaction(transactions.length > 0 ? transactions[0] : null);
-  }, [transactions]);
+    dispatch(
+      getInvoiceNumberTransaction({
+        type,
+        invoiceNumber: parseInt(invoiceNumber),
+      })
+    );
+  }, [dispatch, type, invoiceNumber, AllTransactions]);
 
   return (
     <>

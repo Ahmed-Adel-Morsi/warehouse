@@ -1,43 +1,21 @@
-import { fetchTransactions } from "../features/transactionsSlice";
 import convertDateFormat from "../utils/convertDateFormat";
 import CustomTable from "../components/CustomTable";
 import TableContainer from "../components/TableContainer";
 import SearchInput from "../components/SearchInput";
 import PageHeader from "../components/PageHeader";
-import useFetch from "../hooks/useFetch";
-import { useEffect, useState } from "react";
 import useSearch from "../hooks/useSearch";
+import { useSelector } from "react-redux";
 
 function Transactions() {
-  const [products, setProducts] = useState([]);
-  const { filteredData: filteredProducts, filterItems } = useSearch(products, [
-    "name",
-  ]);
   const {
-    data: transactions,
-    error,
     loading,
-  } = useFetch(fetchTransactions, "transactions");
-
-  useEffect(() => {
-    if (transactions.length > 0) {
-      const newProducts = [];
-      transactions.forEach((transaction) => {
-        transaction.products.forEach((product) => {
-          newProducts.push({
-            ...product,
-            key: `${transaction._id}${product._id}`,
-            transactionType: transaction.transactionType,
-            customerName: transaction.customerDetails.name,
-            transactionDate: transaction.createdAt,
-          });
-        });
-      });
-      setProducts(newProducts);
-    } else {
-      setProducts([]);
-    }
-  }, [transactions]);
+    error,
+    detailedTransactions: transactions,
+  } = useSelector((state) => state.transactions);
+  const { filteredData: filteredTransactions, filterItems } = useSearch(
+    transactions,
+    [["productDetails", "name"]]
+  );
 
   return (
     <>
@@ -57,7 +35,7 @@ function Transactions() {
             حدث خطأ ما:
             <p>{error.message}</p>
           </div>
-        ) : filteredProducts.length > 0 ? (
+        ) : filteredTransactions.length > 0 ? (
           <CustomTable>
             <thead>
               <CustomTable.Row header>
@@ -72,29 +50,29 @@ function Transactions() {
               </CustomTable.Row>
             </thead>
             <tbody>
-              {filteredProducts.map((product, i, a) => (
-                <CustomTable.Row key={product.key} last={i === a.length - 1}>
-                  <CustomTable.Data body={product.name} />
+              {filteredTransactions.map((transaction, i, a) => (
+                <CustomTable.Row key={`${transaction._id}${transaction.productDetails._id}`} last={i === a.length - 1}>
+                  <CustomTable.Data body={transaction.productDetails.name} />
                   <CustomTable.Data
                     body={
                       <span
                         className={`badge p-badge fw-semibold fs-075rem ${
-                          product.transactionType === "sell"
+                          transaction.transactionType === "sell"
                             ? "text-bg-dark"
                             : "bg-hov-color"
                         }`}
                       >
-                        {product.transactionType === "sell" ? "إضافة" : "بيع"}
+                        {transaction.transactionType === "sell" ? "إضافة" : "بيع"}
                       </span>
                     }
                   />
-                  <CustomTable.Data body={product.code} />
-                  <CustomTable.Data body={product.brand} />
-                  <CustomTable.Data body={product.quantity} />
-                  <CustomTable.Data body={product.price} />
-                  <CustomTable.Data body={product.customerName} />
+                  <CustomTable.Data body={transaction.productDetails.code} />
+                  <CustomTable.Data body={transaction.productDetails.brand} />
+                  <CustomTable.Data body={transaction.productDetails.quantity} />
+                  <CustomTable.Data body={transaction.productDetails.price} />
+                  <CustomTable.Data body={transaction.customerDetails.name} />
                   <CustomTable.Data
-                    body={convertDateFormat(product.transactionDate)}
+                    body={convertDateFormat(transaction.createdAt)}
                     last
                   />
                 </CustomTable.Row>

@@ -77,29 +77,44 @@ export const editCustomer = createAsyncThunk(
 
 const customersSlice = createSlice({
   name: "customersSlice",
-  initialState: [],
+  initialState: {
+    loading: false,
+    error: null,
+    customers: [],
+  },
   reducers: {},
   extraReducers: (builder) => {
     builder
+      .addCase(fetchCustomers.pending, (state, action) => {
+        state.loading = true;
+        state.error = null;
+      })
       .addCase(fetchCustomers.fulfilled, (state, action) => {
-        return action.payload;
+        state.loading = false;
+        state.customers = action.payload;
+      })
+      .addCase(fetchCustomers.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       })
       .addCase(addCustomer.fulfilled, (state, action) => {
+        state.customers.unshift(action.payload);
         toastFire("success", `تم اضافة ${action.payload.name} بنجاح`);
-        state.push(action.payload);
       })
       .addCase(deleteCustomer.fulfilled, (state, action) => {
+        state.customers = state.customers.filter(
+          (customer) => customer._id !== action.payload
+        );
         toastFire("success", `تم حذف العميل بنجاح`);
-        return state.filter((customer) => customer._id !== action.payload);
       })
       .addCase(editCustomer.fulfilled, (state, action) => {
-        toastFire("success", `تم تعديل ${action.payload.name} بنجاح`);
-        const index = state.findIndex(
+        const index = state.customers.findIndex(
           (customer) => customer._id === action.payload._id
         );
         if (index !== -1) {
-          state[index] = action.payload;
+          state.customers[index] = action.payload;
         }
+        toastFire("success", `تم تعديل ${action.payload.name} بنجاح`);
       });
   },
 });

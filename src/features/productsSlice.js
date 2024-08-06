@@ -76,28 +76,42 @@ export const editProduct = createAsyncThunk(
 
 const productsSlice = createSlice({
   name: "productsSlice",
-  initialState: [],
+  initialState: {
+    loading: false,
+    error: null,
+    products: [],
+  },
   reducers: {},
   extraReducers: (builder) => {
     builder
+      .addCase(fetchProducts.pending, (state, action) => {
+        state.loading = true;
+        state.error = null;
+      })
       .addCase(fetchProducts.fulfilled, (state, action) => {
-        return action.payload;
+        state.loading = false;
+        state.products = action.payload;
+      })
+      .addCase(fetchProducts.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       })
       .addCase(addProduct.fulfilled, (state, action) => {
+        state.products.unshift(action.payload);
         toastFire("success", `تم اضافة ${action.payload.name} بنجاح`);
-        state.push(action.payload);
       })
       .addCase(deleteProduct.fulfilled, (state, action) => {
+        state.products = state.products.filter((product) => product._id !== action.payload);
         toastFire("success", `تم حذف الصنف بنجاح`);
-        return state.filter((product) => product._id !== action.payload);
       })
       .addCase(editProduct.fulfilled, (state, action) => {
-        const index = state.findIndex(
+        const index = state.products.findIndex(
           (product) => product._id === action.payload._id
         );
         if (index !== -1) {
-          state[index] = action.payload;
+          state.products[index] = action.payload;
         }
+        toastFire("success", `تم تعديل ${action.payload.name} بنجاح`);
       });
   },
 });

@@ -1,27 +1,24 @@
 import { useState } from "react";
 import CustomModal from "../CustomModal";
 import { selectTogglerSvg } from "../../svgs/pageContentSVGs";
-import { fetchCustomers } from "../../features/customersSlice";
 import { customersSvg } from "../../svgs/sidebarSVGs";
 import MainButton from "../MainButton";
 import { Modal } from "react-bootstrap";
 import { toastFire } from "../../utils/toastFire";
-import useFetch from "../../hooks/useFetch";
 import useModal from "../../hooks/useModal";
 import useSearch from "../../hooks/useSearch";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setChosenCustomer } from "../../features/soldPermissionSlice";
 import handleDropdownChoice from "../../utils/handleDropdownChoice";
 
 function ChooseCustomer() {
   const [currentChoice, setCurrentChoice] = useState({});
-  const [loading, setLoading] = useState(false);
   const { show, handleClose, handleShow } = useModal();
   const {
-    data: customers,
+    loading,
     error,
-    loading: fetchLoading,
-  } = useFetch(fetchCustomers, "customers");
+    customers,
+  } = useSelector((state) => state.customers);
   const { filteredData: filteredCustomers, filterItems } = useSearch(
     customers,
     ["name"]
@@ -29,14 +26,12 @@ function ChooseCustomer() {
   const dispatch = useDispatch();
 
   const handleCustomerChoice = () => {
-    setLoading(true);
     if (Object.keys(currentChoice).length !== 0) {
       dispatch(setChosenCustomer(currentChoice));
       toastFire("success", `تم اختيار العميل ${currentChoice.name} بنجاح`);
     } else {
       toastFire("warning", "يرجى اختيار العميل من فضلك");
     }
-    setLoading(false);
   };
 
   return (
@@ -83,7 +78,7 @@ function ChooseCustomer() {
                   onInput={filterItems}
                   autoComplete="off"
                 />
-                {fetchLoading ? (
+                {loading ? (
                   <div className="p-4 text-center fs-small fw-medium">
                     جارى التحميل...
                   </div>
@@ -117,7 +112,6 @@ function ChooseCustomer() {
           <CustomModal.Footer
             confirmBtnTitle="اضافة"
             clickHandler={handleCustomerChoice}
-            loadingState={loading}
           />
         </CustomModal>
       </Modal>

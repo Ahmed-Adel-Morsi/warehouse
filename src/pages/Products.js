@@ -1,4 +1,4 @@
-import { deleteProduct, fetchProducts } from "../features/productsSlice";
+import { deleteProduct } from "../features/productsSlice";
 import { actionsSvg, productTransactionsSvg } from "../svgs/actionsSVGs";
 import AddandEditProduct from "../components/modals/AddandEditProduct";
 import { Link } from "react-router-dom";
@@ -7,15 +7,11 @@ import TableContainer from "../components/TableContainer";
 import SearchInput from "../components/SearchInput";
 import PageHeader from "../components/PageHeader";
 import RemoveItem from "../components/modals/RemoveItem";
-import useFetch from "../hooks/useFetch";
 import useSearch from "../hooks/useSearch";
+import { useSelector } from "react-redux";
 
 function Products() {
-  const {
-    data: products,
-    error,
-    loading,
-  } = useFetch(fetchProducts, "products");
+  const { loading, error, products } = useSelector((state) => state.products);
   const { filteredData: filteredProducts, filterItems } = useSearch(products, [
     "name",
     "code",

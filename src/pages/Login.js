@@ -10,7 +10,7 @@ import CustomInput from "../components/CustomInput";
 
 function Login() {
   const navigate = useNavigate();
-  const { token } = useSelector((state) => state.auth);
+  const token = useSelector((state) => state.auth.token);
   const { formData, fieldErrors, loading, handleChange, handleSubmit } =
     useForm({ userName: "", password: "" }, loginSchema, loginUser);
 

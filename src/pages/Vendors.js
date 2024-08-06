@@ -1,4 +1,3 @@
-import { fetchVendors } from "../features/vendorsSlice";
 import { actionsSvg, productTransactionsSvg } from "../svgs/actionsSVGs";
 import { deleteVendor } from "../features/vendorsSlice";
 import AddandEditVendor from "../components/modals/AddandEditVendor";
@@ -7,12 +6,12 @@ import TableContainer from "../components/TableContainer";
 import SearchInput from "../components/SearchInput";
 import PageHeader from "../components/PageHeader";
 import RemoveItem from "../components/modals/RemoveItem";
-import useFetch from "../hooks/useFetch";
 import useSearch from "../hooks/useSearch";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 function Vendors() {
-  const { data: vendors, error, loading } = useFetch(fetchVendors, "vendors");
+  const { loading, error, vendors } = useSelector((state) => state.vendors);
   const { filteredData: filteredVendors, filterItems } = useSearch(vendors, [
     "name",
     "code",

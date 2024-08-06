@@ -77,27 +77,42 @@ export const editVendor = createAsyncThunk(
 
 const vendorsSlice = createSlice({
   name: "vendorsSlice",
-  initialState: [],
+  initialState: {
+    loading: false,
+    error: null,
+    vendors: [],
+  },
   reducers: {},
   extraReducers: (builder) => {
     builder
+      .addCase(fetchVendors.pending, (state, action) => {
+        state.loading = true;
+        state.error = null;
+      })
       .addCase(fetchVendors.fulfilled, (state, action) => {
-        return action.payload;
+        state.loading = false;
+        state.vendors = action.payload;
+      })
+      .addCase(fetchVendors.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       })
       .addCase(addVendor.fulfilled, (state, action) => {
-        state.push(action.payload);
+        state.vendors.unshift(action.payload);
         toastFire("success", `تم اضافة ${action.payload.name} بنجاح`);
       })
       .addCase(deleteVendor.fulfilled, (state, action) => {
+        state.vendors = state.vendors.filter(
+          (vendor) => vendor._id !== action.payload
+        );
         toastFire("success", `تم حذف المورد بنجاح`);
-        return state.filter((vendor) => vendor._id !== action.payload);
       })
       .addCase(editVendor.fulfilled, (state, action) => {
-        const index = state.findIndex(
+        const index = state.vendors.findIndex(
           (vendor) => vendor._id === action.payload._id
         );
         if (index !== -1) {
-          state[index] = action.payload;
+          state.vendors[index] = action.payload;
         }
         toastFire("success", `تم تعديل ${action.payload.name} بنجاح`);
       });

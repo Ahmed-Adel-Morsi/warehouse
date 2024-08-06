@@ -1,13 +1,11 @@
 import CustomModal from "../CustomModal";
 import { selectTogglerSvg } from "../../svgs/pageContentSVGs";
-import { fetchProducts } from "../../features/productsSlice";
 import { productsSvg } from "../../svgs/sidebarSVGs";
 import CustomInput from "../CustomInput";
 import MainButton from "../MainButton";
 import { Modal } from "react-bootstrap";
 import CustomForm from "../CustomForm";
 import { toastFire } from "../../utils/toastFire";
-import useFetch from "../../hooks/useFetch";
 import useModal from "../../hooks/useModal";
 import useSearch from "../../hooks/useSearch";
 import useForm from "../../hooks/useForm";
@@ -21,38 +19,26 @@ import handleDropdownChoice from "../../utils/handleDropdownChoice";
 
 function ChooseProductToSell() {
   const { show, handleClose, handleShow } = useModal();
-  const {
-    data: products,
-    error,
-    loading: fetchLoading,
-  } = useFetch(fetchProducts, "products");
-
+  const { loading, error, products } = useSelector((state) => state.products);
   const { filteredData: filteredProducts, filterItems } = useSearch(products, [
     "name",
   ]);
-
   const { soldPermissionOrderIds, chosenProductToSell } = useSelector(
     (state) => state.soldPermission
   );
-
   const soldPermissionSchema = transactionSchema(chosenProductToSell);
+  const { formData, fieldErrors, handleChange, handleSubmit } = useForm(
+    { quantity: "", price: "" },
+    soldPermissionSchema,
+    setSoldPermissionOrders,
+    () => {
+      handleClose();
+      toastFire("success", `تم اختيار الصنف ${chosenProductToSell.name} بنجاح`);
+    },
+    undefined,
+    true
+  );
   const dispatch = useDispatch();
-
-  const { formData, fieldErrors, loading, handleChange, handleSubmit } =
-    useForm(
-      { quantity: "", price: "" },
-      soldPermissionSchema,
-      setSoldPermissionOrders,
-      () => {
-        handleClose();
-        toastFire(
-          "success",
-          `تم اختيار الصنف ${chosenProductToSell.name} بنجاح`
-        );
-      },
-      undefined,
-      true
-    );
 
   return (
     <>
@@ -101,7 +87,7 @@ function ChooseProductToSell() {
                     onInput={filterItems}
                     autoComplete="off"
                   />
-                  {fetchLoading ? (
+                  {loading ? (
                     <div className="p-4 text-center fs-small fw-medium">
                       جارى التحميل...
                     </div>
@@ -184,7 +170,6 @@ function ChooseProductToSell() {
             confirmBtnTitle="اضافة"
             formId="chooseProductToSell"
             disableConfirmBtn={!chosenProductToSell}
-            loadingState={loading}
           />
         </CustomModal>
       </Modal>

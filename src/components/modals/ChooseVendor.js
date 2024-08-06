@@ -1,41 +1,32 @@
 import { useState } from "react";
 import CustomModal from "../CustomModal";
 import { selectTogglerSvg } from "../../svgs/pageContentSVGs";
-import { fetchVendors } from "../../features/vendorsSlice";
 import { vendorsSvg } from "../../svgs/sidebarSVGs";
-import useFetch from "../../hooks/useFetch";
 import { toastFire } from "../../utils/toastFire";
 import MainButton from "../MainButton";
 import { Modal } from "react-bootstrap";
 import useModal from "../../hooks/useModal";
 import useSearch from "../../hooks/useSearch";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setChosenVendor } from "../../features/addPermissionSlice";
 import handleDropdownChoice from "../../utils/handleDropdownChoice";
 
 function ChooseVendor() {
   const [currentChoice, setCurrentChoice] = useState({});
-  const [loading, setLoading] = useState(false);
   const { show, handleClose, handleShow } = useModal();
-  const {
-    data: vendors,
-    error,
-    loading: fetchLoading,
-  } = useFetch(fetchVendors, "vendors");
+  const { loading, error, vendors } = useSelector((state) => state.vendors);
   const { filteredData: filteredVendors, filterItems } = useSearch(vendors, [
     "name",
   ]);
   const dispatch = useDispatch();
 
   const handleVendorChoice = () => {
-    setLoading(true);
     if (Object.keys(currentChoice).length !== 0) {
       dispatch(setChosenVendor(currentChoice));
       toastFire("success", `تم اختيار المورد ${currentChoice.name} بنجاح`);
     } else {
       toastFire("warning", "يرجى اختيار المورد من فضلك");
     }
-    setLoading(false);
   };
 
   return (
@@ -82,7 +73,7 @@ function ChooseVendor() {
                   onInput={filterItems}
                   autoComplete="off"
                 />
-                {fetchLoading ? (
+                {loading ? (
                   <div className="p-4 text-center fs-small fw-medium">
                     جارى التحميل...
                   </div>
@@ -116,7 +107,6 @@ function ChooseVendor() {
           <CustomModal.Footer
             confirmBtnTitle="اضافة"
             clickHandler={handleVendorChoice}
-            loadingState={loading}
           />
         </CustomModal>
       </Modal>

@@ -10,7 +10,6 @@ import MainButton from "../MainButton";
 import { Modal } from "react-bootstrap";
 import CustomForm from "../CustomForm";
 import useModal from "../../hooks/useModal";
-import { toastFire } from "../../utils/toastFire";
 import productSchema from "../../schemas/productSchema";
 
 function AddandEditProduct({
@@ -41,10 +40,7 @@ function AddandEditProduct({
     initialFormData,
     productSchema,
     forEdit ? editProduct : addProduct,
-    () => {
-      handleClose();
-      if (forEdit) toastFire("success", `تم تعديل ${formData.name} بنجاح`);
-    }
+    handleClose
   );
 
   useEffect(() => {

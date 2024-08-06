@@ -1,21 +1,28 @@
 import { useParams } from "react-router-dom";
-import { getTransactionsByCustomerId } from "../features/transactionsSlice";
+import { getCustomerTransactions } from "../features/transactionsSlice";
 import { printerSvg } from "../svgs/pageContentSVGs";
 import convertDateFormat from "../utils/convertDateFormat";
 import PageHeader from "../components/PageHeader";
 import MainButton from "../components/MainButton";
 import CustomTable from "../components/CustomTable";
 import TableContainer from "../components/TableContainer";
-import useFetch from "../hooks/useFetch";
 import handlePrint from "../utils/handlePrint";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
 
-function ItemDetails({ type }) {
+function CustomerTransactions({ type }) {
   const { customerId } = useParams();
   const {
-    data: transactions,
-    error,
     loading,
-  } = useFetch(getTransactionsByCustomerId, "transactions", customerId);
+    error,
+    transactions: AllTransactions,
+    customerTransactions: transactions,
+  } = useSelector((state) => state.transactions);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(getCustomerTransactions(customerId));
+  }, [dispatch, customerId, AllTransactions]);
 
   return (
     <>
@@ -62,42 +69,40 @@ function ItemDetails({ type }) {
                 </CustomTable.Row>
               </thead>
               <tbody>
-                {transactions.map((transaction, index, arr) =>
-                  transaction.products.map((product, i, a) => (
-                    <CustomTable.Row
-                      key={`${transaction._id}${product._id}`}
-                      last={index === arr.length - 1 && i === a.length - 1}
-                    >
-                      <CustomTable.Data body={product.name} />
-                      <CustomTable.Data
-                        body={
-                          <span
-                            className={`badge p-badge fw-semibold fs-075rem ${
-                              transaction.transactionType === "sell"
-                                ? "bg-hov-color"
-                                : "text-bg-dark"
-                            }`}
-                          >
-                            {transaction.transactionType === "sell"
-                              ? "بيع"
-                              : "اضافة"}
-                          </span>
-                        }
-                      />
-                      <CustomTable.Data body={product.code} />
-                      <CustomTable.Data body={product.brand} />
-                      <CustomTable.Data body={product.quantity} />
-                      <CustomTable.Data body={product.price} />
-                      <CustomTable.Data
-                        body={transaction.customerDetails.name}
-                      />
-                      <CustomTable.Data
-                        body={convertDateFormat(transaction.createdAt)}
-                        last
-                      />
-                    </CustomTable.Row>
-                  ))
-                )}
+                {transactions.map((transaction, index, arr) => (
+                  <CustomTable.Row
+                    key={`${transaction._id}${transaction.productDetails._id}`}
+                    last={index === arr.length - 1}
+                  >
+                    <CustomTable.Data body={transaction.productDetails.name} />
+                    <CustomTable.Data
+                      body={
+                        <span
+                          className={`badge p-badge fw-semibold fs-075rem ${
+                            transaction.transactionType === "sell"
+                              ? "bg-hov-color"
+                              : "text-bg-dark"
+                          }`}
+                        >
+                          {transaction.transactionType === "sell"
+                            ? "بيع"
+                            : "اضافة"}
+                        </span>
+                      }
+                    />
+                    <CustomTable.Data body={transaction.productDetails.code} />
+                    <CustomTable.Data body={transaction.productDetails.brand} />
+                    <CustomTable.Data
+                      body={transaction.productDetails.quantity}
+                    />
+                    <CustomTable.Data body={transaction.productDetails.price} />
+                    <CustomTable.Data body={transaction.customerDetails.name} />
+                    <CustomTable.Data
+                      body={convertDateFormat(transaction.createdAt)}
+                      last
+                    />
+                  </CustomTable.Row>
+                ))}
               </tbody>
             </CustomTable>
           </>
@@ -111,4 +116,4 @@ function ItemDetails({ type }) {
   );
 }
 
-export default ItemDetails;
+export default CustomerTransactions;

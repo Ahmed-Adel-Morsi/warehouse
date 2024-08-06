@@ -1,4 +1,3 @@
-import { getTransactionsOfType } from "../features/transactionsSlice";
 import { showInvoicesSvg } from "../svgs/actionsSVGs";
 import { Link } from "react-router-dom";
 import convertDateFormat from "../utils/convertDateFormat";
@@ -6,15 +5,15 @@ import TableContainer from "../components/TableContainer";
 import CustomTable from "../components/CustomTable";
 import SearchInput from "../components/SearchInput";
 import PageHeader from "../components/PageHeader";
-import useFetch from "../hooks/useFetch";
 import useSearch from "../hooks/useSearch";
+import { useSelector } from "react-redux";
 
 function AdditionInvoices() {
   const {
-    data: transactions,
-    error,
     loading,
-  } = useFetch(getTransactionsOfType, "transactions", "buy");
+    error,
+    additionsTransactions: transactions,
+  } = useSelector((state) => state.transactions);
   const { filteredData: filteredTransactions, filterItems } = useSearch(
     transactions,
     ["invoiceNumber", ["customerDetails", "name"]]

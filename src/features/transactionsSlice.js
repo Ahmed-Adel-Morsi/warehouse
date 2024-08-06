@@ -36,95 +36,85 @@ export const addTransaction = createAsyncThunk(
   }
 );
 
-export const getTransactionsOfType = createAsyncThunk(
-  "transactionsSlice/getTransactionsOfType",
-  async (type, { rejectWithValue, getState }) => {
-    const { token } = getState().auth;
-    return await apiCall(
-      `/transactions?type=${type}`,
-      {
-        headers: {
-          Authorization: token,
-        },
-      },
-      rejectWithValue
-    );
-  }
-);
-
-export const getTransactionsByProductId = createAsyncThunk(
-  "transactionsSlice/getTransactionsByProductId",
-  async (productId, { rejectWithValue, getState }) => {
-    const { token } = getState().auth;
-    return await apiCall(
-      `/transactions?product_id=${productId}`,
-      {
-        headers: {
-          Authorization: token,
-        },
-      },
-      rejectWithValue
-    );
-  }
-);
-
-export const getTransactionsByCustomerId = createAsyncThunk(
-  "transactionsSlice/getTransactionsByCustomerId",
-  async (customerId, { rejectWithValue, getState }) => {
-    const { token } = getState().auth;
-    return await apiCall(
-      `/transactions?customer_id=${customerId}`,
-      {
-        headers: {
-          Authorization: token,
-        },
-      },
-      rejectWithValue
-    );
-  }
-);
-
-export const getTransactionByInvoiceNumber = createAsyncThunk(
-  "transactionsSlice/getTransactionByInvoiceNumber",
-  async ({ type, invoiceNumber }, { rejectWithValue, getState }) => {
-    const { token } = getState().auth;
-    return await apiCall(
-      `/transactions?type=${type}&invoice_number=${invoiceNumber}`,
-      {
-        headers: {
-          Authorization: token,
-        },
-      },
-      rejectWithValue
-    );
-  }
-);
-
 const transactionsSlice = createSlice({
   name: "transactionsSlice",
-  initialState: [],
-  reducers: {},
+  initialState: {
+    loading: false,
+    error: null,
+    transactions: [],
+    detailedTransactions: [],
+    soldTransactions: [],
+    additionsTransactions: [],
+    productTransactions: [],
+    customerTransactions: [],
+    invoiceNumberTransaction: null,
+  },
+  reducers: {
+    getTransactionsByProductId: (state, action) => {
+      state.productTransactions = state.detailedTransactions.filter(
+        (transaction) => transaction.productDetails._id === action.payload
+      );
+    },
+    getCustomerTransactions: (state, action) => {
+      state.customerTransactions = state.detailedTransactions.filter(
+        (transaction) => transaction.customerDetails._id === action.payload
+      );
+    },
+    getInvoiceNumberTransaction: (state, action) => {
+      state.invoiceNumberTransaction = state.transactions.find(
+        (transaction) =>
+          transaction.invoiceNumber === action.payload.invoiceNumber &&
+          transaction.transactionType === action.payload.type
+      );
+    },
+  },
   extraReducers: (builder) => {
     builder
+      .addCase(fetchTransactions.pending, (state, action) => {
+        state.loading = true;
+        state.error = null;
+      })
       .addCase(fetchTransactions.fulfilled, (state, action) => {
-        return action.payload;
+        state.loading = false;
+        state.transactions = action.payload;
+        state.soldTransactions = action.payload.filter(
+          (transaction) => transaction.transactionType === "sell"
+        );
+        state.additionsTransactions = action.payload.filter(
+          (transaction) => transaction.transactionType === "buy"
+        );
+
+        const modifiedTransactions = [];
+        action.payload.forEach((transaction) => {
+          transaction.products.forEach((product) => {
+            const newTransaction = {
+              ...transaction,
+              productDetails: { ...product },
+            };
+            delete newTransaction.products;
+            modifiedTransactions.push(newTransaction);
+          });
+        });
+        state.detailedTransactions = modifiedTransactions;
+      })
+      .addCase(fetchTransactions.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       })
       .addCase(addTransaction.fulfilled, (state, action) => {
-        state.push(action.payload);
-      })
-      .addCase(getTransactionsOfType.fulfilled, (state, action) => {
-        return action.payload;
-      })
-      .addCase(getTransactionsByProductId.fulfilled, (state, action) => {
-        return action.payload;
-      })
-      .addCase(getTransactionsByCustomerId.fulfilled, (state, action) => {
-        return action.payload;
-      })
-      .addCase(getTransactionByInvoiceNumber.fulfilled, (state, action) => {
-        return action.payload;
+        if (action.payload.transactionType === "sell") {
+          state.soldTransactions.unshift(action.payload);
+        } else {
+          state.additionsTransactions.unshift(action.payload);
+        }
+        state.transactions.unshift(action.payload);
       });
   },
 });
 
+export const {
+  getTransactionsByProductId,
+  getCustomerTransactions,
+  getInvoiceNumberTransaction,
+} = transactionsSlice.actions;
 export default transactionsSlice.reducer;

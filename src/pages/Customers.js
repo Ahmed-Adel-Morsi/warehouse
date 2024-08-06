@@ -1,4 +1,3 @@
-import { fetchCustomers } from "../features/customersSlice";
 import { actionsSvg, productTransactionsSvg } from "../svgs/actionsSVGs";
 import { deleteCustomer } from "../features/customersSlice";
 import AddandEditCustomer from "../components/modals/AddandEditCustomer";
@@ -7,16 +6,12 @@ import TableContainer from "../components/TableContainer";
 import SearchInput from "../components/SearchInput";
 import PageHeader from "../components/PageHeader";
 import RemoveItem from "../components/modals/RemoveItem";
-import useFetch from "../hooks/useFetch";
 import useSearch from "../hooks/useSearch";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 function Customers() {
-  const {
-    data: customers,
-    error,
-    loading,
-  } = useFetch(fetchCustomers, "customers");
+  const { loading, error, customers } = useSelector((state) => state.customers);
   const { filteredData: filteredCustomers, filterItems } = useSearch(
     customers,
     ["name", "code"]
