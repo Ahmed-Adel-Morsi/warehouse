@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import "./Sidebar.css";
 import ThemeDropdown from "./ThemeDropdown";
@@ -20,21 +19,16 @@ import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../features/authSlice";
 import MainButton from "./MainButton";
 import { ROUTES } from "../routes/routes";
-import { toastFire } from "../utils/toastFire";
 
 function Sidebar({ forOffcanvas, closeHandler }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
   const token = useSelector((state) => state.auth.token);
-  const [loading, setLoading] = useState(false);
 
   const logoutHandler = () => {
-    setLoading(true);
     dispatch(logout());
-    toastFire("success", "تم تسجيل الخروج بنجاح");
     navigate("/");
-    setLoading(false);
   };
 
   const closeNavbar = () => {
@@ -138,7 +132,6 @@ function Sidebar({ forOffcanvas, closeHandler }) {
                 title="تسجيل الخروج"
                 description="هل انت متاكد؟ سيتم تسجيل الخروج نهائياً"
                 confirmBtnTitle="تسجيل الخروج"
-                loadingState={loading}
                 handler={logoutHandler}
               />
             )}

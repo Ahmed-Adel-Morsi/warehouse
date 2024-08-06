@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { getValue, setValue } from "../utils/localStorageHandler";
+import { toastFire } from "../utils/toastFire";
 
 const addPermissionSlice = createSlice({
   name: "addPermissionSlice",
@@ -14,29 +15,48 @@ const addPermissionSlice = createSlice({
   },
   reducers: {
     setChosenVendor: (state, action) => {
-      setValue("chosenVendor", action.payload, action.payload !== null);
-      state.chosenVendor = action.payload;
+      if (action.payload) {
+        setValue("chosenVendor", action.payload, action.payload !== null);
+        state.chosenVendor = action.payload;
+        toastFire("success", `تم اختيار المورد ${action.payload.name} بنجاح`);
+      } else {
+        toastFire("warning", "يرجى اختيار المورد من فضلك");
+      }
     },
 
-    setAddPermissionOrders: (state, action) => {
-      const value = Array.isArray(action.payload)
-        ? action.payload
-        : [
-            ...state.addPermissionOrders,
-            {
-              ...state.chosenProductToBuy,
-              orignalPrice: state.chosenProductToBuy.price,
-              originalQuantity: state.chosenProductToBuy.quantity,
-              ...action.payload,
-              totalPrice:
-                parseInt(action.payload.quantity) *
-                parseFloat(action.payload.price),
-            },
-          ];
+    addAdditionPermissionOrder: (state, action) => {
+      const value = [
+        ...state.addPermissionOrders,
+        {
+          ...state.chosenProductToBuy,
+          orignalPrice: state.chosenProductToBuy.price,
+          originalQuantity: state.chosenProductToBuy.quantity,
+          ...action.payload,
+          totalPrice:
+            parseInt(action.payload.quantity) *
+            parseFloat(action.payload.price),
+        },
+      ];
       setValue("addPermissionOrders", value, value.length > 0);
       state.addPermissionOrderIds = value.map((order) => order._id);
-      state.chosenProductToBuy = null;
       state.addPermissionOrders = value;
+      toastFire(
+        "success",
+        `تم اضافة الصنف ${state.chosenProductToBuy.name} بنجاح`
+      );
+      state.chosenProductToBuy = null;
+    },
+
+    removeAdditionPermissionOrder: (state, action) => {
+      const value = state.addPermissionOrders.filter(
+        (product) => product._id !== action.payload._id
+      );
+      state.addPermissionOrderIds = state.addPermissionOrderIds.filter(
+        (id) => id !== action.payload._id
+      );
+      setValue("addPermissionOrders", value, value.length > 0);
+      state.addPermissionOrders = value;
+      toastFire("success", `تم حذف ${action.payload.name} بنجاح`);
     },
 
     setAddPermissionInvoiceInfo: (state, action) => {
@@ -61,13 +81,15 @@ const addPermissionSlice = createSlice({
       state.addPermissionInvoiceInfo = null;
       state.addPermissionOrderIds = [];
       state.chosenProductToBuy = null;
+      toastFire("success", "تمت إعادة تهيئة البيانات بنجاح");
     },
   },
 });
 
 export const {
   setChosenVendor,
-  setAddPermissionOrders,
+  addAdditionPermissionOrder,
+  removeAdditionPermissionOrder,
   setAddPermissionInvoiceInfo,
   setChosenProductToBuy,
   resetAddPermission,

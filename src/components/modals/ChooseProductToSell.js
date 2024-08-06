@@ -1,28 +1,23 @@
 import CustomModal from "../CustomModal";
-import { selectTogglerSvg } from "../../svgs/pageContentSVGs";
 import { productsSvg } from "../../svgs/sidebarSVGs";
 import CustomInput from "../CustomInput";
 import MainButton from "../MainButton";
 import { Modal } from "react-bootstrap";
 import CustomForm from "../CustomForm";
-import { toastFire } from "../../utils/toastFire";
 import useModal from "../../hooks/useModal";
-import useSearch from "../../hooks/useSearch";
 import useForm from "../../hooks/useForm";
 import { useDispatch, useSelector } from "react-redux";
 import transactionSchema from "../../schemas/transactionSchema";
+import CustomSelect from "../CustomSelect";
+import ChosenProductDetails from "../ChosenProductDetails";
 import {
-  setSoldPermissionOrders,
+  addSoldPermissionOrder,
   setChosenProductToSell,
 } from "../../features/soldPermissionSlice";
-import handleDropdownChoice from "../../utils/handleDropdownChoice";
 
 function ChooseProductToSell() {
   const { show, handleClose, handleShow } = useModal();
   const { loading, error, products } = useSelector((state) => state.products);
-  const { filteredData: filteredProducts, filterItems } = useSearch(products, [
-    "name",
-  ]);
   const { soldPermissionOrderIds, chosenProductToSell } = useSelector(
     (state) => state.soldPermission
   );
@@ -30,11 +25,8 @@ function ChooseProductToSell() {
   const { formData, fieldErrors, handleChange, handleSubmit } = useForm(
     { quantity: "", price: "" },
     soldPermissionSchema,
-    setSoldPermissionOrders,
-    () => {
-      handleClose();
-      toastFire("success", `تم اختيار الصنف ${chosenProductToSell.name} بنجاح`);
-    },
+    addSoldPermissionOrder,
+    handleClose,
     undefined,
     true
   );
@@ -62,79 +54,21 @@ function ChooseProductToSell() {
           />
           <CustomModal.Body>
             <CustomForm id="chooseProductToSell" onSubmit={handleSubmit}>
-              <div className="dropdown dropdown-center w-100">
-                <button
-                  className="btn border w-100 d-flex justify-content-between align-items-center btn-hov"
-                  type="button"
-                  id="dropdownMenuButton1"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false"
-                >
-                  {chosenProductToSell
-                    ? chosenProductToSell.name
-                    : "اختر الصنف"}
-                  {selectTogglerSvg}
-                </button>
-                <ul
-                  className="dropdown-menu pt-0 position-fixed overflow-hidden"
-                  aria-labelledby="dropdownMenuButton1"
-                >
-                  <input
-                    type="text"
-                    name="search"
-                    className="form-control border-0 border-bottom rounded-0 shadow-none mb-2 no-outline search-input pe-30px"
-                    placeholder="ابحث عن الصنف بالإسم"
-                    onInput={filterItems}
-                    autoComplete="off"
-                  />
-                  {loading ? (
-                    <div className="p-4 text-center fs-small fw-medium">
-                      جارى التحميل...
-                    </div>
-                  ) : error ? (
-                    <div className="p-4 text-center fs-small fw-medium">
-                      حدث خطأ ما:
-                      <p>{error.message}</p>
-                    </div>
-                  ) : (
-                    <div className="overflow-y-auto mh-6rem sm-scroll">
-                      {filteredProducts.map(
-                        (product) =>
-                          !soldPermissionOrderIds.includes(product._id) && (
-                            <li className="text-end" key={product._id}>
-                              <a
-                                className={`dropdown-item rounded py-1 pe-30px btn-hov ${
-                                  chosenProductToSell &&
-                                  chosenProductToSell.name === product.name
-                                    ? "selected-item"
-                                    : ""
-                                }`}
-                                href="/"
-                                onClick={(e) =>
-                                  handleDropdownChoice(e, product, () => {
-                                    dispatch(setChosenProductToSell(product));
-                                  })
-                                }
-                              >
-                                {product.name}
-                              </a>
-                            </li>
-                          )
-                      )}
-                    </div>
-                  )}
-                </ul>
-              </div>
+              <CustomSelect
+                currentState={{ loading, error, data: products }}
+                chosenItem={chosenProductToSell}
+                setChosenItem={(currentChoice) =>
+                  dispatch(setChosenProductToSell(currentChoice))
+                }
+                itemName="الصنف"
+                excludedIds={soldPermissionOrderIds}
+              />
               {chosenProductToSell && (
                 <>
-                  <div className="d-flex gap-3 text-muted">
-                    <p className="mb-0">
-                      العدد بالمخزن : {chosenProductToSell.quantity || 0}
-                    </p>
-                    <p className="mb-0">
-                      السعر بالمخزن : {chosenProductToSell.price || 0}
-                    </p>
-                  </div>
+                  <ChosenProductDetails
+                    quantity={chosenProductToSell.quantity}
+                    price={chosenProductToSell.price}
+                  />
                   {chosenProductToSell.quantity ? (
                     <>
                       <CustomInput

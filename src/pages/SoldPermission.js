@@ -17,12 +17,13 @@ import { Modal } from "react-bootstrap";
 import useModal from "../hooks/useModal";
 import handlePrint from "../utils/handlePrint";
 import convertDateFormat from "../utils/convertDateFormat";
+import TableSection from "../components/TableSection";
 import {
   resetSoldPermission,
   setSoldPermissionInvoiceInfo,
-  setSoldPermissionOrders,
+  removeSoldPermissionOrder,
 } from "../features/soldPermissionSlice";
-import TableSection from "../components/TableSection";
+import PrintData from "../components/PrintData";
 
 function SoldPermission() {
   const [loading, setLoading] = useState(false);
@@ -30,26 +31,6 @@ function SoldPermission() {
   const { chosenCustomer, soldPermissionOrders, soldPermissionInvoiceInfo } =
     useSelector((state) => state.soldPermission);
   const dispatch = useDispatch();
-
-  const removeProductHandler = (currentProduct) => {
-    setLoading(true);
-    dispatch(
-      setSoldPermissionOrders(
-        soldPermissionOrders.filter(
-          (product) => product._id !== currentProduct._id
-        )
-      )
-    );
-    toastFire("success", `تم حذف ${currentProduct.name} بنجاح`);
-    setLoading(false);
-  };
-
-  const resetHandler = () => {
-    setLoading(true);
-    dispatch(resetSoldPermission());
-    toastFire("success", "تمت إعادة تهيئة البيانات بنجاح");
-    setLoading(false);
-  };
 
   const submitHandler = async () => {
     try {
@@ -92,18 +73,9 @@ function SoldPermission() {
     <>
       <PageHeader>إذن بيع</PageHeader>
       <div className="mb-3 d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 fw-semibold">
-        <div className="d-none d-print-block fw-bold fs-6 align-self-start">
-          <p>
-            {chosenCustomer
-              ? `اسم العميل : ${chosenCustomer.name}`
-              : "الرجاء اختيار العميل"}
-          </p>
-          <p>
-            تحرير في :{" "}
-            {soldPermissionInvoiceInfo !== null
-              ? soldPermissionInvoiceInfo.createdAt
-              : ""}
-          </p>
+        <div className="d-none d-print-block align-self-start">
+          <PrintData data={`اسم العميل : ${chosenCustomer?.name}`} />
+          <PrintData.InvDate permissionInfo={soldPermissionInvoiceInfo} />
         </div>
         <div className="text-center text-md-end d-print-none">
           {chosenCustomer
@@ -129,7 +101,9 @@ function SoldPermission() {
                 الاحتفاظ بالبيانات، يُرجى الضغط على 'حفظ' قبل إعادة التهيئة."
                 confirmBtnTitle="إعادة تهيئة"
                 loadingState={loading}
-                handler={resetHandler}
+                handler={() => {
+                  dispatch(resetSoldPermission());
+                }}
               />
 
               {soldPermissionInvoiceInfo && (
@@ -201,7 +175,7 @@ function SoldPermission() {
                     confirmBtnTitle="حذف"
                     loadingState={loading}
                     handler={() => {
-                      removeProductHandler(order);
+                      dispatch(removeSoldPermissionOrder(order));
                     }}
                   />
                 }
@@ -211,13 +185,8 @@ function SoldPermission() {
           </Row>
         ))}
       </TableSection>
-      <p className="mt-4 d-none d-print-block fw-bold fs-6">
-        رقم الاذن:{" "}
-        {soldPermissionInvoiceInfo !== null
-          ? soldPermissionInvoiceInfo.invoiceNumber
-          : ""}
-      </p>
-      <p className="mt-3 d-none d-print-block fw-bold fs-6">التوقيع:</p>
+      <PrintData.InvNumber permissionInfo={soldPermissionInvoiceInfo} />
+      <PrintData.Signature />
     </>
   );
 }

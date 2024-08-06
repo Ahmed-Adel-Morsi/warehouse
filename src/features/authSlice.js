@@ -48,6 +48,7 @@ const authSlice = createSlice({
       setValue("token", null);
       state.user = null;
       state.token = null;
+      toastFire("success", "تم تسجيل الخروج بنجاح");
     },
   },
   extraReducers: (builder) => {

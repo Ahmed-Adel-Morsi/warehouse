@@ -9,6 +9,11 @@ import { useEffect } from "react";
 import handlePrint from "../utils/handlePrint";
 import { useDispatch, useSelector } from "react-redux";
 import TableSection from "../components/TableSection";
+import PrintData from "../components/PrintData";
+
+function Paragraph({ data }) {
+  return <p className="fw-semibold mb-0 align-self-center">{data}</p>;
+}
 
 function InvoiceDetails({ type }) {
   const { invoiceNumber } = useParams();
@@ -36,16 +41,15 @@ function InvoiceDetails({ type }) {
       {transaction && (
         <div className="d-flex flex-column flex-lg-row justify-content-between align-items-center gap-3">
           <div className="d-flex flex-column flex-lg-row justify-content-between gap-2 w-75 invoice-details">
-            <p className="fw-semibold mb-0 align-self-center">
-              اسم {type === "sell" ? "العميل" : "المورد"} :{" "}
-              {transaction.customerDetails.name}
-            </p>
-            <p className="fw-semibold mb-0 align-self-center">
-              تحريرا في : {convertDateFormat(transaction.createdAt)}
-            </p>
-            <p className="fw-semibold mb-0 align-self-center">
-              رقم الفاتورة : {transaction.invoiceNumber}
-            </p>
+            <Paragraph
+              data={`اسم ${type === "sell" ? "العميل" : "المورد"} : ${
+                transaction.customerDetails.name
+              }`}
+            />
+            <Paragraph
+              data={`تحريرا في : ${convertDateFormat(transaction.createdAt)}`}
+            />
+            <Paragraph data={`رقم الفاتورة : ${transaction.invoiceNumber}`} />
           </div>
           <div className="d-print-none">
             <MainButton
@@ -79,7 +83,7 @@ function InvoiceDetails({ type }) {
           ))}
       </TableSection>
 
-      <p className="mt-4 d-none d-print-block fw-bold fs-6">التوقيع:</p>
+      <PrintData.Signature />
     </>
   );
 }

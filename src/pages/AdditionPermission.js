@@ -18,12 +18,13 @@ import MainButton from "../components/MainButton";
 import useModal from "../hooks/useModal";
 import handlePrint from "../utils/handlePrint";
 import convertDateFormat from "../utils/convertDateFormat";
+import TableSection from "../components/TableSection";
 import {
   resetAddPermission,
   setAddPermissionInvoiceInfo,
-  setAddPermissionOrders,
+  removeAdditionPermissionOrder,
 } from "../features/addPermissionSlice";
-import TableSection from "../components/TableSection";
+import PrintData from "../components/PrintData";
 
 function AdditionPermission() {
   const [loading, setLoading] = useState(false);
@@ -31,26 +32,6 @@ function AdditionPermission() {
   const { chosenVendor, addPermissionOrders, addPermissionInvoiceInfo } =
     useSelector((state) => state.addPermission);
   const dispatch = useDispatch();
-
-  const removeProductHandler = (currentProduct) => {
-    setLoading(true);
-    dispatch(
-      setAddPermissionOrders(
-        addPermissionOrders.filter(
-          (product) => product._id !== currentProduct._id
-        )
-      )
-    );
-    toastFire("success", `تم حذف ${currentProduct.name} بنجاح`);
-    setLoading(false);
-  };
-
-  const resetHandler = () => {
-    setLoading(true);
-    dispatch(resetAddPermission());
-    toastFire("success", "تمت إعادة تهيئة البيانات بنجاح");
-    setLoading(false);
-  };
 
   const submitHandler = async () => {
     try {
@@ -94,18 +75,9 @@ function AdditionPermission() {
     <>
       <PageHeader>إذن اضافة</PageHeader>
       <div className="mb-3 d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 fw-semibold">
-        <div className="d-none d-print-block fw-bold fs-6 align-self-start">
-          <p>
-            {chosenVendor
-              ? `اسم المورد : ${chosenVendor.name}`
-              : "الرجاء اختيار المورد"}
-          </p>
-          <p>
-            تحرير في :{" "}
-            {addPermissionInvoiceInfo !== null
-              ? addPermissionInvoiceInfo.createdAt
-              : ""}
-          </p>
+        <div className="d-none d-print-block align-self-start">
+          <PrintData data={`اسم المورد : ${chosenVendor?.name}`} />
+          <PrintData.InvDate permissionInfo={addPermissionInvoiceInfo} />
         </div>
         <div className="text-center text-md-end d-print-none">
           {chosenVendor
@@ -136,7 +108,9 @@ function AdditionPermission() {
                 الاحتفاظ بالبيانات، يُرجى الضغط على 'حفظ' قبل إعادة التهيئة."
                 confirmBtnTitle="إعادة تهيئة"
                 loadingState={loading}
-                handler={resetHandler}
+                handler={() => {
+                  dispatch(resetAddPermission());
+                }}
               />
 
               {addPermissionInvoiceInfo && (
@@ -208,7 +182,7 @@ function AdditionPermission() {
                     confirmBtnTitle="حذف"
                     loadingState={loading}
                     handler={() => {
-                      removeProductHandler(order);
+                      dispatch(removeAdditionPermissionOrder(order));
                     }}
                   />
                 }
@@ -218,13 +192,8 @@ function AdditionPermission() {
           </Row>
         ))}
       </TableSection>
-      <p className="mt-4 d-none d-print-block fw-bold fs-6">
-        رقم الاذن:{" "}
-        {addPermissionInvoiceInfo !== null
-          ? addPermissionInvoiceInfo.invoiceNumber
-          : ""}
-      </p>
-      <p className="mt-3 d-none d-print-block fw-bold fs-6">التوقيع:</p>
+      <PrintData.InvNumber permissionInfo={addPermissionInvoiceInfo} />
+      <PrintData.Signature />
     </>
   );
 }
