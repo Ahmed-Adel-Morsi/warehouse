@@ -105,7 +105,6 @@ function AdditionPermission() {
                 description="هل أنت متأكد؟ سيتم إعادة تهيئة البيانات، إذا كنت ترغب في
                 الاحتفاظ بالبيانات، يُرجى الضغط على 'حفظ' قبل إعادة التهيئة."
                 confirmBtnTitle="إعادة تهيئة"
-                loadingState={loading}
                 handler={() => {
                   dispatch(resetAddPermission());
                 }}
@@ -153,7 +152,6 @@ function AdditionPermission() {
         </div>
       </div>
       <TableSection
-        loading={loading}
         dataLength={addPermissionOrders.length}
         pageName={
           addPermissionInvoiceInfo ? "submittedPermission" : "permission"
@@ -178,7 +176,6 @@ function AdditionPermission() {
                     title="حذف الصنف"
                     description="هل انت متاكد؟ سيتم حذف الصنف"
                     confirmBtnTitle="حذف"
-                    loadingState={loading}
                     handler={() => {
                       dispatch(removeAdditionPermissionOrder(order));
                     }}

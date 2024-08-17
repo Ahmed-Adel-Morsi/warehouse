@@ -99,7 +99,6 @@ function SoldPermission() {
                 description="هل أنت متأكد؟ سيتم إعادة تهيئة البيانات، إذا كنت ترغب في
                 الاحتفاظ بالبيانات، يُرجى الضغط على 'حفظ' قبل إعادة التهيئة."
                 confirmBtnTitle="إعادة تهيئة"
-                loadingState={loading}
                 handler={() => {
                   dispatch(resetSoldPermission());
                 }}
@@ -147,7 +146,6 @@ function SoldPermission() {
         </div>
       </div>
       <TableSection
-        loading={loading}
         dataLength={soldPermissionOrders.length}
         pageName={
           soldPermissionInvoiceInfo ? "submittedPermission" : "permission"
@@ -172,7 +170,6 @@ function SoldPermission() {
                     title="حذف الصنف"
                     description="هل انت متاكد؟ سيتم حذف الصنف"
                     confirmBtnTitle="حذف"
-                    loadingState={loading}
                     handler={() => {
                       dispatch(removeSoldPermissionOrder(order));
                     }}
