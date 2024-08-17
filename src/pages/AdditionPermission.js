@@ -57,6 +57,7 @@ function AdditionPermission() {
           editProduct({
             ...order,
             quantity: order.transactionQuantity + order.quantity,
+            price: order.transactionPrice,
           })
         );
       }
