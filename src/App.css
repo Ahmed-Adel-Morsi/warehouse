@@ -138,6 +138,10 @@ td .dropdown-menu {
       background-color: var(--main-hov-color) !important;
     }
   }
+  html,
+  body {
+    height: 99%;
+  }
   body {
     margin: 1cm;
     padding: 0 1rem;
