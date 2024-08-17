@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { toastFire } from "../utils/toastFire";
 
 const ProtectedRoute = () => {
-  let token = useSelector((state) => state.auth.token);
+  const token = useSelector((state) => state.auth.token);
 
   useEffect(() => {
     if (!token) {

@@ -11,7 +11,7 @@ import CustomSelect from "../CustomSelect";
 function ChooseCustomer() {
   const [currentChoice, setCurrentChoice] = useState(null);
   const { show, handleClose, handleShow } = useModal();
-  const { loading, error, customers } = useSelector((state) => state.customers);
+  const { loading, error, data } = useSelector((state) => state.customers);
   const dispatch = useDispatch();
 
   return (
@@ -36,7 +36,7 @@ function ChooseCustomer() {
           />
           <CustomModal.Body>
             <CustomSelect
-              currentState={{ loading, error, data: customers }}
+              currentState={{ loading, error, data }}
               chosenItem={currentChoice}
               setChosenItem={setCurrentChoice}
               itemName="العميل"

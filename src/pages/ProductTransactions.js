@@ -71,8 +71,8 @@ function ProductTransactions() {
             />
             <Data body={transaction.productDetails.code} />
             <Data body={transaction.productDetails.brand} />
-            <Data body={transaction.productDetails.quantity} />
-            <Data body={transaction.productDetails.price} />
+            <Data body={transaction.productDetails.transactionQuantity} />
+            <Data body={transaction.productDetails.transactionPrice} />
             <Data body={transaction.customerDetails.name} />
             <Data body={convertDateFormat(transaction.createdAt)} last />
           </Row>

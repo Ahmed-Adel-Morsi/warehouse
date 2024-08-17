@@ -80,7 +80,7 @@ const customersSlice = createSlice({
   initialState: {
     loading: false,
     error: null,
-    customers: [],
+    data: [],
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -91,28 +91,28 @@ const customersSlice = createSlice({
       })
       .addCase(fetchCustomers.fulfilled, (state, action) => {
         state.loading = false;
-        state.customers = action.payload;
+        state.data = action.payload;
       })
       .addCase(fetchCustomers.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
       .addCase(addCustomer.fulfilled, (state, action) => {
-        state.customers.unshift(action.payload);
+        state.data.unshift(action.payload);
         toastFire("success", `تم اضافة ${action.payload.name} بنجاح`);
       })
       .addCase(deleteCustomer.fulfilled, (state, action) => {
-        state.customers = state.customers.filter(
+        state.data = state.data.filter(
           (customer) => customer._id !== action.payload
         );
         toastFire("success", `تم حذف العميل بنجاح`);
       })
       .addCase(editCustomer.fulfilled, (state, action) => {
-        const index = state.customers.findIndex(
+        const index = state.data.findIndex(
           (customer) => customer._id === action.payload._id
         );
         if (index !== -1) {
-          state.customers[index] = action.payload;
+          state.data[index] = action.payload;
         }
         toastFire("success", `تم تعديل ${action.payload.name} بنجاح`);
       });

@@ -3,7 +3,7 @@ import AddandEditCustomer from "../components/modals/AddandEditCustomer";
 import ChooseCustomer from "../components/modals/ChooseCustomer";
 import CustomModal from "../components/CustomModal";
 import { printerSvg, resetSvg, saveSvg } from "../svgs/pageContentSVGs";
-import ChooseProductToSell from "../components/modals/ChooseProductToSell";
+import ChooseProduct from "../components/modals/ChooseProduct";
 import DangerPopup from "../components/modals/DangerPopup";
 import { useDispatch, useSelector } from "react-redux";
 import { addTransaction } from "../features/transactionsSlice";
@@ -55,8 +55,7 @@ function SoldPermission() {
         await dispatch(
           editProduct({
             ...order,
-            quantity:
-              parseInt(order.originalQuantity) - parseInt(order.quantity),
+            quantity: order.quantity - order.transactionQuantity,
           })
         );
       }
@@ -91,7 +90,7 @@ function SoldPermission() {
           )}
           {chosenCustomer && (
             <>
-              {!soldPermissionInvoiceInfo && <ChooseProductToSell />}
+              {!soldPermissionInvoiceInfo && <ChooseProduct forSell />}
 
               <DangerPopup
                 btnTitle="إعادة تهيئة"
@@ -161,8 +160,8 @@ function SoldPermission() {
             <Data body={order.brand} />
             <Data body={order.size} />
             <Data body={order.color} />
-            <Data body={order.quantity} />
-            <Data body={order.price} />
+            <Data body={order.transactionQuantity} />
+            <Data body={order.transactionPrice} />
             <Data body={order.totalPrice} last={soldPermissionInvoiceInfo} />
             {!soldPermissionInvoiceInfo && (
               <Data

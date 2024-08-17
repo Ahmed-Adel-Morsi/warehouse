@@ -1,9 +1,9 @@
 import CustomModal from "../CustomModal";
+import CustomForm from "../CustomForm";
 import { productsSvg } from "../../svgs/sidebarSVGs";
 import CustomInput from "../CustomInput";
-import MainButton from "../MainButton";
 import { Modal } from "react-bootstrap";
-import CustomForm from "../CustomForm";
+import MainButton from "../MainButton";
 import useModal from "../../hooks/useModal";
 import useForm from "../../hooks/useForm";
 import { useDispatch, useSelector } from "react-redux";
@@ -11,21 +11,30 @@ import transactionSchema from "../../schemas/transactionSchema";
 import CustomSelect from "../CustomSelect";
 import ChosenProductDetails from "../ChosenProductDetails";
 import {
+  addAdditionPermissionOrder,
+  setChosenProductToBuy,
+} from "../../features/addPermissionSlice";
+import {
   addSoldPermissionOrder,
   setChosenProductToSell,
 } from "../../features/soldPermissionSlice";
 
-function ChooseProductToSell() {
+function ChooseProduct({ forSell }) {
   const { show, handleClose, handleShow } = useModal();
-  const { loading, error, products } = useSelector((state) => state.products);
+  const { loading, error, data } = useSelector((state) => state.products);
+  const { addPermissionOrderIds, chosenProductToBuy } = useSelector(
+    (state) => state.addPermission
+  );
   const { soldPermissionOrderIds, chosenProductToSell } = useSelector(
     (state) => state.soldPermission
   );
-  const soldPermissionSchema = transactionSchema(chosenProductToSell);
+  const schema = forSell
+    ? transactionSchema(chosenProductToSell)
+    : transactionSchema();
   const { formData, fieldErrors, handleChange, handleSubmit } = useForm(
     { quantity: "", price: "" },
-    soldPermissionSchema,
-    addSoldPermissionOrder,
+    schema,
+    forSell ? addSoldPermissionOrder : addAdditionPermissionOrder,
     handleClose,
     undefined,
     true
@@ -53,23 +62,41 @@ function ChooseProductToSell() {
             description="يرجي اختيار الصنف من فضلك"
           />
           <CustomModal.Body>
-            <CustomForm id="chooseProductToSell" onSubmit={handleSubmit}>
+            <CustomForm
+              id={forSell ? "chooseProductToSell" : "chooseProductToBuy"}
+              onSubmit={handleSubmit}
+            >
               <CustomSelect
-                currentState={{ loading, error, data: products }}
-                chosenItem={chosenProductToSell}
+                currentState={{ loading, error, data }}
+                chosenItem={forSell ? chosenProductToSell : chosenProductToBuy}
                 setChosenItem={(currentChoice) =>
-                  dispatch(setChosenProductToSell(currentChoice))
+                  dispatch(
+                    forSell
+                      ? setChosenProductToSell(currentChoice)
+                      : setChosenProductToBuy(currentChoice)
+                  )
                 }
                 itemName="الصنف"
-                excludedIds={soldPermissionOrderIds}
+                excludedIds={
+                  forSell ? soldPermissionOrderIds : addPermissionOrderIds
+                }
               />
-              {chosenProductToSell && (
+              {((forSell && chosenProductToSell) ||
+                (!forSell && chosenProductToBuy)) && (
                 <>
                   <ChosenProductDetails
-                    quantity={chosenProductToSell.quantity}
-                    price={chosenProductToSell.price}
+                    quantity={
+                      forSell
+                        ? chosenProductToSell.quantity
+                        : chosenProductToBuy.quantity
+                    }
+                    price={
+                      forSell
+                        ? chosenProductToSell.price
+                        : chosenProductToBuy.price
+                    }
                   />
-                  {chosenProductToSell.quantity ? (
+                  {(forSell && chosenProductToSell.quantity) || !forSell ? (
                     <>
                       <CustomInput
                         type="text"
@@ -102,8 +129,10 @@ function ChooseProductToSell() {
           </CustomModal.Body>
           <CustomModal.Footer
             confirmBtnTitle="اضافة"
-            formId="chooseProductToSell"
-            disableConfirmBtn={!chosenProductToSell}
+            formId={forSell ? "chooseProductToSell" : "chooseProductToBuy"}
+            disableConfirmBtn={
+              forSell ? !chosenProductToSell : !chosenProductToBuy
+            }
           />
         </CustomModal>
       </Modal>
@@ -111,4 +140,4 @@ function ChooseProductToSell() {
   );
 }
 
-export default ChooseProductToSell;
+export default ChooseProduct;

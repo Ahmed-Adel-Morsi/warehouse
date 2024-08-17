@@ -26,8 +26,8 @@ import ProductTransactions from "./pages/ProductTransactions";
 
 function App() {
   const theme = useSelector((state) => state.theme);
+  const token = useSelector((state) => state.auth.token);
   document.body.setAttribute("data-bs-theme", theme);
-
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -35,7 +35,7 @@ function App() {
     dispatch(fetchCustomers());
     dispatch(fetchVendors());
     dispatch(fetchTransactions());
-  }, [dispatch]);
+  }, [dispatch, token]);
 
   return (
     <div className="App">

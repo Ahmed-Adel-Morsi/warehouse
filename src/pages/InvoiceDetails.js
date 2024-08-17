@@ -76,8 +76,8 @@ function InvoiceDetails({ type }) {
               <Data body={product.size} />
               <Data body={product.color} />
               {type === "buy" && <Data body={product.location} />}
-              <Data body={product.quantity} />
-              <Data body={product.price} />
+              <Data body={product.transactionQuantity} />
+              <Data body={product.transactionPrice} />
               <Data body={product.totalPrice} last />
             </Row>
           ))}

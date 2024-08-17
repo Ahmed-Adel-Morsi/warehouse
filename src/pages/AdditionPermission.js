@@ -7,7 +7,7 @@ import DangerPopup from "../components/modals/DangerPopup";
 import { useDispatch, useSelector } from "react-redux";
 import { addTransaction } from "../features/transactionsSlice";
 import { editProduct } from "../features/productsSlice";
-import ChooseProductToBuy from "../components/modals/ChooseProductToBuy";
+import ChooseProduct from "../components/modals/ChooseProduct";
 import AddandEditProduct from "../components/modals/AddandEditProduct";
 import { Row, Data } from "../components/CustomTable";
 import PageHeader from "../components/PageHeader";
@@ -56,9 +56,7 @@ function AdditionPermission() {
         await dispatch(
           editProduct({
             ...order,
-            quantity:
-              (parseInt(order.originalQuantity) || 0) +
-              parseInt(order.quantity),
+            quantity: order.transactionQuantity + order.quantity,
           })
         );
       }
@@ -95,7 +93,7 @@ function AdditionPermission() {
             <>
               {!addPermissionInvoiceInfo && (
                 <>
-                  <ChooseProductToBuy />
+                  <ChooseProduct />
                   <AddandEditProduct btnTitle="إضافة صنف جديد" />
                 </>
               )}
@@ -168,8 +166,8 @@ function AdditionPermission() {
             <Data body={order.brand} />
             <Data body={order.size} />
             <Data body={order.color} />
-            <Data body={order.quantity} />
-            <Data body={order.price} />
+            <Data body={order.transactionQuantity} />
+            <Data body={order.transactionPrice} />
             <Data body={order.totalPrice} last={addPermissionInvoiceInfo} />
             {!addPermissionInvoiceInfo && (
               <Data

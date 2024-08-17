@@ -80,7 +80,7 @@ const vendorsSlice = createSlice({
   initialState: {
     loading: false,
     error: null,
-    vendors: [],
+    data: [],
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -91,28 +91,28 @@ const vendorsSlice = createSlice({
       })
       .addCase(fetchVendors.fulfilled, (state, action) => {
         state.loading = false;
-        state.vendors = action.payload;
+        state.data = action.payload;
       })
       .addCase(fetchVendors.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
       .addCase(addVendor.fulfilled, (state, action) => {
-        state.vendors.unshift(action.payload);
+        state.data.unshift(action.payload);
         toastFire("success", `تم اضافة ${action.payload.name} بنجاح`);
       })
       .addCase(deleteVendor.fulfilled, (state, action) => {
-        state.vendors = state.vendors.filter(
+        state.data = state.data.filter(
           (vendor) => vendor._id !== action.payload
         );
         toastFire("success", `تم حذف المورد بنجاح`);
       })
       .addCase(editVendor.fulfilled, (state, action) => {
-        const index = state.vendors.findIndex(
+        const index = state.data.findIndex(
           (vendor) => vendor._id === action.payload._id
         );
         if (index !== -1) {
-          state.vendors[index] = action.payload;
+          state.data[index] = action.payload;
         }
         toastFire("success", `تم تعديل ${action.payload.name} بنجاح`);
       });

@@ -1,6 +1,19 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import apiCall from "../utils/apiCall";
 
+function separateTransactions(transaction) {
+  const modifiedTransactions = [];
+  transaction.products.forEach((product) => {
+    const newTransaction = {
+      ...transaction,
+      productDetails: { ...product },
+    };
+    delete newTransaction.products;
+    modifiedTransactions.push(newTransaction);
+  });
+  return modifiedTransactions;
+}
+
 export const fetchTransactions = createAsyncThunk(
   "transactionsSlice/fetchTransactions",
   async (_, { rejectWithValue, getState }) => {
@@ -84,18 +97,12 @@ const transactionsSlice = createSlice({
           (transaction) => transaction.transactionType === "buy"
         );
 
-        const modifiedTransactions = [];
+        const detailedTransactions = [];
         action.payload.forEach((transaction) => {
-          transaction.products.forEach((product) => {
-            const newTransaction = {
-              ...transaction,
-              productDetails: { ...product },
-            };
-            delete newTransaction.products;
-            modifiedTransactions.push(newTransaction);
-          });
+          const modifiedTransactions = separateTransactions(transaction);
+          detailedTransactions.push(...modifiedTransactions);
         });
-        state.detailedTransactions = modifiedTransactions;
+        state.detailedTransactions = detailedTransactions;
       })
       .addCase(fetchTransactions.rejected, (state, action) => {
         state.loading = false;
@@ -108,6 +115,9 @@ const transactionsSlice = createSlice({
           state.additionsTransactions.unshift(action.payload);
         }
         state.transactions.unshift(action.payload);
+
+        const modifiedTransactions = separateTransactions(action.payload);
+        state.detailedTransactions.unshift(...modifiedTransactions);
       });
   },
 });

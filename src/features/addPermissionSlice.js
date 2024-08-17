@@ -25,17 +25,17 @@ const addPermissionSlice = createSlice({
     },
 
     addAdditionPermissionOrder: (state, action) => {
+      const quantity = parseInt(action.payload.quantity);
+      const price = parseFloat(action.payload.price);
+
       const value = [
-        ...state.addPermissionOrders,
         {
           ...state.chosenProductToBuy,
-          orignalPrice: state.chosenProductToBuy.price,
-          originalQuantity: state.chosenProductToBuy.quantity,
-          ...action.payload,
-          totalPrice:
-            parseInt(action.payload.quantity) *
-            parseFloat(action.payload.price),
+          transactionQuantity: quantity,
+          transactionPrice: price,
+          totalPrice: quantity * price,
         },
+        ...state.addPermissionOrders,
       ];
       setValue("addPermissionOrders", value, value.length > 0);
       state.addPermissionOrderIds = value.map((order) => order._id);

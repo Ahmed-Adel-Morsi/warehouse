@@ -11,7 +11,7 @@ import { useSelector } from "react-redux";
 import TableSection from "../components/TableSection";
 
 function Products() {
-  const { loading, error, products } = useSelector((state) => state.products);
+  const { loading, error, data: products } = useSelector((state) => state.products);
   const { filteredData: filteredProducts, filterItems } = useSearch(products, [
     "name",
     "code",

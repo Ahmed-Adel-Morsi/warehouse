@@ -79,7 +79,7 @@ const productsSlice = createSlice({
   initialState: {
     loading: false,
     error: null,
-    products: [],
+    data: [],
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -90,28 +90,27 @@ const productsSlice = createSlice({
       })
       .addCase(fetchProducts.fulfilled, (state, action) => {
         state.loading = false;
-        state.products = action.payload;
+        state.data = action.payload;
       })
       .addCase(fetchProducts.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
       .addCase(addProduct.fulfilled, (state, action) => {
-        state.products.unshift(action.payload);
+        state.data.unshift(action.payload);
         toastFire("success", `تم اضافة ${action.payload.name} بنجاح`);
       })
       .addCase(deleteProduct.fulfilled, (state, action) => {
-        state.products = state.products.filter((product) => product._id !== action.payload);
+        state.data = state.data.filter((product) => product._id !== action.payload);
         toastFire("success", `تم حذف الصنف بنجاح`);
       })
       .addCase(editProduct.fulfilled, (state, action) => {
-        const index = state.products.findIndex(
+        const index = state.data.findIndex(
           (product) => product._id === action.payload._id
         );
         if (index !== -1) {
-          state.products[index] = action.payload;
+          state.data[index] = action.payload;
         }
-        toastFire("success", `تم تعديل ${action.payload.name} بنجاح`);
       });
   },
 });

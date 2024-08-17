@@ -11,7 +11,11 @@ import { useSelector } from "react-redux";
 import TableSection from "../components/TableSection";
 
 function Vendors() {
-  const { loading, error, vendors } = useSelector((state) => state.vendors);
+  const {
+    loading,
+    error,
+    data: vendors,
+  } = useSelector((state) => state.vendors);
   const { filteredData: filteredVendors, filterItems } = useSearch(vendors, [
     "name",
     "code",

@@ -42,18 +42,18 @@ function Transactions() {
                 <span
                   className={`badge p-badge fw-semibold fs-075rem ${
                     transaction.transactionType === "sell"
-                      ? "text-bg-dark"
-                      : "bg-hov-color"
+                      ? "bg-hov-color"
+                      : "text-bg-dark"
                   }`}
                 >
-                  {transaction.transactionType === "sell" ? "إضافة" : "بيع"}
+                  {transaction.transactionType === "sell" ? "بيع" : "إضافة"}
                 </span>
               }
             />
             <Data body={transaction.productDetails.code} />
             <Data body={transaction.productDetails.brand} />
-            <Data body={transaction.productDetails.quantity} />
-            <Data body={transaction.productDetails.price} />
+            <Data body={transaction.productDetails.transactionQuantity} />
+            <Data body={transaction.productDetails.transactionPrice} />
             <Data body={transaction.customerDetails.name} />
             <Data body={convertDateFormat(transaction.createdAt)} last />
           </Row>
