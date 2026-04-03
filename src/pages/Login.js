@@ -12,7 +12,7 @@ function Login() {
   const navigate = useNavigate();
   const token = useSelector((state) => state.auth.token);
   const { formData, fieldErrors, loading, handleChange, handleSubmit } =
-    useForm({ userName: "", password: "" }, loginSchema, loginUser);
+    useForm({ userName: "admin", password: "admin" }, loginSchema, loginUser);
 
   useEffect(() => {
     if (token) {

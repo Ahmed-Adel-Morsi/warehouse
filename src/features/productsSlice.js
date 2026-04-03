@@ -13,9 +13,9 @@ export const fetchProducts = createAsyncThunk(
           Authorization: token,
         },
       },
-      rejectWithValue
+      rejectWithValue,
     );
-  }
+  },
 );
 
 export const addProduct = createAsyncThunk(
@@ -32,9 +32,9 @@ export const addProduct = createAsyncThunk(
         },
         body: JSON.stringify(product),
       },
-      rejectWithValue
+      rejectWithValue,
     );
-  }
+  },
 );
 
 export const deleteProduct = createAsyncThunk(
@@ -49,10 +49,10 @@ export const deleteProduct = createAsyncThunk(
           Authorization: token,
         },
       },
-      rejectWithValue
+      rejectWithValue,
     );
     return productId;
-  }
+  },
 );
 
 export const editProduct = createAsyncThunk(
@@ -69,9 +69,9 @@ export const editProduct = createAsyncThunk(
         },
         body: JSON.stringify(product),
       },
-      rejectWithValue
+      rejectWithValue,
     );
-  }
+  },
 );
 
 const productsSlice = createSlice({
@@ -101,16 +101,19 @@ const productsSlice = createSlice({
         toastFire("success", `تم اضافة ${action.payload.name} بنجاح`);
       })
       .addCase(deleteProduct.fulfilled, (state, action) => {
-        state.data = state.data.filter((product) => product._id !== action.payload);
+        state.data = state.data.filter(
+          (product) => product._id !== action.payload,
+        );
         toastFire("success", `تم حذف الصنف بنجاح`);
       })
       .addCase(editProduct.fulfilled, (state, action) => {
         const index = state.data.findIndex(
-          (product) => product._id === action.payload._id
+          (product) => product._id === action.payload._id,
         );
         if (index !== -1) {
           state.data[index] = action.payload;
         }
+        toastFire("success", `تم تعديل بيانات الصنف بنجاح`);
       });
   },
 });
