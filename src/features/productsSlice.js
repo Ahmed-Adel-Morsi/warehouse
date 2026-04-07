@@ -113,7 +113,6 @@ const productsSlice = createSlice({
         if (index !== -1) {
           state.data[index] = action.payload;
         }
-        toastFire("success", `تم تعديل بيانات الصنف بنجاح`);
       });
   },
 });
