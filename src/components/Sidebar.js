@@ -19,6 +19,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../features/authSlice";
 import MainButton from "./MainButton";
 import { ROUTES } from "../routes/routes";
+import { toastFire } from "../utils/toastFire";
 
 function Sidebar({ forOffcanvas, closeHandler }) {
   const dispatch = useDispatch();
@@ -28,6 +29,7 @@ function Sidebar({ forOffcanvas, closeHandler }) {
 
   const logoutHandler = () => {
     dispatch(logout());
+    toastFire("success", "تم تسجيل الخروج بنجاح");
     navigate("/");
   };
 

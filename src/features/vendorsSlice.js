@@ -4,7 +4,7 @@ import { toastFire } from "../utils/toastFire";
 
 export const fetchVendors = createAsyncThunk(
   "vendorsSlice/fetchVendors",
-  async (_, { rejectWithValue, getState }) => {
+  async (_, { getState, ...thunkApi }) => {
     const { token } = getState().auth;
     return await apiCall(
       `/vendors`,
@@ -13,14 +13,14 @@ export const fetchVendors = createAsyncThunk(
           Authorization: token,
         },
       },
-      rejectWithValue
+      thunkApi,
     );
-  }
+  },
 );
 
 export const addVendor = createAsyncThunk(
   "vendorsSlice/addVendor",
-  async (vendor, { getState, rejectWithValue }) => {
+  async (vendor, { getState, ...thunkApi }) => {
     const { token } = getState().auth;
 
     return await apiCall(
@@ -33,14 +33,14 @@ export const addVendor = createAsyncThunk(
         },
         body: JSON.stringify(vendor),
       },
-      rejectWithValue
+      thunkApi,
     );
-  }
+  },
 );
 
 export const deleteVendor = createAsyncThunk(
   "vendorsSlice/deleteVendor",
-  async (vendorId, { getState, rejectWithValue }) => {
+  async (vendorId, { getState, ...thunkApi }) => {
     const { token } = getState().auth;
     await apiCall(
       `/vendors/${vendorId}`,
@@ -50,15 +50,15 @@ export const deleteVendor = createAsyncThunk(
           Authorization: token,
         },
       },
-      rejectWithValue
+      thunkApi,
     );
     return vendorId;
-  }
+  },
 );
 
 export const editVendor = createAsyncThunk(
   "vendorsSlice/editVendor",
-  async (vendor, { getState, rejectWithValue }) => {
+  async (vendor, { getState, ...thunkApi }) => {
     const { token } = getState().auth;
     return await apiCall(
       `/vendors/${vendor._id}`,
@@ -70,9 +70,9 @@ export const editVendor = createAsyncThunk(
         },
         body: JSON.stringify(vendor),
       },
-      rejectWithValue
+      thunkApi,
     );
-  }
+  },
 );
 
 const vendorsSlice = createSlice({
@@ -103,13 +103,13 @@ const vendorsSlice = createSlice({
       })
       .addCase(deleteVendor.fulfilled, (state, action) => {
         state.data = state.data.filter(
-          (vendor) => vendor._id !== action.payload
+          (vendor) => vendor._id !== action.payload,
         );
         toastFire("success", `تم حذف المورد بنجاح`);
       })
       .addCase(editVendor.fulfilled, (state, action) => {
         const index = state.data.findIndex(
-          (vendor) => vendor._id === action.payload._id
+          (vendor) => vendor._id === action.payload._id,
         );
         if (index !== -1) {
           state.data[index] = action.payload;

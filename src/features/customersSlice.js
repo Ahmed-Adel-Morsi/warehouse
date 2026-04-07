@@ -4,7 +4,7 @@ import { toastFire } from "../utils/toastFire";
 
 export const fetchCustomers = createAsyncThunk(
   "customersSlice/fetchCustomers",
-  async (_, { rejectWithValue, getState }) => {
+  async (_, { getState, ...thunkApi }) => {
     const { token } = getState().auth;
     return await apiCall(
       `/customers`,
@@ -13,14 +13,14 @@ export const fetchCustomers = createAsyncThunk(
           Authorization: token,
         },
       },
-      rejectWithValue
+      thunkApi,
     );
-  }
+  },
 );
 
 export const addCustomer = createAsyncThunk(
   "customersSlice/addCustomer",
-  async (customer, { getState, rejectWithValue }) => {
+  async (customer, { getState, ...thunkApi }) => {
     const { token } = getState().auth;
 
     return await apiCall(
@@ -33,14 +33,14 @@ export const addCustomer = createAsyncThunk(
         },
         body: JSON.stringify(customer),
       },
-      rejectWithValue
+      thunkApi,
     );
-  }
+  },
 );
 
 export const deleteCustomer = createAsyncThunk(
   "customersSlice/deleteCustomer",
-  async (customerId, { getState, rejectWithValue }) => {
+  async (customerId, { getState, ...thunkApi }) => {
     const { token } = getState().auth;
     await apiCall(
       `/customers/${customerId}`,
@@ -50,15 +50,15 @@ export const deleteCustomer = createAsyncThunk(
           Authorization: token,
         },
       },
-      rejectWithValue
+      thunkApi,
     );
     return customerId;
-  }
+  },
 );
 
 export const editCustomer = createAsyncThunk(
   "customersSlice/editCustomer",
-  async (customer, { getState, rejectWithValue }) => {
+  async (customer, { getState, ...thunkApi }) => {
     const { token } = getState().auth;
     return await apiCall(
       `/customers/${customer._id}`,
@@ -70,9 +70,9 @@ export const editCustomer = createAsyncThunk(
         },
         body: JSON.stringify(customer),
       },
-      rejectWithValue
+      thunkApi,
     );
-  }
+  },
 );
 
 const customersSlice = createSlice({
@@ -103,13 +103,13 @@ const customersSlice = createSlice({
       })
       .addCase(deleteCustomer.fulfilled, (state, action) => {
         state.data = state.data.filter(
-          (customer) => customer._id !== action.payload
+          (customer) => customer._id !== action.payload,
         );
         toastFire("success", `تم حذف العميل بنجاح`);
       })
       .addCase(editCustomer.fulfilled, (state, action) => {
         const index = state.data.findIndex(
-          (customer) => customer._id === action.payload._id
+          (customer) => customer._id === action.payload._id,
         );
         if (index !== -1) {
           state.data[index] = action.payload;

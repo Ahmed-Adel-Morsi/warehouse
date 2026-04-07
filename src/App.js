@@ -31,10 +31,12 @@ function App() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(fetchProducts());
-    dispatch(fetchCustomers());
-    dispatch(fetchVendors());
-    dispatch(fetchTransactions());
+    if (token) {
+      dispatch(fetchProducts());
+      dispatch(fetchCustomers());
+      dispatch(fetchVendors());
+      dispatch(fetchTransactions());
+    }
   }, [dispatch, token]);
 
   return (

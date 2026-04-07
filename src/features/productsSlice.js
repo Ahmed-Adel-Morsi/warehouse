@@ -4,7 +4,7 @@ import { toastFire } from "../utils/toastFire";
 
 export const fetchProducts = createAsyncThunk(
   "productsSlice/fetchProducts",
-  async (_, { rejectWithValue, getState }) => {
+  async (_, { getState, ...thunkApi }) => {
     const { token } = getState().auth;
     return await apiCall(
       `/products`,
@@ -13,14 +13,14 @@ export const fetchProducts = createAsyncThunk(
           Authorization: token,
         },
       },
-      rejectWithValue,
+      thunkApi,
     );
   },
 );
 
 export const addProduct = createAsyncThunk(
   "productsSlice/addProduct",
-  async (product, { rejectWithValue, getState }) => {
+  async (product, { getState, ...thunkApi }) => {
     const { token } = getState().auth;
     return await apiCall(
       `/products`,
@@ -32,14 +32,14 @@ export const addProduct = createAsyncThunk(
         },
         body: JSON.stringify(product),
       },
-      rejectWithValue,
+      thunkApi,
     );
   },
 );
 
 export const deleteProduct = createAsyncThunk(
   "productsSlice/deleteProduct",
-  async (productId, { rejectWithValue, getState }) => {
+  async (productId, { getState, ...thunkApi }) => {
     const { token } = getState().auth;
     await apiCall(
       `/products/${productId}`,
@@ -49,7 +49,7 @@ export const deleteProduct = createAsyncThunk(
           Authorization: token,
         },
       },
-      rejectWithValue,
+      thunkApi,
     );
     return productId;
   },
@@ -57,7 +57,7 @@ export const deleteProduct = createAsyncThunk(
 
 export const editProduct = createAsyncThunk(
   "productsSlice/editProduct",
-  async (product, { rejectWithValue, getState }) => {
+  async (product, { getState, ...thunkApi }) => {
     const { token } = getState().auth;
     return await apiCall(
       `/products/${product._id}`,
@@ -69,7 +69,7 @@ export const editProduct = createAsyncThunk(
         },
         body: JSON.stringify(product),
       },
-      rejectWithValue,
+      thunkApi,
     );
   },
 );

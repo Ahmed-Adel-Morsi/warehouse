@@ -16,7 +16,7 @@ function separateTransactions(transaction) {
 
 export const fetchTransactions = createAsyncThunk(
   "transactionsSlice/fetchTransactions",
-  async (_, { rejectWithValue, getState }) => {
+  async (_, { getState, ...thunkApi }) => {
     const { token } = getState().auth;
     return await apiCall(
       `/transactions`,
@@ -25,14 +25,14 @@ export const fetchTransactions = createAsyncThunk(
           Authorization: token,
         },
       },
-      rejectWithValue
+      thunkApi,
     );
-  }
+  },
 );
 
 export const addTransaction = createAsyncThunk(
   "transactionsSlice/addTransaction",
-  async (transaction, { getState, rejectWithValue }) => {
+  async (transaction, { getState, ...thunkApi }) => {
     const { token } = getState().auth;
     return await apiCall(
       `/transactions`,
@@ -44,9 +44,9 @@ export const addTransaction = createAsyncThunk(
         },
         body: JSON.stringify(transaction),
       },
-      rejectWithValue
+      thunkApi,
     );
-  }
+  },
 );
 
 const transactionsSlice = createSlice({
@@ -65,19 +65,19 @@ const transactionsSlice = createSlice({
   reducers: {
     getTransactionsByProductId: (state, action) => {
       state.productTransactions = state.detailedTransactions.filter(
-        (transaction) => transaction.productDetails._id === action.payload
+        (transaction) => transaction.productDetails._id === action.payload,
       );
     },
     getCustomerTransactions: (state, action) => {
       state.customerTransactions = state.detailedTransactions.filter(
-        (transaction) => transaction.customerDetails._id === action.payload
+        (transaction) => transaction.customerDetails._id === action.payload,
       );
     },
     getInvoiceNumberTransaction: (state, action) => {
       state.invoiceNumberTransaction = state.transactions.find(
         (transaction) =>
           transaction.invoiceNumber === action.payload.invoiceNumber &&
-          transaction.transactionType === action.payload.type
+          transaction.transactionType === action.payload.type,
       );
     },
   },
@@ -91,10 +91,10 @@ const transactionsSlice = createSlice({
         state.loading = false;
         state.transactions = action.payload;
         state.soldTransactions = action.payload.filter(
-          (transaction) => transaction.transactionType === "sell"
+          (transaction) => transaction.transactionType === "sell",
         );
         state.additionsTransactions = action.payload.filter(
-          (transaction) => transaction.transactionType === "buy"
+          (transaction) => transaction.transactionType === "buy",
         );
 
         const detailedTransactions = [];

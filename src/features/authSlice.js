@@ -5,7 +5,7 @@ import { getValue, setValue } from "../utils/localStorageHandler";
 
 export const loginUser = createAsyncThunk(
   "auth/loginUser",
-  async (userCredentials, { rejectWithValue }) => {
+  async (userCredentials, thunkApi) => {
     return await apiCall(
       `/auth/login`,
       {
@@ -15,14 +15,14 @@ export const loginUser = createAsyncThunk(
         },
         body: JSON.stringify(userCredentials),
       },
-      rejectWithValue
+      thunkApi,
     );
-  }
+  },
 );
 
 export const registerUser = createAsyncThunk(
   "auth/registerUser",
-  async (userDetails, { rejectWithValue }) => {
+  async (userDetails, thunkApi) => {
     return await apiCall(
       `/auth/register`,
       {
@@ -32,9 +32,9 @@ export const registerUser = createAsyncThunk(
         },
         body: JSON.stringify(userDetails),
       },
-      rejectWithValue
+      thunkApi,
     );
-  }
+  },
 );
 
 const authSlice = createSlice({
@@ -48,7 +48,6 @@ const authSlice = createSlice({
       setValue("token", null);
       state.user = null;
       state.token = null;
-      toastFire("success", "تم تسجيل الخروج بنجاح");
     },
   },
   extraReducers: (builder) => {
@@ -61,7 +60,7 @@ const authSlice = createSlice({
         toastFire(
           "success",
           `<div class="fw-bold fs-small">مرحباً بعودتك! تم تسجيل الدخول بنجاح.</div>
-          <div class="fs-small">يمكنك الآن استخدام البرنامج.</div>`
+          <div class="fs-small">يمكنك الآن استخدام البرنامج.</div>`,
         );
       })
       .addCase(registerUser.fulfilled, (state, action) => {
