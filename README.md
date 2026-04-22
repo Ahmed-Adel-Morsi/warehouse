@@ -365,17 +365,12 @@ Contributions are welcome! To contribute:
 
 ---
 
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
----
-
 ## 👨‍💻 Author
 
 **Ahmed Adel Morsi**
 
 - GitHub: [@Ahmed-Adel-Morsi](https://github.com/Ahmed-Adel-Morsi)
+- Linkedin: [@Ahmed-Adel-Morsi](https://www.linkedin.com/in/ahmed-adel-morsi/)
 - Project: [warehouse](https://github.com/Ahmed-Adel-Morsi/warehouse)
 
 ---
